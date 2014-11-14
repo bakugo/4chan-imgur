@@ -1,0 +1,105 @@
+### 1.7.9 - *2014-11-14*
+- Move to [bakugo/4chan-imgur](https://github.com/bakugo/4chan-imgur)
+
+### 1.7.8 - *2014-11-12*
+- Made "auto scroll back to post" more accurate when using 4chan X (now takes the header height into account aswell)
+
+### 1.7.7 - *2014-09-14*
+- More fixes to the generic URL regexp
+
+### 1.7.6 - *2014-09-13*
+- Fixed generic processor ignoring URLs where the filename has more than one period
+
+### 1.7.5 - *2014-09-11*
+- Fixed 4chan thumbnails sometimes failing to load
+- Settings button in 4chan x's header now displays properly in some other forks
+
+### 1.7.4 - *2014-08-14*
+- Fixed hover expansion sometimes not working at all
+
+### 1.7.3 - *2014-08-14*
+- Fixed hover images sometimes being positioned too low until the mouse was moved (position is now updated when the image begins loading)
+
+### 1.7.2 - *2014-07-27*
+- Force https on media.tumblr.com again, always use 1.media.tumblr.com to avoid bad certificates
+
+### 1.7.1 - *2014-07-19*
+- Minor update to fix hover expansion
+
+### 1.7.0 - *2014-07-19*
+- Improved inline expansion
+- Added swf inline expansion (for 4chan and e621)
+- Added a new thumbnail for swf files
+- Fixed thumbnails not working on 4chan links to boards with a number in their name
+
+### 1.6.3 - *2014-06-14*
+- Changed @require scripts domain
+
+### 1.6.2 - *2014-06-14*
+- Middle mouse click no longer expands images
+- Fix some whitespace issues with post comment parsing
+- Removed autogif option from derpibooru since thumbnails are already animated (wow, that was dumb)
+
+### 1.6.1 - *2014-06-02*
+- Fix vocaroo embeds not working
+- Fix derpibooru duplicate images with redirects causing errors
+
+### 1.6.0 - *2014-05-31*
+- More code cleanup
+- Fix 4chan x's index search sometimes causing multiple thumbnails in the same post
+- Fix menu link sometimes not being added to 4chan x's header bar
+- Fix the script trying to load imgur.com/gallery/ urls
+- Script no longer forces https on media.tumblr.com links
+ - The media.tumblr.com domain sometimes has a bad https certificate, preventing the images from loading (blame the idiots in charge of that site)
+- e621 SWF files can no longer be expanded and break the script
+ - (maybe I'll add actual swf expansion in the future)
+- Image format and dimensions are now displayed for derpibooru and e621 images
+ - Filesize is also displayed for e621 images only
+- Vocaroo embedding now works in https (mirrored player.swf on a domain that supports https)
+- Long image filenames will now be truncated and expand on mouse hover
+- Added new error/loading/placeholder images
+- Added autogif option to 4chan, e621
+- Removed tiny thumb option from imgur since it was pretty useless
+- When closing the settings menu, if any setting has been changed, all thumbnails will be regenerated with the new settings applied
+- Changed menu link in 4chan x's header to be in the same style as the other buttons on it
+- When an expanded image is closed, automatically scroll to the post the image is in
+ - For example, when you expand a large image and scroll down to see more of it, when you close it you won't be halfway down the page
+- Removed code that imported settings from old versions
+- Page can no longer be scrolled when the settings menu is open
+- Added tag blacklist for derpibooru
+ - Comma-separated
+ - Any images with a blacklisted tag will not be auto-loaded
+
+### 1.5.0 - *2014-05-04*
+- Add e621.net embedding
+- Better fix for inline extension breaking click events
+
+### 1.4.2 - *2014-05-04*
+- Parse posts using the post itself instead of the blockquote element
+
+### 1.4.1 - *2014-05-04*
+- Automatically add wildcard to tumblr.com allowed domain imported from previous version
+
+### 1.4.0 - *2014-05-03*
+- Major code rewrite
+- Now uses jQuery
+- Script will not run if it's not installed in Greasemonkey/Tampermonkey
+- Implemented userscript thing from b4k.js
+ - Settings are now saved using GM_setValue and all in the same value (using JSON)
+  - Settings from previous versions will automatically be converted
+  - Settings will no longer be different when browsing with http or https
+ - Added GM_xmlhttpRequest wrapper for jQuery.ajax() to allow cross-domain requests
+- HTTP requests are now made with jQuery.ajax()
+- Fixed derpibooru embedding not working on Chrome
+- Fixed deleted derpibooru images causing an error
+- Prevent the native 4chan extension from breaking click events (inline expand, etc.)
+- Fixed incorrect vocaroo embed size
+- Updated 4chan regexp for new image urls (i.4cdn.org, no /src/ or /thumb/ folders)
+- URL black/whitelist fields now allow wildcards (* and ?)
+- When browsing with HTTPS, images are also loaded over HTTPS
+- Improved style adding
+- Completely changed menu layout
+ - Now compatible with different themes/user styles
+ - Added changelog link
+- Probably a few more changes that I forgot I even made
+- Note: vocaroo embeds currently do not work on HTTPS due to the vocaroo site having an invalid HTTPS certificate.

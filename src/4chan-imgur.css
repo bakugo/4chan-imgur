@@ -1,0 +1,172 @@
+body.imgur_no_scroll {
+	overflow: hidden;
+}
+
+#imgur_overlay {
+	background-color: rgba(0, 0, 0, 0.5);
+	display: flex;
+	position: fixed;
+	top: 0;
+	left: 0;
+	height: 100%;
+	width: 100%;
+}
+
+.dialog {
+	background-color: #d6daf0;
+	border-color: #b7c5d9;
+}
+
+#imgur_settings {
+	box-shadow: 0 0 15px rgba(0, 0, 0, 0.15);
+	background-color: ;
+	display: inline-block;
+	padding: 5px;
+	position: relative;
+	text-align: left;
+	vertical-align: middle;
+	margin: auto;
+	width: 660px;
+	height: 500px;
+	max-width: 100%;
+	max-height: 80%;
+	font-size: 13px;
+}
+
+	#imgur_settings .links {
+		position: absolute;
+		top: 4px;
+		right: 10px;
+		font-size: 11px;
+	}
+	
+		#imgur_settings .links a {
+			margin-left: 5px;
+		}
+	
+	#imgur_settings .header {
+		font-size: 16px;
+		font-weight: bold;
+		margin-top: 6px;
+		text-align: center;
+	}
+	
+	#imgur_settings .fields {
+		max-height: calc(100% - 40px);
+		overflow-y: scroll;
+		margin-top: 10px;
+		padding: 0 10px;
+	}
+	
+		#imgur_settings .fields ul {
+			padding: 0;
+			list-style: none;
+		}
+		
+			#imgur_settings .fields ul:first-child {
+				margin-top: 0;
+			}
+			
+			#imgur_settings .fields ul:last-child {
+				margin-bottom: 10px;
+			}
+			
+			#imgur_settings .fields ul .name {
+				font-size: 15px;
+				margin-left: 10px;
+				font-weight: bold;
+			}
+			
+			#imgur_settings .fields ul li {
+			}
+			
+				#imgur_settings .fields ul li.text {
+					margin-left: 20px;
+				}
+				
+					#imgur_settings .fields ul li.text .description {
+						position: relative;
+						top: 1px;
+					}
+				
+				#imgur_settings .fields ul li label {
+					text-decoration: underline;
+				}
+				
+				#imgur_settings .fields ul li input[type="text"] {
+					width: 220px;
+					margin-top: 3px;
+					height: 12px;
+				}
+				
+				#imgur_settings .fields ul li input[type="checkbox"] {
+					position: relative;
+					top: 2px;
+				}
+				
+				#imgur_settings .fields ul li .info,
+				#imgur_settings .fields ul li .warning {
+					font-size: 11px;
+				}
+				
+				#imgur_settings .fields ul li .warning {
+					color: #f00;
+				}
+
+.file.imgur_file {
+}
+
+	.file.imgur_file .fileText {
+	}
+	
+		.file.imgur_file .fileText a img {
+			position: relative;
+			top: 3px;
+			padding-left: 3px;
+			padding-right: 1px;
+		}
+	
+	.file.imgur_file .fileThumb {
+		position: relative;
+	}
+	
+		.file.imgur_file .fileThumb :first-child {
+		}
+		
+			.file.imgur_file .fileThumb img:first-child {
+				border: 1px solid #00a !important;
+				padding: 2px;
+				max-height: 125px !important;
+				max-width: 125px !important;
+			}
+			
+				.file.imgur_file .fileThumb img:first-child.expanding {
+					opacity: 0.5;
+				}
+		
+		.file.imgur_file .fileThumb span {
+			display: inline-block;
+			overflow: hidden;
+			position: absolute;
+			top: 0;
+			right: 0;
+			color: #F00;
+			font-size: 26px;
+			line-height: 4px;
+			width: 10px;
+			height: 10px;
+			padding: 8px 8px 2px 2px;
+		}
+		
+		.file.imgur_file .fileThumb object:last-child:not(:first-child) {
+			display: block;
+			background-color: #fff;
+			margin-bottom: -4px;
+		}
+
+#imgur_hover_img {
+	position: fixed;
+	max-height: 97%;
+	max-width: 75%;
+	padding-bottom: 18px;
+}
