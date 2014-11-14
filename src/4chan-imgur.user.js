@@ -684,6 +684,7 @@
 	
 	main = {
 		processors: [],
+		
 		sort_processors: function() {
 			main.processors.sort(function(a, b) {
 				if(a.priority < b.priority) {
@@ -697,6 +698,7 @@
 				return 0;
 			});
 		},
+		
 		attach: function(proc) {
 			for(var processor in main.processors) {
 				if(main.processors[processor].name == proc) {
@@ -706,6 +708,7 @@
 			
 			main.processors.push(new processors[proc].obj);
 		},
+		
 		attach_all: function() {
 			for(var processor in processors) {
 				if(us.config([processor, "enabled"], processors[processor].options.enabled[0], true)) {
@@ -715,9 +718,11 @@
 			
 			main.sort_processors();
 		},
+		
 		detach_all: function() {
 			main.processors = [];
 		},
+		
 		process: function(post, init) {
 			var post_no;
 			var file;
@@ -756,6 +761,7 @@
 				}
 			}
 		},
+		
 		process_all: function() {
 			var posts;
 			
@@ -765,6 +771,7 @@
 				main.process(posts[i], true);
 			}
 		},
+		
 		post_text: function(post) {
 			var com;
 			var innerhtml;
@@ -788,6 +795,7 @@
 			
 			return text;
 		},
+		
 		init: function() {
 			var info;
 			
@@ -805,6 +813,7 @@
 			
 			b4k.chan.post_listener(main.process, true);
 		},
+		
 		restart: function() {
 			thumb.clear_files();
 			
@@ -819,6 +828,7 @@
 	processors = {
 		"imgur": {
 			name: "Imgur",
+			
 			obj: function() {
 				var self = this;
 				
@@ -888,6 +898,7 @@
 					return true;
 				};
 			},
+			
 			options: {
 				enabled: [true, "Enabled", "Enable imgur.com link thumbnails"],
 				preload: [true, "Auto-Load", "Load thumbnail automatically instead of waiting for user action"],
@@ -896,8 +907,10 @@
 				auto_gif: [true, "Auto-GIF", "Use animated gifs instead of non-animated thumbnails"]
 			}
 		},
+		
 		"4chan": {
 			name: "4chan",
+			
 			obj: function() {
 				var self = this;
 				
@@ -953,6 +966,7 @@
 					return true;
 				};
 			},
+			
 			options: {
 				enabled: [true, "Enabled", "Enable 4chan link thumbnails"],
 				preload: [true, "Auto-Load", "Load thumbnail automatically instead of waiting for user action"],
@@ -961,8 +975,10 @@
 				auto_gif: [true, "Auto-GIF", "Use animated gifs instead of non-animated thumbnails"]
 			}
 		},
+		
 		"youtube": {
 			name: "Youtube",
+			
 			obj: function() {
 				var self = this;
 				
@@ -1005,6 +1021,7 @@
 					return true;
 				};
 			},
+			
 			options: {
 				enabled: [true, "Enabled", "Enable Youtube link thumbnails"],
 				preload: [true, "Auto-Load", "Load thumbnail automatically instead of waiting for user action"],
@@ -1012,8 +1029,10 @@
 				hover_expand: [true, "Hover Expand", "Hover the thumbnail to show the full image"]
 			}
 		},
+		
 		"derpibooru": {
 			name: "Derpibooru",
+			
 			obj: function() {
 				var self = this;
 				
@@ -1112,6 +1131,7 @@
 					return true;
 				};
 			},
+			
 			options: {
 				enabled: [true, "Enabled", "Enable <a target=\"_blank\" href=\"//derpibooru.org\">derpibooru.org</a> link thumbnails"],
 				preload: [true, "Auto-Load", "Load thumbnail automatically instead of waiting for user action"],
@@ -1120,8 +1140,10 @@
 				hover_expand: [true, "Hover Expand", "Hover the thumbnail to show the full image"]
 			}
 		},
+		
 		"e621": {
 			name: "e621",
+			
 			obj: function() {
 				var self = this;
 				
@@ -1210,6 +1232,7 @@
 					return true;
 				};
 			},
+			
 			options: {
 				enabled: [true, "Enabled", "Enable <a target=\"_blank\" href=\"https://e621.net\">e621.net</a> link thumbnails"],
 				preload: [true, "Auto-Load", "Load thumbnail automatically instead of waiting for user action"],
@@ -1218,8 +1241,10 @@
 				auto_gif: [true, "Auto-GIF", "Use animated gifs instead of non-animated thumbnails"]
 			}
 		},
+		
 		"vocaroo": {
 			name: "Vocaroo",
+			
 			obj: function() {
 				var self = this;
 				
@@ -1269,13 +1294,16 @@
 					return true;
 				};
 			},
+			
 			options: {
 				enabled: [true, "Enabled", "Enable <a target=\"_blank\" href=\"http://vocaroo.com\">vocaroo.com</a> embedding"],
 				autoplay: [false, "Auto-Play", "Automatically play new embeds <span class=\"info\">(never on page load)</span>"]
 			}
 		},
+		
 		"generic": {
 			name: "Generic",
+			
 			obj: function() {
 				var self = this;
 				
@@ -1388,6 +1416,7 @@
 					return true;
 				};
 			},
+			
 			options: {
 				enabled: [true, "Enabled", "Enable other image link thumbnails"],
 				whitelist_only: [false, "Allowed Only", "Only enable for whitelisted domains <span class=\"info\">(comma-separated, exact match, wildcards supported)</span>"],
@@ -1410,6 +1439,7 @@
 				menu.dialog();
 			}
 		},
+		
 		dialog: function(event) {
 			var overlay;
 			var links;
@@ -1533,6 +1563,7 @@
 			
 			$(document.body).addClass("imgur_no_scroll");
 		},
+		
 		change: function() {
 			var value;
 			
@@ -1553,6 +1584,7 @@
 			
 			return value;
 		},
+		
 		close: function() {
 			menu.is_open = false;
 			
@@ -1564,7 +1596,9 @@
 				main.restart();
 			}
 		},
+		
 		is_open: false,
+		
 		option_changed: false
 	};
 	
