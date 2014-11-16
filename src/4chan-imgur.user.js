@@ -1454,8 +1454,8 @@
 			var procs;
 			
 			links = {
-				"home": "https://github.com/bakugo/userscripts",
-				"changelog": "https://github.com/bakugo/userscripts/blob/master/4chanimgur/changelog.md"
+				"home": "https://github.com/bakugo/4chan-imgur",
+				"changelog": "https://github.com/bakugo/4chan-imgur/blob/master/CHANGELOG.md"
 			};
 			
 			if(event) {
