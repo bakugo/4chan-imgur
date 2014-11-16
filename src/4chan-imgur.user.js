@@ -730,8 +730,6 @@
 			var post_text;
 			var _thumb;
 			
-			init = init || false;
-			
 			if(main.processors.length == 0) {
 				return;
 			}
@@ -754,7 +752,7 @@
 					continue;
 				}
 				
-				process = processor.process(post, post_text, init);
+				process = processor.process(post, post_text, !!init);
 				
 				if(process) {
 					break;
@@ -780,17 +778,24 @@
 			
 			com = b4k.chan.get_post_com(post);
 			
+			if(!com) {
+				return "";
+			}
+			
 			text = com.innerHTML;
 			text = b4k.replace_all(text, "<br>", " ");
 			text = b4k.html_decode(text);
 			
-			// fix for 4cs youtube links
+			// fix for links that were replaced/parsed by other extensions
 			a = com.getElementsByTagName("a");
 			
 			for(var i = 0; i < a.length; i++) {
-				if(a[i].getAttribute("mp_media_id")) {
-					text += " " + a[i].getAttribute("mp_original_url");
+				// skip quotelinks
+				if($(a[i]).hasClass("quotelink")) {
+					continue;
 				}
+				
+				text += " " + a[i].getAttribute("href");
 			}
 			
 			return text;
