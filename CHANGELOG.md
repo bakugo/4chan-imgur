@@ -1,3 +1,7 @@
+### 1.7.10 - *2014-11-19*
+- Fixed detection of links that were replaced/embedded by other extensions (ex: 4chan X youtube link titles)
+- Updated menu links to link to the new repo
+
 ### 1.7.9 - *2014-11-14*
 - Move to [bakugo/4chan-imgur](https://github.com/bakugo/4chan-imgur)
 
