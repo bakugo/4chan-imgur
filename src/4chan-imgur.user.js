@@ -8,8 +8,8 @@
 // @grant       GM_xmlhttpRequest
 // @grant       GM_getValue
 // @grant       GM_setValue
-// @require     http://b4k.co/code/jquery.js?959652
-// @require     http://b4k.co/code/b4k.js?959652
+// @require     http://b4k.co/code/jquery.js?959653
+// @require     http://b4k.co/code/b4k.js?959653
 // @run-at      document-end
 // @updateURL   https://github.com/bakugo/4chan-imgur/raw/master/dist/4chan-imgur.user.js
 // @downloadURL https://github.com/bakugo/4chan-imgur/raw/master/dist/4chan-imgur.user.js
@@ -37,7 +37,6 @@
 	var build_file;
 	var build_object;
 	var embed_object;
-	var func;
 	var hover;
 	var inline_expand;
 	var processors;
@@ -62,7 +61,7 @@
 		init: function(file) {
 			var img;
 			
-			img = thumb.get_thumb(file);
+			img = main.get_thumb(file);
 			
 			$(img).on("mouseover", hover.set);
 			$(img).on("mousemove", hover.update);
@@ -148,7 +147,7 @@
 		suspend: function(file) {
 			var img;
 			
-			img = thumb.get_thumb(file);
+			img = main.get_thumb(file);
 			
 			$(img).off("mouseover", hover.set);
 			$(img).off("mousemove", hover.update);
@@ -204,7 +203,7 @@
 				
 				img.style.display = "";
 				
-				thumb.expand_scroll_back(file);
+				main.expand_scroll_back(file);
 				
 				return;
 			}
@@ -280,7 +279,7 @@
 		
 		url = img_data[post_no]["image_url"];
 		
-		img = thumb.get_thumb(file);
+		img = main.get_thumb(file);
 		
 		$(img.parentElement).on("click", expand);
 	};
@@ -352,7 +351,7 @@
 				}
 			};
 			
-			img = thumb.get_thumb(file);
+			img = main.get_thumb(file);
 			
 			if(self.thumb_url.indexOf("data:") === 0) {
 				load();
@@ -388,7 +387,7 @@
 			
 			file = file || build_file(file_id, self, "img");
 			
-			img = thumb.get_thumb(file);
+			img = main.get_thumb(file);
 			
 			img.src = resources.placeholder_thumb;
 			
@@ -403,7 +402,7 @@
 				
 				e.preventDefault();
 				
-				thumb.preloaded.push(file_id);
+				main.preloaded.push(file_id);
 				
 				loaded = true;
 				
@@ -412,7 +411,7 @@
 			
 			$(img).on("click", click);
 			
-			thumb.insert_file(post, file);
+			main.insert_file(post, file);
 		};
 		
 		self.plant = function(post, file) {
@@ -436,7 +435,7 @@
 				};
 			}
 			
-			if((!us.config([self.processor, "preload"], processors[self.processor].options["preload"][0], true) || self.no_preload) && !thumb.is_preloaded(post_no)) {
+			if((!us.config([self.processor, "preload"], processors[self.processor].options["preload"][0], true) || self.no_preload) && !main.is_preloaded(post_no)) {
 				self.placehold(post, file);
 				
 				return;
@@ -444,93 +443,11 @@
 			
 			file = file || build_file(post_no, self, "img");
 			
-			thumb.insert_file(post, file);
+			main.insert_file(post, file);
 			
 			self.load_image(file);
 		};
 	};
-	
-	$.extend(thumb, {
-		preloaded: [],
-		
-		files: [],
-		
-		get_thumb: function(file) {
-			return file.getElementsByClassName("fileThumb")[0].children[0];
-		},
-		
-		expand_scroll_back: function(e) {
-			var post;
-			var pos_top;
-			var fourchanx;
-			var header;
-			
-			fourchanx = b4k.chan.check_fourchanx();
-			
-			header = document.getElementById("header-bar");
-			
-			post = b4k.chan.in_post(e);
-			
-			pos_top = $(post).offset().top;
-			
-			/*
-				the inline extension normally scrolls to the exact top of the post,
-				but other extensions like 4chan x scroll 8 pixels above it
-			*/
-			if(fourchanx) {
-				if(fourchanx == "seaweedchan") {
-					if(
-						header &&
-						$(header).hasClass("dialog") &&
-						!$(header).hasClass("autohide") &&
-						!$(document.body.parentElement).hasClass("bottom-header")
-					) {
-						pos_top = pos_top - 26;
-					}
-				} else {
-					pos_top = pos_top - 8;
-				}
-			}
-			
-			if(b4k.scroll() > pos_top) {
-				b4k.scroll(pos_top);
-			}
-		},
-		
-		insert_file: function(post, file) {
-			var comment;
-			
-			if(!post) {
-				return;
-			}
-			
-			comment = b4k.chan.get_post_com(post);
-			
-			thumb.register_file(file);
-			
-			$(comment).before(file);
-		},
-		
-		is_preloaded: function(id) {
-			return b4k.array_contains(thumb.preloaded, id);
-		},
-		
-		register_file: function(file) {
-			if(b4k.array_contains(thumb.files, file)) {
-				return;
-			}
-			
-			thumb.files.push(file);
-		},
-		
-		clear_files: function(file) {
-			for(var i = 0; i < thumb.files.length; i++) {
-				$(thumb.files[i]).remove();
-			}
-			
-			thumb.files = [];
-		}
-	});
 	
 	build_file = function(post_no, self, type) {
 		var container;
@@ -678,12 +595,14 @@
 			
 			obj = obj || build_file(file_id, self, "obj", !!self.filename_truncate);
 			
-			thumb.insert_file(post, obj);
+			main.insert_file(post, obj);
 		};
 	};
 	
 	main = {
 		processors: [],
+		preloaded: [],
+		files: [],
 		
 		sort_processors: function() {
 			main.processors.sort(function(a, b) {
@@ -699,7 +618,7 @@
 			});
 		},
 		
-		attach: function(proc) {
+		processors_attach: function(proc) {
 			for(var processor in main.processors) {
 				if(main.processors[processor].name == proc) {
 					return;
@@ -709,17 +628,17 @@
 			main.processors.push(new processors[proc].obj);
 		},
 		
-		attach_all: function() {
+		processors_attach_all: function() {
 			for(var processor in processors) {
 				if(us.config([processor, "enabled"], processors[processor].options.enabled[0], true)) {
-					main.attach(processor);
+					main.processors_attach(processor);
 				}
 			}
 			
 			main.sort_processors();
 		},
 		
-		detach_all: function() {
+		processors_detach_all: function() {
 			main.processors = [];
 		},
 		
@@ -755,6 +674,8 @@
 				process = processor.process(post, post_text, !!init);
 				
 				if(process) {
+					us.log("Post #" + post_no + " processed with \"" + processor.name + "\"");
+					
 					break;
 				}
 			}
@@ -812,7 +733,7 @@
 			
 			menu.init();
 			
-			main.attach_all();
+			main.processors_attach_all();
 			
 			main.process_all();
 			
@@ -820,13 +741,91 @@
 		},
 		
 		restart: function() {
-			thumb.clear_files();
+			us.log("Restart: reprocessing all posts");
 			
-			main.detach_all();
+			main.clear_files();
 			
-			main.attach_all();
+			main.processors_detach_all();
+			
+			main.processors_attach_all();
 			
 			main.process_all();
+		},
+		
+		get_thumb: function(file) {
+			return file.getElementsByClassName("fileThumb")[0].children[0];
+		},
+		
+		expand_scroll_back: function(e) {
+			var post;
+			var pos_top;
+			var fourchanx;
+			var header;
+			
+			fourchanx = b4k.chan.check_fourchanx();
+			
+			header = document.getElementById("header-bar");
+			
+			post = b4k.chan.in_post(e);
+			
+			pos_top = $(post).offset().top;
+			
+			/*
+				the inline extension normally scrolls to the exact top of the post,
+				but other extensions like 4chan x scroll 8 pixels above it
+			*/
+			if(fourchanx) {
+				if(fourchanx == "seaweedchan") {
+					if(
+						header &&
+						$(header).hasClass("dialog") &&
+						!$(header).hasClass("autohide") &&
+						!$(document.body.parentElement).hasClass("bottom-header")
+					) {
+						pos_top = pos_top - 26;
+					}
+				} else {
+					pos_top = pos_top - 8;
+				}
+			}
+			
+			if(b4k.scroll() > pos_top) {
+				b4k.scroll(pos_top);
+			}
+		},
+		
+		insert_file: function(post, file) {
+			var comment;
+			
+			if(!post) {
+				return;
+			}
+			
+			comment = b4k.chan.get_post_com(post);
+			
+			main.register_file(file);
+			
+			$(comment).before(file);
+		},
+		
+		is_preloaded: function(id) {
+			return b4k.array_contains(main.preloaded, id);
+		},
+		
+		register_file: function(file) {
+			if(b4k.array_contains(main.files, file)) {
+				return;
+			}
+			
+			main.files.push(file);
+		},
+		
+		clear_files: function(file) {
+			for(var i = 0; i < main.files.length; i++) {
+				$(main.files[i]).remove();
+			}
+			
+			main.files = [];
 		}
 	};
 	
