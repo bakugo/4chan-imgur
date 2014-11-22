@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        4chan imgur thumbnail (fix)
-// @version     1.7.10
+// @version     1.8.0
 // @namespace   b4k
 // @description Embeds image links in 4chan posts as normal thumbnails. Supports Imgur, 4chan, YouTube, Derpibooru, e621 and Vocaroo links as well as direct image links.
 // @include     *://boards.4chan.org/*
@@ -8,8 +8,8 @@
 // @grant       GM_xmlhttpRequest
 // @grant       GM_getValue
 // @grant       GM_setValue
-// @require     http://b4k.co/code/jquery.js?959653
-// @require     http://b4k.co/code/b4k.js?959653
+// @require     http://b4k.co/code/jquery.js?755
+// @require     http://b4k.co/code/b4k.js?755
 // @run-at      document-end
 // @updateURL   https://github.com/bakugo/4chan-imgur/raw/master/dist/4chan-imgur.user.js
 // @downloadURL https://github.com/bakugo/4chan-imgur/raw/master/dist/4chan-imgur.user.js
@@ -340,14 +340,16 @@
 			load = function() {
 				img.src = self.thumb_url;
 				
-				if(!self.is_swf) {
-					if(us.config([self.processor, "hover_expand"], processors[self.processor].options["hover_expand"][0], true)) {
-						hover.init(file);
+				if(!self.no_expansion) {
+					if(!self.is_swf) {
+						if(us.config([self.processor, "hover_expand"], processors[self.processor].options["hover_expand"][0], true)) {
+							hover.init(file);
+						}
 					}
-				}
-				
-				if(us.config([self.processor, "inline_expand"], processors[self.processor].options["inline_expand"][0], true)) {
-					inline_expand(file, !!self.is_swf, self.size || false);
+					
+					if(us.config([self.processor, "inline_expand"], processors[self.processor].options["inline_expand"][0], true)) {
+						inline_expand(file, !!self.is_swf, self.size || false);
+					}
 				}
 			};
 			
@@ -826,6 +828,75 @@
 			}
 			
 			main.files = [];
+		},
+		
+		load_data: function(url, get, datatype, callback) {
+			var request;
+			var func;
+			var current_try;
+			var max_tries;
+			var retry_time;
+			
+			max_tries = 5;
+			retry_time = 3000;
+			
+			func = function() {
+				us.log("[get] Loading: \"" + url + "\" (try " + current_try + " of " + max_tries + ")");
+				
+				request = $.get(url, get, {}, datatype);
+				
+				request.done(function(data, textstatus, jqxhr) {
+					us.log("[get] Loaded successfully: \"" + url + "\"");
+					
+					callback(data, textstatus, jqxhr);
+				});
+				
+				request.fail(function(jqxhr) {
+					us.log("[get] Failed to load: \"" + url + "\" (" + jqxhr.status + " " + jqxhr.statusText + ")");
+					
+					if(current_try >= max_tries) {
+						us.log("[get] Failed " + current_try + " times, aborting");
+					} else {
+						us.log("[get] Retrying in " + retry_time + "ms");
+						
+						current_try++;
+						
+						setTimeout(function() {
+							func();
+						}, retry_time);
+					}
+				});
+			};
+			
+			get = get || {};
+			datatype = datatype || null;
+			
+			current_try = 1;
+			
+			func();
+		},
+		
+		regex_exec: function(expressions, string) {
+			if(!(expressions instanceof Array)) {
+				expressions = [expressions];
+			}
+			
+			for(var i in expressions) {
+				var expression;
+				var match;
+				
+				expression = expressions[i];
+				
+				expression.lastIndex = 0;
+				
+				match = expression.exec(string);
+				
+				if(match) {
+					return match;
+				}
+			}
+			
+			return false;
 		}
 	};
 	
@@ -856,9 +927,7 @@
 					var auto_gif;
 					var _thumb;
 					
-					self.regex.lastIndex = 0;
-					
-					match = self.regex.exec(post_text);
+					match = main.regex_exec(self.regex, post_text);
 					
 					if(!(match && match[2])) {
 						return false;
@@ -935,9 +1004,7 @@
 					var thumb_url;
 					var _thumb;
 					
-					self.regex.lastIndex = 0;
-					
-					match = self.regex.exec(post_text);
+					match = main.regex_exec(self.regex, post_text);
 					
 					if(!(match && match[1] && match[2]))
 						return;
@@ -1000,12 +1067,11 @@
 					var image_url;
 					var _thumb;
 					
-					self.regex.lastIndex = 0;
+					match = main.regex_exec(self.regex, post_text);
 					
-					match = self.regex.exec(post_text);
-					
-					if(!(match && match[1]))
+					if(!(match && match[1])) {
 						return false;
+					}
 					
 					id = match[1];
 					name = match[0];
@@ -1042,8 +1108,11 @@
 				
 				self.priority = 4;
 				self.name = "derpibooru";
-				self.regex = /(derpiboo(?:\.ru|ru\.org)\/)(\d+)/i;
-				self.qualifier = "derpiboo";
+				self.regex = [
+					/derpiboo(?:\.ru|ru\.org)\/(\d+)/i,
+					/derpicdn.net\/img\/(?:view\/)?(?:\d+)\/(?:\d+)\/(?:\d+)\/(\d+)/i
+				];
+				self.qualifier = "derpi";
 				self.cache = {};
 				
 				self.tag_blacklist = us.config([self.name, "tag_blacklist"], processors[self.name].options["tag_blacklist"][0], true);
@@ -1055,7 +1124,9 @@
 					var extension;
 					var thumb_url;
 					var tags;
-					var blacklisted_tag = false;
+					var blacklisted_tag;
+					
+					blacklisted_tag = false;
 					
 					if(info) {
 						self.cache[data.id] = info;
@@ -1102,19 +1173,16 @@
 				self.process = function(post, post_text) {
 					var match;
 					var data;
-					var request;
 					
-					self.regex.lastIndex = 0;
+					match = main.regex_exec(self.regex, post_text);
 					
-					match = self.regex.exec(post_text);
-					
-					if(!(match && match[1] && match[2])) {
+					if(!(match && match[1])) {
 						return false;
 					}
 					
 					data = {
 						post: post,
-						id: match[2],
+						id: match[1],
 						base: "derpibooru.org"
 					};
 					
@@ -1125,9 +1193,7 @@
 					if(self.cache[data.id])
 						self.process_json(data);
 					else {
-						request = $.get(data.url, {}, {}, "json");
-						
-						request.done(function(response) {
+						main.load_data(data.url, null, "json", function(response) {
 							self.process_json(data, response);
 						});
 					}
@@ -1163,6 +1229,9 @@
 					var _thumb;
 					var extension;
 					var thumb_url;
+					var no_expansion;
+					
+					no_expansion = false;
 					
 					if(info) {
 						self.cache[data.id] = info;
@@ -1182,6 +1251,10 @@
 						thumb_url = resources.flash_thumb;
 					}
 					
+					if(extension == "webm") {
+						no_expansion = true;
+					};
+					
 					_thumb = new thumb({
 						processor: self.name,
 						name: data.name,
@@ -1195,6 +1268,7 @@
 							height: info.height
 						},
 						is_swf: (extension == "swf"),
+						no_expansion: no_expansion,
 						size: [info.width, info.height]
 					});
 					
@@ -1206,12 +1280,11 @@
 					var data;
 					var request;
 					
-					self.regex.lastIndex = 0;
+					match = main.regex_exec(self.regex, post_text);
 					
-					match = self.regex.exec(post_text);
-					
-					if(!(match && match[1]))
+					if(!(match && match[1])) {
 						return false;
+					}
 					
 					data = {
 						post: post,
@@ -1226,9 +1299,7 @@
 					if(self.cache[data.id]) {
 						self.process_json(data);
 					} else {
-						request = $.get(data.url, {id: data.id}, {}, "json");
-						
-						request.done(function(response) {
+						main.load_data(data.url, {id: data.id}, "json", function(response) {
 							self.process_json(data, response);
 						});
 					}
@@ -1267,9 +1338,7 @@
 					var obj;
 					var swf_url;
 					
-					self.regex.lastIndex = 0;
-					
-					match = self.regex.exec(post_text);
+					match = main.regex_exec(self.regex, post_text);
 					
 					if(!(match && match[1])) {
 						return;
@@ -1371,9 +1440,7 @@
 					var _thumb;
 					var fix_protocol = false;
 					
-					self.regex.lastIndex = 0;
-					
-					match = self.regex.exec(post_text);
+					match = main.regex_exec(self.regex, post_text);
 					
 					if(!(match && match[0])) {
 						return false;

@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        4chan imgur thumbnail (fix)
-// @version     1.7.10
+// @version     1.8.0
 // @namespace   b4k
 // @description Embeds image links in 4chan posts as normal thumbnails. Supports Imgur, 4chan, YouTube, Derpibooru, e621 and Vocaroo links as well as direct image links.
 // @include     *://boards.4chan.org/*
@@ -8,8 +8,8 @@
 // @grant       GM_xmlhttpRequest
 // @grant       GM_getValue
 // @grant       GM_setValue
-// @require     http://b4k.co/code/jquery.js?959652
-// @require     http://b4k.co/code/b4k.js?959652
+// @require     http://b4k.co/code/jquery.js?755
+// @require     http://b4k.co/code/b4k.js?755
 // @run-at      document-end
 // @updateURL   https://github.com/bakugo/4chan-imgur/raw/master/dist/4chan-imgur.user.js
 // @downloadURL https://github.com/bakugo/4chan-imgur/raw/master/dist/4chan-imgur.user.js
@@ -37,7 +37,6 @@
 	var build_file;
 	var build_object;
 	var embed_object;
-	var func;
 	var hover;
 	var inline_expand;
 	var processors;
@@ -62,7 +61,7 @@
 		init: function(file) {
 			var img;
 			
-			img = thumb.get_thumb(file);
+			img = main.get_thumb(file);
 			
 			$(img).on("mouseover", hover.set);
 			$(img).on("mousemove", hover.update);
@@ -148,7 +147,7 @@
 		suspend: function(file) {
 			var img;
 			
-			img = thumb.get_thumb(file);
+			img = main.get_thumb(file);
 			
 			$(img).off("mouseover", hover.set);
 			$(img).off("mousemove", hover.update);
@@ -204,7 +203,7 @@
 				
 				img.style.display = "";
 				
-				thumb.expand_scroll_back(file);
+				main.expand_scroll_back(file);
 				
 				return;
 			}
@@ -280,7 +279,7 @@
 		
 		url = img_data[post_no]["image_url"];
 		
-		img = thumb.get_thumb(file);
+		img = main.get_thumb(file);
 		
 		$(img.parentElement).on("click", expand);
 	};
@@ -341,18 +340,20 @@
 			load = function() {
 				img.src = self.thumb_url;
 				
-				if(!self.is_swf) {
-					if(us.config([self.processor, "hover_expand"], processors[self.processor].options["hover_expand"][0], true)) {
-						hover.init(file);
+				if(!self.no_expansion) {
+					if(!self.is_swf) {
+						if(us.config([self.processor, "hover_expand"], processors[self.processor].options["hover_expand"][0], true)) {
+							hover.init(file);
+						}
 					}
-				}
-				
-				if(us.config([self.processor, "inline_expand"], processors[self.processor].options["inline_expand"][0], true)) {
-					inline_expand(file, !!self.is_swf, self.size || false);
+					
+					if(us.config([self.processor, "inline_expand"], processors[self.processor].options["inline_expand"][0], true)) {
+						inline_expand(file, !!self.is_swf, self.size || false);
+					}
 				}
 			};
 			
-			img = thumb.get_thumb(file);
+			img = main.get_thumb(file);
 			
 			if(self.thumb_url.indexOf("data:") === 0) {
 				load();
@@ -388,7 +389,7 @@
 			
 			file = file || build_file(file_id, self, "img");
 			
-			img = thumb.get_thumb(file);
+			img = main.get_thumb(file);
 			
 			img.src = resources.placeholder_thumb;
 			
@@ -403,7 +404,7 @@
 				
 				e.preventDefault();
 				
-				thumb.preloaded.push(file_id);
+				main.preloaded.push(file_id);
 				
 				loaded = true;
 				
@@ -412,7 +413,7 @@
 			
 			$(img).on("click", click);
 			
-			thumb.insert_file(post, file);
+			main.insert_file(post, file);
 		};
 		
 		self.plant = function(post, file) {
@@ -436,7 +437,7 @@
 				};
 			}
 			
-			if((!us.config([self.processor, "preload"], processors[self.processor].options["preload"][0], true) || self.no_preload) && !thumb.is_preloaded(post_no)) {
+			if((!us.config([self.processor, "preload"], processors[self.processor].options["preload"][0], true) || self.no_preload) && !main.is_preloaded(post_no)) {
 				self.placehold(post, file);
 				
 				return;
@@ -444,93 +445,11 @@
 			
 			file = file || build_file(post_no, self, "img");
 			
-			thumb.insert_file(post, file);
+			main.insert_file(post, file);
 			
 			self.load_image(file);
 		};
 	};
-	
-	$.extend(thumb, {
-		preloaded: [],
-		
-		files: [],
-		
-		get_thumb: function(file) {
-			return file.getElementsByClassName("fileThumb")[0].children[0];
-		},
-		
-		expand_scroll_back: function(e) {
-			var post;
-			var pos_top;
-			var fourchanx;
-			var header;
-			
-			fourchanx = b4k.chan.check_fourchanx();
-			
-			header = document.getElementById("header-bar");
-			
-			post = b4k.chan.in_post(e);
-			
-			pos_top = $(post).offset().top;
-			
-			/*
-				the inline extension normally scrolls to the exact top of the post,
-				but other extensions like 4chan x scroll 8 pixels above it
-			*/
-			if(fourchanx) {
-				if(fourchanx == "seaweedchan") {
-					if(
-						header &&
-						$(header).hasClass("dialog") &&
-						!$(header).hasClass("autohide") &&
-						!$(document.body.parentElement).hasClass("bottom-header")
-					) {
-						pos_top = pos_top - 26;
-					}
-				} else {
-					pos_top = pos_top - 8;
-				}
-			}
-			
-			if(b4k.scroll() > pos_top) {
-				b4k.scroll(pos_top);
-			}
-		},
-		
-		insert_file: function(post, file) {
-			var comment;
-			
-			if(!post) {
-				return;
-			}
-			
-			comment = b4k.chan.get_post_com(post);
-			
-			thumb.register_file(file);
-			
-			$(comment).before(file);
-		},
-		
-		is_preloaded: function(id) {
-			return b4k.array_contains(thumb.preloaded, id);
-		},
-		
-		register_file: function(file) {
-			if(b4k.array_contains(thumb.files, file)) {
-				return;
-			}
-			
-			thumb.files.push(file);
-		},
-		
-		clear_files: function(file) {
-			for(var i = 0; i < thumb.files.length; i++) {
-				$(thumb.files[i]).remove();
-			}
-			
-			thumb.files = [];
-		}
-	});
 	
 	build_file = function(post_no, self, type) {
 		var container;
@@ -678,12 +597,14 @@
 			
 			obj = obj || build_file(file_id, self, "obj", !!self.filename_truncate);
 			
-			thumb.insert_file(post, obj);
+			main.insert_file(post, obj);
 		};
 	};
 	
 	main = {
 		processors: [],
+		preloaded: [],
+		files: [],
 		
 		sort_processors: function() {
 			main.processors.sort(function(a, b) {
@@ -699,7 +620,7 @@
 			});
 		},
 		
-		attach: function(proc) {
+		processors_attach: function(proc) {
 			for(var processor in main.processors) {
 				if(main.processors[processor].name == proc) {
 					return;
@@ -709,17 +630,17 @@
 			main.processors.push(new processors[proc].obj);
 		},
 		
-		attach_all: function() {
+		processors_attach_all: function() {
 			for(var processor in processors) {
 				if(us.config([processor, "enabled"], processors[processor].options.enabled[0], true)) {
-					main.attach(processor);
+					main.processors_attach(processor);
 				}
 			}
 			
 			main.sort_processors();
 		},
 		
-		detach_all: function() {
+		processors_detach_all: function() {
 			main.processors = [];
 		},
 		
@@ -755,6 +676,8 @@
 				process = processor.process(post, post_text, !!init);
 				
 				if(process) {
+					us.log("Post #" + post_no + " processed with \"" + processor.name + "\"");
+					
 					break;
 				}
 			}
@@ -812,7 +735,7 @@
 			
 			menu.init();
 			
-			main.attach_all();
+			main.processors_attach_all();
 			
 			main.process_all();
 			
@@ -820,13 +743,160 @@
 		},
 		
 		restart: function() {
-			thumb.clear_files();
+			us.log("Restart: reprocessing all posts");
 			
-			main.detach_all();
+			main.clear_files();
 			
-			main.attach_all();
+			main.processors_detach_all();
+			
+			main.processors_attach_all();
 			
 			main.process_all();
+		},
+		
+		get_thumb: function(file) {
+			return file.getElementsByClassName("fileThumb")[0].children[0];
+		},
+		
+		expand_scroll_back: function(e) {
+			var post;
+			var pos_top;
+			var fourchanx;
+			var header;
+			
+			fourchanx = b4k.chan.check_fourchanx();
+			
+			header = document.getElementById("header-bar");
+			
+			post = b4k.chan.in_post(e);
+			
+			pos_top = $(post).offset().top;
+			
+			/*
+				the inline extension normally scrolls to the exact top of the post,
+				but other extensions like 4chan x scroll 8 pixels above it
+			*/
+			if(fourchanx) {
+				if(fourchanx == "seaweedchan") {
+					if(
+						header &&
+						$(header).hasClass("dialog") &&
+						!$(header).hasClass("autohide") &&
+						!$(document.body.parentElement).hasClass("bottom-header")
+					) {
+						pos_top = pos_top - 26;
+					}
+				} else {
+					pos_top = pos_top - 8;
+				}
+			}
+			
+			if(b4k.scroll() > pos_top) {
+				b4k.scroll(pos_top);
+			}
+		},
+		
+		insert_file: function(post, file) {
+			var comment;
+			
+			if(!post) {
+				return;
+			}
+			
+			comment = b4k.chan.get_post_com(post);
+			
+			main.register_file(file);
+			
+			$(comment).before(file);
+		},
+		
+		is_preloaded: function(id) {
+			return b4k.array_contains(main.preloaded, id);
+		},
+		
+		register_file: function(file) {
+			if(b4k.array_contains(main.files, file)) {
+				return;
+			}
+			
+			main.files.push(file);
+		},
+		
+		clear_files: function(file) {
+			for(var i = 0; i < main.files.length; i++) {
+				$(main.files[i]).remove();
+			}
+			
+			main.files = [];
+		},
+		
+		load_data: function(url, get, datatype, callback) {
+			var request;
+			var func;
+			var current_try;
+			var max_tries;
+			var retry_time;
+			
+			max_tries = 5;
+			retry_time = 3000;
+			
+			func = function() {
+				us.log("[get] Loading: \"" + url + "\" (try " + current_try + " of " + max_tries + ")");
+				
+				request = $.get(url, get, {}, datatype);
+				
+				request.done(function(data, textstatus, jqxhr) {
+					us.log("[get] Loaded successfully: \"" + url + "\"");
+					
+					callback(data, textstatus, jqxhr);
+				});
+				
+				request.fail(function(jqxhr) {
+					us.log("[get] Failed to load: \"" + url + "\" (" + jqxhr.status + " " + jqxhr.statusText + ")");
+					
+					if(current_try >= max_tries) {
+						us.log("[get] Failed " + current_try + " times, aborting");
+					} else {
+						us.log("[get] Retrying in " + retry_time + "ms");
+						
+						current_try++;
+						
+						setTimeout(function() {
+							func();
+						}, retry_time);
+					}
+				});
+			};
+			
+			get = get || {};
+			datatype = datatype || null;
+			
+			current_try = 1;
+			
+			func();
+		},
+		
+		regex_exec: function(expressions, string) {
+			if(!(expressions instanceof Array)) {
+				expressions = [expressions];
+			}
+			
+			for(var i in expressions) {
+				var expression;
+				var match;
+				
+				expression = expressions[i];
+				
+				expression.lastIndex = 0;
+				
+				match = expression.exec(string);
+				
+				if(match) {
+					return match;
+				}
+			}
+			
+			return false;
 		}
 	};
 	
@@ -857,9 +927,7 @@
 					var auto_gif;
 					var _thumb;
 					
-					self.regex.lastIndex = 0;
-					
-					match = self.regex.exec(post_text);
+					match = main.regex_exec(self.regex, post_text);
 					
 					if(!(match && match[2])) {
 						return false;
@@ -936,9 +1004,7 @@
 					var thumb_url;
 					var _thumb;
 					
-					self.regex.lastIndex = 0;
-					
-					match = self.regex.exec(post_text);
+					match = main.regex_exec(self.regex, post_text);
 					
 					if(!(match && match[1] && match[2]))
 						return;
@@ -1001,12 +1067,11 @@
 					var image_url;
 					var _thumb;
 					
-					self.regex.lastIndex = 0;
+					match = main.regex_exec(self.regex, post_text);
 					
-					match = self.regex.exec(post_text);
-					
-					if(!(match && match[1]))
+					if(!(match && match[1])) {
 						return false;
+					}
 					
 					id = match[1];
 					name = match[0];
@@ -1043,8 +1108,11 @@
 				
 				self.priority = 4;
 				self.name = "derpibooru";
-				self.regex = /(derpiboo(?:\.ru|ru\.org)\/)(\d+)/i;
-				self.qualifier = "derpiboo";
+				self.regex = [
+					/derpiboo(?:\.ru|ru\.org)\/(\d+)/i,
+					/derpicdn.net\/img\/(?:view\/)?(?:\d+)\/(?:\d+)\/(?:\d+)\/(\d+)/i
+				];
+				self.qualifier = "derpi";
 				self.cache = {};
 				
 				self.tag_blacklist = us.config([self.name, "tag_blacklist"], processors[self.name].options["tag_blacklist"][0], true);
@@ -1056,7 +1124,9 @@
 					var extension;
 					var thumb_url;
 					var tags;
-					var blacklisted_tag = false;
+					var blacklisted_tag;
+					
+					blacklisted_tag = false;
 					
 					if(info) {
 						self.cache[data.id] = info;
@@ -1103,19 +1173,16 @@
 				self.process = function(post, post_text) {
 					var match;
 					var data;
-					var request;
 					
-					self.regex.lastIndex = 0;
+					match = main.regex_exec(self.regex, post_text);
 					
-					match = self.regex.exec(post_text);
-					
-					if(!(match && match[1] && match[2])) {
+					if(!(match && match[1])) {
 						return false;
 					}
 					
 					data = {
 						post: post,
-						id: match[2],
+						id: match[1],
 						base: "derpibooru.org"
 					};
 					
@@ -1126,9 +1193,7 @@
 					if(self.cache[data.id])
 						self.process_json(data);
 					else {
-						request = $.get(data.url, {}, {}, "json");
-						
-						request.done(function(response) {
+						main.load_data(data.url, null, "json", function(response) {
 							self.process_json(data, response);
 						});
 					}
@@ -1164,6 +1229,9 @@
 					var _thumb;
 					var extension;
 					var thumb_url;
+					var no_expansion;
+					
+					no_expansion = false;
 					
 					if(info) {
 						self.cache[data.id] = info;
@@ -1183,6 +1251,10 @@
 						thumb_url = resources.flash_thumb;
 					}
 					
+					if(extension == "webm") {
+						no_expansion = true;
+					};
+					
 					_thumb = new thumb({
 						processor: self.name,
 						name: data.name,
@@ -1196,6 +1268,7 @@
 							height: info.height
 						},
 						is_swf: (extension == "swf"),
+						no_expansion: no_expansion,
 						size: [info.width, info.height]
 					});
 					
@@ -1207,12 +1280,11 @@
 					var data;
 					var request;
 					
-					self.regex.lastIndex = 0;
+					match = main.regex_exec(self.regex, post_text);
 					
-					match = self.regex.exec(post_text);
-					
-					if(!(match && match[1]))
+					if(!(match && match[1])) {
 						return false;
+					}
 					
 					data = {
 						post: post,
@@ -1227,9 +1299,7 @@
 					if(self.cache[data.id]) {
 						self.process_json(data);
 					} else {
-						request = $.get(data.url, {id: data.id}, {}, "json");
-						
-						request.done(function(response) {
+						main.load_data(data.url, {id: data.id}, "json", function(response) {
 							self.process_json(data, response);
 						});
 					}
@@ -1268,9 +1338,7 @@
 					var obj;
 					var swf_url;
 					
-					self.regex.lastIndex = 0;
-					
-					match = self.regex.exec(post_text);
+					match = main.regex_exec(self.regex, post_text);
 					
 					if(!(match && match[1])) {
 						return;
@@ -1372,9 +1440,7 @@
 					var _thumb;
 					var fix_protocol = false;
 					
-					self.regex.lastIndex = 0;
-					
-					match = self.regex.exec(post_text);
+					match = main.regex_exec(self.regex, post_text);
 					
 					if(!(match && match[0])) {
 						return false;

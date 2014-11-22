@@ -1,3 +1,10 @@
+### 1.8.0 - *2014-11-22*
+- Code refractoring
+- Improved loading of derpibooru and e261 image data: if loading fails, the script will try again after 3 seconds (up to 5 times)
+ - This should make derpibooru images fail to load less often when the servers are being slow
+- Static derpibooru image links (derpicdn.net) are now recognized and embedded as normal derpibooru links
+- Script will no longer try to load WEBMs from e264 as normal images (shows the e264 video thumbnail for now)
+
 ### 1.7.10 - *2014-11-19*
 - Fixed detection of links that were replaced/embedded by other extensions (ex: 4chan X youtube link titles)
 - Updated menu links to link to the new repo
