@@ -1491,7 +1491,7 @@
 			options: {
 				enabled: [true, "Enabled", "Enable other image link thumbnails"],
 				whitelist_only: [false, "Allowed Only", "Only enable for whitelisted domains <span class=\"info\">(comma-separated, exact match, wildcards supported)</span>"],
-				allowed_domains: ["*.tumblr.com, derpicdn.net", "Allowed Domains"],
+				allowed_domains: ["*.tumblr.com", "Allowed Domains"],
 				disallowed_domains: ["", "Disallowed Domains"],
 				preload: [true, "Auto-Load", "Load thumbnail automatically instead of waiting for user action"],
 				inline_expand: [true, "Inline Expand", "Click the thumbnail to switch to the full image"],
