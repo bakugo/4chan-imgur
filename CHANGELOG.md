@@ -1,3 +1,6 @@
+### 1.8.2 - *2014-11-22*
+- Fixed an undeclared variable causing the script to not run on Firefox
+
 ### 1.8.1 - *2014-11-22*
 - Fix/update b4k.js
 

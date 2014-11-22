@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        4chan imgur thumbnail (fix)
-// @version     1.8.1
+// @version     1.8.2
 // @namespace   b4k
 // @description Embeds image links in 4chan posts as normal thumbnails. Supports Imgur, 4chan, YouTube, Derpibooru, e621 and Vocaroo links as well as direct image links.
 // @include     *://boards.4chan.org/*
@@ -8,8 +8,8 @@
 // @grant       GM_xmlhttpRequest
 // @grant       GM_getValue
 // @grant       GM_setValue
-// @require     http://b4k.co/code/jquery.js?756
-// @require     http://b4k.co/code/b4k.js?756
+// @require     http://b4k.co/code/jquery.js?758
+// @require     http://b4k.co/code/b4k.js?758
 // @run-at      document-end
 // @updateURL   https://github.com/bakugo/4chan-imgur/raw/master/dist/4chan-imgur.user.js
 // @downloadURL https://github.com/bakugo/4chan-imgur/raw/master/dist/4chan-imgur.user.js
@@ -27,6 +27,7 @@
 */
 
 (function() {
+	"use strict";
 	
 	if(!function(e){if(typeof GM_info!=="undefined"){return true}alert(e+"\n\n"+"This script is not installed correctly."+"\n"+"Please install this script using a script manager like Greasemonkey or Tampermonkey.");return false}("4chan imgur thumbnail")){return};
 	
@@ -1491,7 +1492,7 @@
 			options: {
 				enabled: [true, "Enabled", "Enable other image link thumbnails"],
 				whitelist_only: [false, "Allowed Only", "Only enable for whitelisted domains <span class=\"info\">(comma-separated, exact match, wildcards supported)</span>"],
-				allowed_domains: ["*.tumblr.com, derpicdn.net", "Allowed Domains"],
+				allowed_domains: ["*.tumblr.com", "Allowed Domains"],
 				disallowed_domains: ["", "Disallowed Domains"],
 				preload: [true, "Auto-Load", "Load thumbnail automatically instead of waiting for user action"],
 				inline_expand: [true, "Inline Expand", "Click the thumbnail to switch to the full image"],
