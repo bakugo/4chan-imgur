@@ -1,3 +1,6 @@
+### 1.8.1 - *2014-11-22*
+- Fix/update b4k.js
+
 ### 1.8.0 - *2014-11-22*
 - Code refractoring
 - Improved loading of derpibooru and e261 image data: if loading fails, the script will try again after 3 seconds (up to 5 times)
