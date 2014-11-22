@@ -8,8 +8,8 @@
 // @grant       GM_xmlhttpRequest
 // @grant       GM_getValue
 // @grant       GM_setValue
-// @require     http://b4k.co/code/jquery.js?756
-// @require     http://b4k.co/code/b4k.js?756
+// @require     http://b4k.co/code/jquery.js?758
+// @require     http://b4k.co/code/b4k.js?758
 // @run-at      document-end
 // @updateURL   https://github.com/bakugo/4chan-imgur/raw/master/dist/4chan-imgur.user.js
 // @downloadURL https://github.com/bakugo/4chan-imgur/raw/master/dist/4chan-imgur.user.js
@@ -27,6 +27,7 @@
 */
 
 (function() {
+	"use strict";
 	
 	if(!function(e){if(typeof GM_info!=="undefined"){return true}alert(e+"\n\n"+"This script is not installed correctly."+"\n"+"Please install this script using a script manager like Greasemonkey or Tampermonkey.");return false}("4chan imgur thumbnail")){return};
 	
