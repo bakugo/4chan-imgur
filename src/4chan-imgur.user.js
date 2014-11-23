@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        4chan imgur thumbnail (fix)
-// @version     1.8.2
+// @version     1.8.3
 // @namespace   b4k
 // @description Embeds image links in 4chan posts as normal thumbnails. Supports Imgur, 4chan, YouTube, Derpibooru, e621 and Vocaroo links as well as direct image links.
 // @include     *://boards.4chan.org/*
@@ -8,8 +8,8 @@
 // @grant       GM_xmlhttpRequest
 // @grant       GM_getValue
 // @grant       GM_setValue
-// @require     http://b4k.co/code/jquery.js?758
-// @require     http://b4k.co/code/b4k.js?758
+// @require     http://b4k.co/code/jquery.js?759
+// @require     http://b4k.co/code/b4k.js?759
 // @run-at      document-end
 // @updateURL   https://github.com/bakugo/4chan-imgur/raw/master/dist/4chan-imgur.user.js
 // @downloadURL https://github.com/bakugo/4chan-imgur/raw/master/dist/4chan-imgur.user.js
@@ -44,7 +44,8 @@
 	var thumb;
 	var main;
 	var menu;
-	var img_data = {};
+	var post_img = {};
+	var data_cache = {};
 	
 	css = "body.imgur_no_scroll {\r\n\toverflow: hidden;\r\n}\r\n\r\n#imgur_overlay {\r\n\tbackground-color: rgba(0, 0, 0, 0.5);\r\n\tdisplay: flex;\r\n\tposition: fixed;\r\n\ttop: 0;\r\n\tleft: 0;\r\n\theight: 100%;\r\n\twidth: 100%;\r\n}\r\n\r\n.dialog {\r\n\tbackground-color: #d6daf0;\r\n\tborder-color: #b7c5d9;\r\n}\r\n\r\n#imgur_settings {\r\n\tbox-shadow: 0 0 15px rgba(0, 0, 0, 0.15);\r\n\tdisplay: inline-block;\r\n\tpadding: 5px;\r\n\tposition: relative;\r\n\ttext-align: left;\r\n\tvertical-align: middle;\r\n\tmargin: auto;\r\n\twidth: 660px;\r\n\theight: 500px;\r\n\tmax-width: 100%;\r\n\tmax-height: 80%;\r\n\tfont-size: 13px;\r\n}\r\n\r\n\t#imgur_settings .links {\r\n\t\tposition: absolute;\r\n\t\ttop: 4px;\r\n\t\tright: 10px;\r\n\t\tfont-size: 11px;\r\n\t}\r\n\t\r\n\t\t#imgur_settings .links a {\r\n\t\t\tmargin-left: 5px;\r\n\t\t}\r\n\t\r\n\t#imgur_settings .header {\r\n\t\tfont-size: 16px;\r\n\t\tfont-weight: bold;\r\n\t\tmargin-top: 6px;\r\n\t\ttext-align: center;\r\n\t}\r\n\t\r\n\t#imgur_settings .fields {\r\n\t\tmax-height: calc(100% - 40px);\r\n\t\toverflow-y: scroll;\r\n\t\tmargin-top: 10px;\r\n\t\tpadding: 0 10px;\r\n\t}\r\n\t\r\n\t\t#imgur_settings .fields ul {\r\n\t\t\tpadding: 0;\r\n\t\t\tlist-style: none;\r\n\t\t}\r\n\t\t\r\n\t\t\t#imgur_settings .fields ul:first-child {\r\n\t\t\t\tmargin-top: 0;\r\n\t\t\t}\r\n\t\t\t\r\n\t\t\t#imgur_settings .fields ul:last-child {\r\n\t\t\t\tmargin-bottom: 10px;\r\n\t\t\t}\r\n\t\t\t\r\n\t\t\t#imgur_settings .fields ul .name {\r\n\t\t\t\tfont-size: 15px;\r\n\t\t\t\tmargin-left: 10px;\r\n\t\t\t\tfont-weight: bold;\r\n\t\t\t}\r\n\t\t\t\r\n\t\t\t#imgur_settings .fields ul li {\r\n\t\t\t}\r\n\t\t\t\r\n\t\t\t\t#imgur_settings .fields ul li.text {\r\n\t\t\t\t\tmargin-left: 20px;\r\n\t\t\t\t}\r\n\t\t\t\t\r\n\t\t\t\t\t#imgur_settings .fields ul li.text .description {\r\n\t\t\t\t\t\tposition: relative;\r\n\t\t\t\t\t\ttop: 1px;\r\n\t\t\t\t\t}\r\n\t\t\t\t\r\n\t\t\t\t#imgur_settings .fields ul li label {\r\n\t\t\t\t\ttext-decoration: underline;\r\n\t\t\t\t}\r\n\t\t\t\t\r\n\t\t\t\t#imgur_settings .fields ul li input[type=\"text\"] {\r\n\t\t\t\t\twidth: 220px;\r\n\t\t\t\t\tmargin-top: 3px;\r\n\t\t\t\t\theight: 12px;\r\n\t\t\t\t}\r\n\t\t\t\t\r\n\t\t\t\t#imgur_settings .fields ul li input[type=\"checkbox\"] {\r\n\t\t\t\t\tposition: relative;\r\n\t\t\t\t\ttop: 2px;\r\n\t\t\t\t}\r\n\t\t\t\t\r\n\t\t\t\t#imgur_settings .fields ul li .info,\r\n\t\t\t\t#imgur_settings .fields ul li .warning {\r\n\t\t\t\t\tfont-size: 11px;\r\n\t\t\t\t}\r\n\t\t\t\t\r\n\t\t\t\t#imgur_settings .fields ul li .warning {\r\n\t\t\t\t\tcolor: #f00;\r\n\t\t\t\t}\r\n\r\n.file.imgur_file {\r\n}\r\n\r\n\t.file.imgur_file .fileText {\r\n\t}\r\n\t\r\n\t\t.file.imgur_file .fileText a img {\r\n\t\t\tposition: relative;\r\n\t\t\ttop: 3px;\r\n\t\t\tpadding-left: 3px;\r\n\t\t\tpadding-right: 1px;\r\n\t\t}\r\n\t\r\n\t.file.imgur_file .fileThumb {\r\n\t\tposition: relative;\r\n\t}\r\n\t\r\n\t\t.file.imgur_file .fileThumb :first-child {\r\n\t\t}\r\n\t\t\r\n\t\t\t.file.imgur_file .fileThumb img:first-child {\r\n\t\t\t\tborder: 1px solid #00a !important;\r\n\t\t\t\tpadding: 2px;\r\n\t\t\t\tmax-height: 125px !important;\r\n\t\t\t\tmax-width: 125px !important;\r\n\t\t\t}\r\n\t\t\t\r\n\t\t\t\t.file.imgur_file .fileThumb img:first-child.expanding {\r\n\t\t\t\t\topacity: 0.5;\r\n\t\t\t\t}\r\n\t\t\r\n\t\t.file.imgur_file .fileThumb span {\r\n\t\t\tdisplay: inline-block;\r\n\t\t\toverflow: hidden;\r\n\t\t\tposition: absolute;\r\n\t\t\ttop: 0;\r\n\t\t\tright: 0;\r\n\t\t\tcolor: #F00;\r\n\t\t\tfont-size: 26px;\r\n\t\t\tline-height: 4px;\r\n\t\t\twidth: 10px;\r\n\t\t\theight: 10px;\r\n\t\t\tpadding: 8px 8px 2px 2px;\r\n\t\t}\r\n\t\t\r\n\t\t.file.imgur_file .fileThumb object:last-child:not(:first-child) {\r\n\t\t\tdisplay: block;\r\n\t\t\tbackground-color: #fff;\r\n\t\t\tmargin-bottom: -4px;\r\n\t\t}\r\n\r\n#imgur_hover_img {\r\n\tposition: fixed;\r\n\tmax-height: 97%;\r\n\tmax-width: 75%;\r\n\tpadding-bottom: 18px;\r\n}";
 	
@@ -76,7 +77,7 @@
 			
 			post_no = b4k.chan.post_no(this);
 			
-			url = img_data[post_no]["image_url"];
+			url = post_img[post_no]["image_url"];
 			
 			if(hover.element) {
 				img = hover.element;
@@ -278,7 +279,7 @@
 		
 		post_no = b4k.chan.post_no(file);
 		
-		url = img_data[post_no]["image_url"];
+		url = post_img[post_no]["image_url"];
 		
 		img = main.get_thumb(file);
 		
@@ -430,8 +431,8 @@
 				return;
 			}
 			
-			if(!img_data[post_no]) {
-				img_data[post_no] = {
+			if(!post_img[post_no]) {
+				post_img[post_no] = {
 					processor: self.processor,
 					thumb_url: self.thumb_url,
 					image_url: self.image_url
@@ -635,6 +636,10 @@
 			for(var processor in processors) {
 				if(us.config([processor, "enabled"], processors[processor].options.enabled[0], true)) {
 					main.processors_attach(processor);
+				}
+				
+				if(!data_cache[processor]) {
+					data_cache[processor] = {};
 				}
 			}
 			
@@ -1114,7 +1119,6 @@
 					/derpicdn.net\/img\/(?:view\/)?(?:\d+)\/(?:\d+)\/(?:\d+)\/(\d+)/i
 				];
 				self.qualifier = "derpi";
-				self.cache = {};
 				
 				self.tag_blacklist = us.config([self.name, "tag_blacklist"], processors[self.name].options["tag_blacklist"][0], true);
 				
@@ -1130,9 +1134,9 @@
 					blacklisted_tag = false;
 					
 					if(info) {
-						self.cache[data.id] = info;
+						data_cache[self.name][data.id] = info;
 					} else {
-						info = self.cache[data.id];
+						info = data_cache[self.name][data.id];
 					}
 					
 					if(!info.image) {
@@ -1191,9 +1195,9 @@
 					data.link = location.protocol + "//" + data.name;
 					data.url = data.link + ".json";
 					
-					if(self.cache[data.id])
+					if(data_cache[self.name][data.id]) {
 						self.process_json(data);
-					else {
+					} else {
 						main.load_data(data.url, null, "json", function(response) {
 							self.process_json(data, response);
 						});
@@ -1222,7 +1226,6 @@
 				self.name = "e621";
 				self.regex = /e621\.net\/post\/show\/(\d+)\/?/i;
 				self.qualifier = "e621.net/";
-				self.cache = {};
 				
 				self.auto_gif = us.config([self.name, "auto_gif"], processors[self.name].options["auto_gif"][0], true);
 				
@@ -1235,9 +1238,9 @@
 					no_expansion = false;
 					
 					if(info) {
-						self.cache[data.id] = info;
+						data_cache[self.name][data.id] = info;
 					} else {
-						info = self.cache[data.id];
+						info = data_cache[self.name][data.id];
 					}
 					
 					extension = info.file_ext;
@@ -1297,7 +1300,7 @@
 					data.link = "https://" + data.name;
 					data.url = "https://" + data.base + "/post/show.json";
 					
-					if(self.cache[data.id]) {
+					if(data_cache[self.name][data.id]) {
 						self.process_json(data);
 					} else {
 						main.load_data(data.url, {id: data.id}, "json", function(response) {

@@ -1,3 +1,7 @@
+### 1.8.3 - *2014-11-22*
+- Update b4k.js
+- Image data cache is now preserved when the script restarts
+
 ### 1.8.2 - *2014-11-22*
 - Fixed an undeclared variable causing the script to not run on Firefox
 
