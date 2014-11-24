@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        4chan imgur thumbnail (fix)
-// @version     1.8.3
+// @version     1.8.4
 // @namespace   b4k
 // @description Embeds image links in 4chan posts as normal thumbnails. Supports Imgur, 4chan, YouTube, Derpibooru, e621 and Vocaroo links as well as direct image links.
 // @include     *://boards.4chan.org/*
@@ -8,8 +8,8 @@
 // @grant       GM_xmlhttpRequest
 // @grant       GM_getValue
 // @grant       GM_setValue
-// @require     http://b4k.co/code/jquery.js?759
-// @require     http://b4k.co/code/b4k.js?759
+// @require     http://b4k.co/code/jquery.js?850
+// @require     http://b4k.co/code/b4k.js?850
 // @run-at      document-end
 // @updateURL   https://github.com/bakugo/4chan-imgur/raw/master/dist/4chan-imgur.user.js
 // @downloadURL https://github.com/bakugo/4chan-imgur/raw/master/dist/4chan-imgur.user.js
@@ -99,7 +99,7 @@
 			document.body.appendChild(img);
 		},
 		
-		update: function(e) {
+		update: function(event) {
 			var now;
 			var img;
 			var height;
@@ -112,10 +112,10 @@
 				return;
 			}
 			
-			if(e) {
-				mouse = {x: e.clientX, y: e.clientY};
+			if(event) {
+				mouse = {x: event.clientX, y: event.clientY};
 			} else {
-				mouse = b4k.mouse;
+				mouse = b4k.mouse_pos;
 			}
 			
 			height = img.offsetHeight;

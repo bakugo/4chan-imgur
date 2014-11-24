@@ -1,3 +1,6 @@
+### 1.8.4 - *2014-11-24*
+- Fixed hover-expanded images being positioned incorrectly due to the mouse position not being detected
+
 ### 1.8.3 - *2014-11-22*
 - Update b4k.js
 - Image data cache is now preserved when the script restarts
