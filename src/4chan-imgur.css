@@ -168,4 +168,5 @@ body.imgur_no_scroll {
 	max-height: 97%;
 	max-width: 75%;
 	padding-bottom: 18px;
+	z-index: 100;
 }
