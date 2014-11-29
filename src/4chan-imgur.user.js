@@ -995,7 +995,7 @@
 				
 				self.priority = 2;
 				self.name = "4chan";
-				self.regex = /i\.4cdn\.org\/(.*?)\/(.*?)\.(jpg|png|gif|swf)/i;
+				self.regex = /i\.4cdn\.org\/([a-zA-Z0-9]+)\/([^"&?\/ ]+)\.(jpg|png|gif|swf)/i;
 				self.qualifier = "i.4cdn.org";
 				
 				self.auto_gif = us.config([self.name, "auto_gif"], processors[self.name].options["auto_gif"][0], true);
@@ -1012,8 +1012,9 @@
 					
 					match = main.regex_exec(self.regex, post_text);
 					
-					if(!(match && match[1] && match[2]))
+					if(!(match && match[1] && match[2])) {
 						return;
+					}
 					
 					name = match[0];
 					board = match[1];
