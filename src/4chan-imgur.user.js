@@ -8,8 +8,8 @@
 // @grant       GM_xmlhttpRequest
 // @grant       GM_getValue
 // @grant       GM_setValue
-// @require     http://b4k.co/code/jquery.js?850
-// @require     http://b4k.co/code/b4k.js?850
+// @require     http://b4k.co/code/jquery.js?853
+// @require     http://b4k.co/code/b4k.js?853
 // @run-at      document-end
 // @updateURL   https://github.com/bakugo/4chan-imgur/raw/master/dist/4chan-imgur.user.js
 // @downloadURL https://github.com/bakugo/4chan-imgur/raw/master/dist/4chan-imgur.user.js
@@ -1026,7 +1026,7 @@
 					} else if(extension == "swf") {
 						thumb_url = resources.flash_thumb;
 					} else {
-						thumb_url = b4k.format("//t.4cdn.org/%board%/%tim%s.jpg", {board: board, tim: timestamp});
+						thumb_url = b4k.format("//t.4cdn.org/{board}/{tim}s.jpg", {board: board, tim: timestamp});
 					}
 					
 					_thumb = new thumb({
@@ -1063,7 +1063,7 @@
 				self.name = "youtube";
 				self.regex = /(?:youtu\.be\/|youtube(?:-nocookie)?\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/ ]{11})/i;
 				self.qualifier = "youtu";
-				self.url = "//i.ytimg.com/vi/%id%/0.jpg";
+				self.url = "//i.ytimg.com/vi/{id}/0.jpg";
 				
 				self.process = function(post, post_text) {
 					var match;
