@@ -1,3 +1,8 @@
+### 1.8.5 - *2014-11-29*
+- Fixed hover-expanded images being layered under the 4chan X header instead of over it
+- Fixed some issues with the youtube and 4chan processors
+- File extension is now shown on 4chan images
+
 ### 1.8.4 - *2014-11-24*
 - Fixed hover-expanded images being positioned incorrectly due to the mouse position not being detected
 
