@@ -1036,6 +1036,9 @@
 						link: link,
 						image_url: link,
 						thumb_url: thumb_url,
+						image_info: {
+							format: extension
+						},
 						is_swf: (extension == "swf")
 					});
 					
