@@ -1061,9 +1061,11 @@
 				
 				self.priority = 3;
 				self.name = "youtube";
-				self.regex = /(?:youtu\.be\/|youtube(?:-nocookie)?\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/ ]{11})/i;
+				self.regex = [
+					/youtube\.com\/watch\?v=([^"&?\/ ]{11})/i,
+					/youtu\.be\/([^"&?\/ ]{11})/i
+				];
 				self.qualifier = "youtu";
-				self.url = "//i.ytimg.com/vi/{id}/0.jpg";
 				
 				self.process = function(post, post_text) {
 					var match;
@@ -1080,9 +1082,9 @@
 					}
 					
 					id = match[1];
-					name = match[0];
-					link = "//" + match[0];
-					image_url = b4k.format(self.url, {"id": id});
+					name = "youtube.com/watch?v=" + id;
+					link = "//www.youtube.com/watch?v=" + id;
+					image_url = b4k.format("//i.ytimg.com/vi/{id}/0.jpg", {"id": id});
 					
 					var _thumb = new thumb({
 						processor: self.name,
