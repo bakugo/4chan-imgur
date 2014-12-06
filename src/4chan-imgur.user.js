@@ -8,8 +8,8 @@
 // @grant       GM_xmlhttpRequest
 // @grant       GM_getValue
 // @grant       GM_setValue
-// @require     http://b4k.co/code/jquery.js?853
-// @require     http://b4k.co/code/b4k.js?853
+// @require     http://b4k.co/code/jquery.js?854
+// @require     http://b4k.co/code/b4k.js?854
 // @run-at      document-end
 // @updateURL   https://github.com/bakugo/4chan-imgur/raw/master/dist/4chan-imgur.user.js
 // @downloadURL https://github.com/bakugo/4chan-imgur/raw/master/dist/4chan-imgur.user.js
@@ -31,7 +31,7 @@
 	
 	if(!function(e){if(typeof GM_info!=="undefined"){return true}alert(e+"\n\n"+"This script is not installed correctly."+"\n"+"Please install this script using a script manager like Greasemonkey or Tampermonkey.");return false}("4chan imgur thumbnail")){return};
 	
-	var us = new b4k.userscript();
+	var us = new b4k.userscript({log_show: true});
 	
 	var css;
 	var resources;
@@ -849,7 +849,11 @@
 			func = function() {
 				us.log("[get] Loading: \"" + url + "\" (try " + current_try + " of " + max_tries + ")");
 				
-				request = $.get(url, get, {}, datatype);
+				request = $.ajax({
+					url: url,
+					data: get,
+					dataType: datatype
+				});
 				
 				request.done(function(data, textstatus, jqxhr) {
 					us.log("[get] Loaded successfully: \"" + url + "\"");
@@ -935,7 +939,7 @@
 					
 					match = main.regex_exec(self.regex, post_text);
 					
-					if(!(match && match[2])) {
+					if(!match) {
 						return false;
 					}
 					
@@ -1012,7 +1016,7 @@
 					
 					match = main.regex_exec(self.regex, post_text);
 					
-					if(!(match && match[1] && match[2])) {
+					if(!match) {
 						return;
 					}
 					
@@ -1081,7 +1085,7 @@
 					
 					match = main.regex_exec(self.regex, post_text);
 					
-					if(!(match && match[1])) {
+					if(!match) {
 						return false;
 					}
 					
@@ -1130,7 +1134,7 @@
 				
 				self.tag_blacklist = b4k.comma_string_to_array(self.tag_blacklist);
 				
-				self.process_json = function(data, info) {
+				self.process_data = function(data, info) {
 					var _thumb;
 					var extension;
 					var thumb_url;
@@ -1183,29 +1187,30 @@
 				
 				self.process = function(post, post_text) {
 					var match;
-					var data;
+					var data = {};
+					var domain;
+					var url;
 					
 					match = main.regex_exec(self.regex, post_text);
 					
-					if(!(match && match[1])) {
+					if(!match) {
 						return false;
 					}
 					
-					data = {
-						post: post,
-						id: match[1],
-						base: "derpibooru.org"
-					};
+					domain = "derpibooru.org";
 					
-					data.name = data.base + "/" + data.id;
-					data.link = location.protocol + "//" + data.name;
-					data.url = data.link + ".json";
+					data.post = post;
+					data.id = match[1];
+					data.name = domain + "/" + data.id;
+					data.link = "https://" + data.name;
+					
+					url = data.link + ".json";
 					
 					if(data_cache[self.name][data.id]) {
-						self.process_json(data);
+						self.process_data(data);
 					} else {
-						main.load_data(data.url, null, "json", function(response) {
-							self.process_json(data, response);
+						main.load_data(url, null, "json", function(response) {
+							self.process_data(data, response);
 						});
 					}
 					
@@ -1235,7 +1240,7 @@
 				
 				self.auto_gif = us.config([self.name, "auto_gif"], processors[self.name].options["auto_gif"][0], true);
 				
-				self.process_json = function(data, info) {
+				self.process_data = function(data, info) {
 					var _thumb;
 					var extension;
 					var thumb_url;
@@ -1287,30 +1292,32 @@
 				
 				self.process = function(post, post_text) {
 					var match;
-					var data;
+					var data = {};
+					var domain;
+					var id;
+					var url;
 					var request;
 					
 					match = main.regex_exec(self.regex, post_text);
 					
-					if(!(match && match[1])) {
+					if(!match) {
 						return false;
 					}
 					
-					data = {
-						post: post,
-						id: match[1],
-						base: "e621.net"
-					};
+					domain = "e621.net";
 					
-					data.name = data.base + "/post/show/" + data.id;
+					data.post = post;
+					data.id = match[1];
+					data.name = domain + "/post/show/" + data.id;
 					data.link = "https://" + data.name;
-					data.url = "https://" + data.base + "/post/show.json";
+					
+					url = "https://" + domain + "/post/show.json";
 					
 					if(data_cache[self.name][data.id]) {
-						self.process_json(data);
+						self.process_data(data);
 					} else {
-						main.load_data(data.url, {id: data.id}, "json", function(response) {
-							self.process_json(data, response);
+						main.load_data(url, {id: data.id}, "json", function(response) {
+							self.process_data(data, response);
 						});
 					}
 					
@@ -1327,13 +1334,176 @@
 			}
 		},
 		
+		"tumblr": {
+			name: "Tumblr",
+			
+			obj: function() {
+				var self = this;
+				
+				self.priority = 6;
+				self.name = "tumblr";
+				self.regex = /https?:\/\/(\S*?).tumblr.com\/(?:post|image)\/(\d+)/i;
+				self.qualifier = ".tumblr.com/";
+				
+				self.process_data = function(data, info) {
+					var _thumb;
+					var extension;
+					var thumb_url;
+					var info_fixed = {};
+					
+					if(info) {
+						info = self.simplify_data(info);
+						
+						if(!info) {
+							us.log("failure.");
+							return;
+						}
+						
+						data_cache[self.name][data.id] = info;
+					} else {
+						info = data_cache[self.name][data.id];
+					}
+					
+					// always use the same protocol
+					info.image_url = location.protocol + "//" + b4k.remove_protocol(info.image_url);
+					info.thumb_url = location.protocol + "//" + b4k.remove_protocol(info.thumb_url);
+					
+					_thumb = new thumb({
+						processor: self.name,
+						name: data.name,
+						link: data.link,
+						image_url: info.image_url,
+						thumb_url: info.thumb_url,
+						image_info: {
+							format: b4k.get_extension(info.image_url),
+							width: info.width,
+							height: info.height
+						},
+						fix_protocol: false
+					});
+					
+					_thumb.plant(data.post);
+				};
+				
+				self.simplify_data = function(info) {
+					var info_s = {};
+					var post;
+					var photo;
+					var thumb_size;
+					
+					thumb_size = 250;
+					
+					// api request probably failed
+					if(info.meta.status !== 200) {
+						return false;
+					}
+					
+					info = info.response;
+					
+					// only 1 post should be returned
+					if(info.posts.length !== 1) {
+						return false;
+					}
+					
+					post = info.posts[0];
+					
+					// check if post belongs to this blog
+					if(info.blog.name !== post.blog_name) {
+						return false;
+					}
+					
+					// check if this post is a photo post with only 1 photo
+					if(post.type !== "photo" || !post.photos || post.photos.length !== 1) {
+						return false;
+					}
+					
+					photo = post.photos[0];
+					
+					info_s.width = photo.original_size.width;
+					info_s.height = photo.original_size.height;
+					
+					info_s.image_url = photo.original_size.url;
+					
+					// attempt to find a thumbnail with a specific size
+					for(var i = 0; i < photo.alt_sizes.length; i++) {
+						var size;
+						
+						size = photo.alt_sizes[i];
+						
+						if(
+							(size.width == thumb_size && size.height <= size.width) ||
+							(size.height == thumb_size && size.width <= size.height)
+						) {
+							info_s.thumb_url = size.url;
+							
+							break;
+						}
+					}
+					
+					if(!info_s.thumb_url) {
+						info_s.thumb_url = info_s.image_url;
+					}
+					
+					return info_s;
+				};
+				
+				self.process = function(post, post_text) {
+					var match;
+					var data = {};
+					var blog_name;
+					var post_id;
+					var url;
+					var request;
+					
+					match = main.regex_exec(self.regex, post_text);
+					
+					if(!match) {
+						return false;
+					}
+					
+					blog_name = match[1];
+					post_id = match[2];
+					
+					data.post = post;
+					data.id = blog_name + "," + post_id;
+					data.name = b4k.format("{blog}.tumblr.com/post/{id}", {
+						blog: blog_name,
+						id: post_id
+					});
+					data.link = "http://" + data.name;
+					
+					url = b4k.format("{url}blog/{blog}.tumblr.com/posts", {url: b4k.tumblr.api_url, blog: blog_name});
+					
+					if(data_cache[self.name][data.id]) {
+						self.process_data(data);
+					} else {
+						main.load_data(url, {
+							id: post_id,
+							api_key: b4k.tumblr.api_key
+						}, "json", function(response) {
+							self.process_data(data, response);
+						});
+					}
+					
+					return true;
+				};
+			},
+			
+			options: {
+				enabled: [true, "Enabled", "Enable <a target=\"_blank\" href=\"https://www.tumblr.com\">Tumblr</a> link thumbnails"],
+				preload: [true, "Auto-Load", "Load thumbnail automatically instead of waiting for user action"],
+				inline_expand: [true, "Inline Expand", "Click the thumbnail to switch to the full image"],
+				hover_expand: [true, "Hover Expand", "Hover the thumbnail to show the full image"],
+			}
+		},
+		
 		"vocaroo": {
 			name: "Vocaroo",
 			
 			obj: function() {
 				var self = this;
 				
-				self.priority = 6;
+				self.priority = 7;
 				self.name = "vocaroo";
 				self.regex = /vocaroo\.com\/i\/([a-z0-9]+)\b/i;
 				self.qualifier = "vocaroo.com";
@@ -1350,7 +1520,7 @@
 					
 					match = main.regex_exec(self.regex, post_text);
 					
-					if(!(match && match[1])) {
+					if(!match) {
 						return;
 					}
 					
@@ -1390,7 +1560,7 @@
 			obj: function() {
 				var self = this;
 				
-				self.priority = 7;
+				self.priority = 8;
 				self.name = "generic";
 				self.regex = /https?:\/\/(?:[\-A-Z0-9.]+)\.(?:[\-A-Z0-9.]+)\/(?:[\-A-Z0-9\.+&@#\/%=~_|]+)\.(?:jpe?g|png|gif)/i;
 				self.qualifier = "http";
