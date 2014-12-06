@@ -31,7 +31,7 @@
 	
 	if(!function(e){if(typeof GM_info!=="undefined"){return true}alert(e+"\n\n"+"This script is not installed correctly."+"\n"+"Please install this script using a script manager like Greasemonkey or Tampermonkey.");return false}("4chan imgur thumbnail")){return};
 	
-	var us = new b4k.userscript({log_show: true});
+	var us = new b4k.userscript();
 	
 	var css;
 	var resources;
@@ -912,7 +912,7 @@
 	
 	processors = {
 		"imgur": {
-			name: "Imgur",
+			name: "imgur",
 			
 			obj: function() {
 				var self = this;
@@ -983,7 +983,7 @@
 			},
 			
 			options: {
-				enabled: [true, "Enabled", "Enable imgur.com link thumbnails"],
+				enabled: [true, "Enabled", "Enable <a href=\"https://imgur.com/\">imgur</a> thumbnails"],
 				preload: [true, "Auto-Load", "Load thumbnail automatically instead of waiting for user action"],
 				inline_expand: [true, "Inline Expand", "Click the thumbnail to switch to the full image"],
 				hover_expand: [true, "Hover Expand", "Hover the thumbnail to show the full image"],
@@ -1053,7 +1053,7 @@
 			},
 			
 			options: {
-				enabled: [true, "Enabled", "Enable 4chan link thumbnails"],
+				enabled: [true, "Enabled", "Enable <a target=\"_blank\" href=\"https://www.4chan.org\">4chan</a> thumbnails"],
 				preload: [true, "Auto-Load", "Load thumbnail automatically instead of waiting for user action"],
 				inline_expand: [true, "Inline Expand", "Click the thumbnail to switch to the full image"],
 				hover_expand: [true, "Hover Expand", "Hover the thumbnail to show the full image"],
@@ -1062,7 +1062,7 @@
 		},
 		
 		"youtube": {
-			name: "Youtube",
+			name: "YouTube",
 			
 			obj: function() {
 				var self = this;
@@ -1109,7 +1109,7 @@
 			},
 			
 			options: {
-				enabled: [true, "Enabled", "Enable Youtube link thumbnails"],
+				enabled: [true, "Enabled", "Enable <a target=\"_blank\" href=\"https://www.youtube.com\">YouTube</a> thumbnails"],
 				preload: [true, "Auto-Load", "Load thumbnail automatically instead of waiting for user action"],
 				inline_expand: [false, "Inline Expand", "Click the thumbnail to switch to the full image"],
 				hover_expand: [true, "Hover Expand", "Hover the thumbnail to show the full image"]
@@ -1219,7 +1219,7 @@
 			},
 			
 			options: {
-				enabled: [true, "Enabled", "Enable <a target=\"_blank\" href=\"//derpibooru.org\">derpibooru.org</a> link thumbnails"],
+				enabled: [true, "Enabled", "Enable <a target=\"_blank\" href=\"https://derpibooru.org\">Derpibooru</a> thumbnails"],
 				preload: [true, "Auto-Load", "Load thumbnail automatically instead of waiting for user action"],
 				tag_blacklist: ["", "Blacklisted Tags", "Will never be auto-loaded <span class=\"info\">(comma-separated)</span>"],
 				inline_expand: [true, "Inline Expand", "Click the thumbnail to switch to the full image"],
@@ -1326,7 +1326,7 @@
 			},
 			
 			options: {
-				enabled: [true, "Enabled", "Enable <a target=\"_blank\" href=\"https://e621.net\">e621.net</a> link thumbnails"],
+				enabled: [true, "Enabled", "Enable <a target=\"_blank\" href=\"https://e621.net\">e621</a> thumbnails"],
 				preload: [true, "Auto-Load", "Load thumbnail automatically instead of waiting for user action"],
 				inline_expand: [true, "Inline Expand", "Click the thumbnail to switch to the full image"],
 				hover_expand: [true, "Hover Expand", "Hover the thumbnail to show the full image"],
@@ -1490,7 +1490,7 @@
 			},
 			
 			options: {
-				enabled: [true, "Enabled", "Enable <a target=\"_blank\" href=\"https://www.tumblr.com\">Tumblr</a> link thumbnails"],
+				enabled: [true, "Enabled", "Enable <a target=\"_blank\" href=\"https://www.tumblr.com\">Tumblr</a> thumbnails"],
 				preload: [true, "Auto-Load", "Load thumbnail automatically instead of waiting for user action"],
 				inline_expand: [true, "Inline Expand", "Click the thumbnail to switch to the full image"],
 				hover_expand: [true, "Hover Expand", "Hover the thumbnail to show the full image"],
@@ -1549,7 +1549,7 @@
 			},
 			
 			options: {
-				enabled: [true, "Enabled", "Enable <a target=\"_blank\" href=\"http://vocaroo.com\">vocaroo.com</a> embedding"],
+				enabled: [true, "Enabled", "Enable <a target=\"_blank\" href=\"http://vocaroo.com\">Vocaroo</a> embedding"],
 				autoplay: [false, "Auto-Play", "Automatically play new embeds <span class=\"info\">(never on page load)</span>"]
 			}
 		},
