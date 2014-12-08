@@ -1,3 +1,11 @@
+### 1.9.0 - *2014-12-08*
+- Added Tumblr processor
+ - Loads images from tumblr posts
+ - Currently only works on single-image posts, ignores all other post types
+ - Example: blog.tumblr.com/image/123456 or blog.tumblr.com/post/123456/post-text
+- Updated b4k.co archive url
+- Fixed a possible issue with URL truncating in links
+
 ### 1.8.5 - *2014-11-29*
 - Fixed hover-expanded images being layered under the 4chan X header instead of over it
 - Fixed some issues with the youtube and 4chan processors

@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name        4chan imgur thumbnail (fix)
-// @version     1.8.5
+// @version     1.9.0
 // @namespace   b4k
-// @description Embeds image links in 4chan posts as normal thumbnails. Supports Imgur, 4chan, YouTube, Derpibooru, e621 and Vocaroo links as well as direct image links.
+// @description Embeds image links in 4chan posts as normal thumbnails. Supports Imgur, 4chan, YouTube, Derpibooru, e621, Tumblr, Vocaroo and direct image links.
 // @include     *://boards.4chan.org/*
 // @include     *://b4k.co/4chan/archive_thread/*
 // @grant       GM_xmlhttpRequest
