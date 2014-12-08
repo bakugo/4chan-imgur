@@ -516,20 +516,20 @@
 		div.id = "fT" + post_no;
 		
 		link_container = document.createElement("span");
-		link_container.innerHTML = "Link: ";
+		link_container.textContent = "Link: ";
 		
 		link = document.createElement("a");
 		link.target = "_blank";
 		link.href = self.link;
 		
 		link_filename = document.createElement("span");
-		link_filename.innerHTML = (filename_truncated || filename_full);
+		link_filename.textContent = (filename_truncated || filename_full);
 		
 		if(filename_truncated) {
 			$(link_container).hover(function() {
-				link_filename.innerHTML = filename_full;
+				link_filename.textContent = filename_full;
 			}, function() {
-				link_filename.innerHTML = filename_truncated;
+				link_filename.textContent = filename_truncated;
 			});
 		}
 		
@@ -1731,7 +1731,7 @@
 			
 			menu_header = document.createElement("div");
 			menu_header.className = "header";
-			menu_header.innerHTML = "4chan imgur thumbnail v" + GM_info.script.version;
+			menu_header.textContent = "4chan imgur thumbnail v" + GM_info.script.version;
 			
 			procs = document.createElement("div");
 			procs.className = "fields";
