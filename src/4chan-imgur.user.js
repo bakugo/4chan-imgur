@@ -8,8 +8,8 @@
 // @grant       GM_xmlhttpRequest
 // @grant       GM_getValue
 // @grant       GM_setValue
-// @require     http://b4k.co/code/jquery.js?854
-// @require     http://b4k.co/code/b4k.js?854
+// @require     http://b4k.co/code/jquery.js?857
+// @require     http://b4k.co/code/b4k.js?857
 // @run-at      document-end
 // @updateURL   https://github.com/bakugo/4chan-imgur/raw/master/dist/4chan-imgur.user.js
 // @downloadURL https://github.com/bakugo/4chan-imgur/raw/master/dist/4chan-imgur.user.js
@@ -464,8 +464,8 @@
 		var img;
 		var image_info = [];
 		var filename_truncate;
-		var filename;
 		var filename_full;
+		var filename_noext;
 		var filename_extension;
 		var filename_truncated;
 		var max_filename_length;
@@ -488,14 +488,14 @@
 			}
 		}
 		
-		filename = b4k.remove_extension(self.name);
 		filename_full = self.name;
+		filename_noext = b4k.remove_extension(filename_full);
 		filename_extension = b4k.get_extension(self.name);
 		filename_truncated = false;
 		
 		if(filename_truncate) {
-			if(filename.length > max_filename_length) {
-				filename_truncated = filename.substring(0, max_filename_length) + "(...)" + (filename_extension ? "." + filename_extension : "");
+			if(filename_full.length > max_filename_length) {
+				filename_truncated = filename_noext.substring(0, max_filename_length) + "(...)" + (filename_extension ? "." + filename_extension : "");
 			}
 		}
 		
@@ -861,7 +861,7 @@
 					callback(data, textstatus, jqxhr);
 				});
 				
-				request.fail(function(jqxhr) {
+				request.fail(function(jqxhr, textstatus, errorthrown) {
 					us.log("[get] Failed to load: \"" + url + "\" (" + jqxhr.status + " " + jqxhr.statusText + ")");
 					
 					if(current_try >= max_tries) {
