@@ -344,12 +344,12 @@
 				
 				if(!self.no_expansion) {
 					if(!self.is_swf) {
-						if(us.config([self.processor, "hover_expand"], processors[self.processor].options["hover_expand"][0], true)) {
+						if(main.get_config_option(self.processor, "hover_expand")) {
 							hover.init(file);
 						}
 					}
 					
-					if(us.config([self.processor, "inline_expand"], processors[self.processor].options["inline_expand"][0], true)) {
+					if(main.get_config_option(self.processor, "inline_expand")) {
 						inline_expand(file, !!self.is_swf, self.size || false);
 					}
 				}
@@ -439,7 +439,7 @@
 				};
 			}
 			
-			if((!us.config([self.processor, "preload"], processors[self.processor].options["preload"][0], true) || self.no_preload) && !main.is_preloaded(post_no)) {
+			if((!main.get_config_option(self.processor, "preload") || self.no_preload) && !main.is_preloaded(post_no)) {
 				self.placehold(post, file);
 				
 				return;
@@ -634,7 +634,7 @@
 		
 		processors_attach_all: function() {
 			for(var processor in processors) {
-				if(us.config([processor, "enabled"], processors[processor].options.enabled[0], true)) {
+				if(main.get_config_option(processor, "enabled")) {
 					main.processors_attach(processor);
 				}
 				
@@ -834,6 +834,7 @@
 			}
 			
 			main.files = [];
+			post_img = {};
 		},
 		
 		load_data: function(url, get, datatype, callback) {
@@ -907,6 +908,10 @@
 			}
 			
 			return false;
+		},
+		
+		get_config_option: function(processor, option) {
+			return us.config([processor, option], processors[processor].options[option][0], true);
 		}
 	};
 	
@@ -919,22 +924,19 @@
 				
 				self.priority = 1;
 				self.name = "imgur";
-				self.regex = /((?:i\.)?imgur.com\/)(\w{4,7})(\.?(?:jpg|png|gif))?/i;
+				self.regex = /(?:i\.)?imgur.com\/(\w{4,7})(?:\.(jpg|png|gif|gifv))?/i;
 				self.qualifier = "imgur.com/";
 				
-				self.auto_gif = us.config([self.name, "auto_gif"], processors[self.name].options["auto_gif"][0], true);
+				self.auto_gif = main.get_config_option(self.name, "auto_gif");
 				
 				self.process = function(post, post_text) {
 					var match;
-					var base;
-					var base_img;
-					var filename;
+					var id;
 					var extension;
 					var name;
 					var link;
 					var image_url;
 					var thumb_url;
-					var auto_gif;
 					var _thumb;
 					
 					match = main.regex_exec(self.regex, post_text);
@@ -943,29 +945,43 @@
 						return false;
 					}
 					
-					base = match[1];
-					base_img = "//i.imgur.com/";
-					filename = match[2];
-					extension = "";
+					id = match[1];
+					extension = match[2];
 					
-					if(filename == "a" || filename == "gallery") {
+					if(id == "a" || id == "gallery") {
 						return;
 					}
 					
-					if(match[3]) {
-						extension = match[3].substring(1);
+					if(!extension) {
+						/*
+						 * todo: use the imgur api to find the file extension
+						 * for now we just assume it to be .jpg if it's not present, which prevents auto-gif on extension-less links
+						 */
+						extension = "jpg";
 					}
 					
-					name = base + filename + (extension ? "." + extension : "");
+					/*
+					 * gifv is a shitty idea and shouldn't exist.
+					 * it's not even a real format. it's literally an .mp4 file in a <video> tag.
+					 */
+					if(extension == "gifv") {
+						extension = "gif";
+					}
 					
-					link = "//" + base + filename + (extension ? "." + extension : "");
-					
-					image_url = base_img + filename + "." + (extension || "jpg");
+					name = b4k.format("imgur.com/{id}", {
+						id: id,
+					});
+					link = "//" + name;
+					image_url = b4k.format("i.imgur.com/{id}.{extension}", {
+						id: id,
+						extension: extension
+					});
+					thumb_url = b4k.format("i.imgur.com/{id}m.jpg", {
+						id: id
+					});
 					
 					if(extension == "gif" && self.auto_gif) {
 						thumb_url = image_url;
-					} else {
-						thumb_url = base_img + filename + "m.jpg";
 					}
 					
 					_thumb = new thumb({
@@ -1002,7 +1018,7 @@
 				self.regex = /i\.4cdn\.org\/([a-zA-Z0-9]+)\/([^"&?\/ ]+)\.(jpg|png|gif|swf)/i;
 				self.qualifier = "i.4cdn.org";
 				
-				self.auto_gif = us.config([self.name, "auto_gif"], processors[self.name].options["auto_gif"][0], true);
+				self.auto_gif = main.get_config_option(self.name, "auto_gif");
 				
 				self.process = function(post, post_text) {
 					var match;
@@ -1024,6 +1040,7 @@
 					board = match[1];
 					timestamp = match[2];
 					extension = match[3];
+					
 					link = "//" + name;
 					
 					if(extension == "gif" && self.auto_gif) {
@@ -1031,7 +1048,10 @@
 					} else if(extension == "swf") {
 						thumb_url = resources.thumb_flash;
 					} else {
-						thumb_url = b4k.format("//t.4cdn.org/{board}/{tim}s.jpg", {board: board, tim: timestamp});
+						thumb_url = b4k.format("//t.4cdn.org/{board}/{tim}s.jpg", {
+							board: board,
+							tim: timestamp
+						});
 					}
 					
 					_thumb = new thumb({
@@ -1090,9 +1110,16 @@
 					}
 					
 					id = match[1];
-					name = "youtube.com/watch?v=" + id;
-					link = "//www.youtube.com/watch?v=" + id;
-					image_url = b4k.format("//i.ytimg.com/vi/{id}/0.jpg", {"id": id});
+					
+					name = b4k.format("youtube.com/watch?v={id}", {
+						id: id
+					});
+					link = b4k.format("//www.youtube.com/watch?v={id}", {
+						id: id
+					});
+					image_url = b4k.format("//i.ytimg.com/vi/{id}/0.jpg", {
+						id: id
+					});
 					
 					var _thumb = new thumb({
 						processor: self.name,
@@ -1130,7 +1157,7 @@
 				];
 				self.qualifier = "derpi";
 				
-				self.tag_blacklist = us.config([self.name, "tag_blacklist"], processors[self.name].options["tag_blacklist"][0], true);
+				self.tag_blacklist = main.get_config_option(self.name, "tag_blacklist");
 				
 				self.tag_blacklist = b4k.comma_string_to_array(self.tag_blacklist);
 				
@@ -1238,7 +1265,7 @@
 				self.regex = /e621\.net\/post\/show\/(\d+)\/?/i;
 				self.qualifier = "e621.net/";
 				
-				self.auto_gif = us.config([self.name, "auto_gif"], processors[self.name].options["auto_gif"][0], true);
+				self.auto_gif = main.get_config_option(self.name, "auto_gif");
 				
 				self.process_data = function(data, info) {
 					var _thumb;
@@ -1472,7 +1499,10 @@
 					});
 					data.link = "http://" + data.name;
 					
-					url = b4k.format("{url}blog/{blog}.tumblr.com/posts", {url: b4k.tumblr.api_url, blog: blog_name});
+					url = b4k.format("{api_url}blog/{blog}.tumblr.com/posts", {
+						api_url: b4k.tumblr.api_url,
+						blog: blog_name
+					});
 					
 					if(data_cache[self.name][data.id]) {
 						self.process_data(data);
@@ -1506,9 +1536,9 @@
 				self.priority = 7;
 				self.name = "vocaroo";
 				self.regex = /vocaroo\.com\/i\/([a-z0-9]+)\b/i;
-				self.qualifier = "vocaroo.com";
+				self.qualifier = "vocaroo.com/";
 				
-				self.autoplay = us.config([self.name, "autoplay"], processors[self.name].options["autoplay"][0], true);
+				self.autoplay = main.get_config_option(self.name, "autoplay");
 				
 				self.process = function(post, post_text, init) {
 					var match;
@@ -1573,11 +1603,13 @@
 					"1.media.tumblr.com"
 				];
 				
-				self.allowed_domains = us.config([self.name, "allowed_domains"], processors[self.name].options["allowed_domains"][0], true);
-				self.disallowed_domains = us.config([self.name, "disallowed_domains"], processors[self.name].options["disallowed_domains"][0], true);
-				
+				self.allowed_domains = main.get_config_option(self.name, "allowed_domains");
 				self.allowed_domains = b4k.comma_string_to_array(self.allowed_domains);
+				
+				self.disallowed_domains = main.get_config_option(self.name, "disallowed_domains");
 				self.disallowed_domains = b4k.comma_string_to_array(self.disallowed_domains);
+				
+				self.whitelist_only = main.get_config_option(self.name, "whitelist_only");
 				
 				self.is_allowed_domain = function(url) {
 					var allowed;
@@ -1598,7 +1630,7 @@
 						}
 					}
 					
-					if(!us.config([self.name, "whitelist_only"], processors[self.name].options["whitelist_only"][0], true)) {
+					if(!self.whitelist_only) {
 						return true;
 					}
 					
@@ -1816,6 +1848,7 @@
 		},
 		
 		change: function() {
+			var option;
 			var value;
 			
 			switch(this.type) {
@@ -1829,7 +1862,10 @@
 					return;
 			}
 			
-			us.config(this.name, value);
+			option = this.name;
+			option = this.name.split(".");
+			
+			us.config(option, value);
 			
 			menu.option_changed = true;
 			
