@@ -129,17 +129,17 @@ body.imgur_no_scroll {
 		position: relative;
 	}
 	
-		.file.imgur_file .fileThumb :first-child {
+		.file.imgur_file .fileThumb .imgur_thumb {
 		}
 		
-			.file.imgur_file .fileThumb img:first-child {
+			.file.imgur_file .fileThumb img.imgur_thumb {
 				border: 1px solid #00a !important;
 				padding: 2px;
 				max-height: 125px !important;
 				max-width: 125px !important;
 			}
 			
-				.file.imgur_file .fileThumb img:first-child.expanding {
+				.file.imgur_file .fileThumb.expanding img.imgur_thumb {
 					opacity: 0.5;
 				}
 		
@@ -157,13 +157,13 @@ body.imgur_no_scroll {
 			padding: 8px 8px 2px 2px;
 		}
 		
-		.file.imgur_file .fileThumb object:last-child:not(:first-child) {
+		.file.imgur_file .fileThumb object.imgur_thumb_expanded {
 			display: block;
 			background-color: #fff;
 			margin-bottom: -4px;
 		}
 
-#imgur_hover_img {
+.imgur_hover {
 	position: fixed;
 	max-height: 97%;
 	max-width: 75%;
