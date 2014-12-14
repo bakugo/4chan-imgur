@@ -1,3 +1,7 @@
+### 1.10.1 - *2014-12-14*
+- Fixed Tumblr thumbnails sometimes not being detected correctly
+- Generic processor will now ignore www.dropbox.com/s/* URLs since they can't be loaded directly
+
 ### 1.10.0 - *2014-12-14*
 - Updated imgur processor
  - Now always links to an image's imgur page, regardless of the link matched (imgur.com or i.imgur.com)
