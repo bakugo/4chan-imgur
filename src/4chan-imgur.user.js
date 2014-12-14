@@ -91,6 +91,7 @@
 			}
 			
 			top = Math.max(0, mouse.y * (innerHeight - e_expanded.offsetHeight) / innerHeight);
+			top = Math.round(top);
 			top = top + "px";
 			
 			if(mouse.x <= (innerWidth / 2)) {
