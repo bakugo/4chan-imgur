@@ -992,7 +992,7 @@
 					match = main.regex_exec(self.regex, post_text);
 					
 					if(!match) {
-						return;
+						return false;
 					}
 					
 					name = match[0];
@@ -1510,7 +1510,7 @@
 					match = main.regex_exec(self.regex, post_text);
 					
 					if(!match) {
-						return;
+						return false;
 					}
 					
 					id = match[1];
@@ -1615,7 +1615,7 @@
 					
 					match = main.regex_exec(self.regex, post_text);
 					
-					if(!(match && match[0])) {
+					if(!match) {
 						return false;
 					}
 					
@@ -1634,6 +1634,11 @@
 					image_url = protocol + domain + path;
 					
 					if(!self.is_allowed_domain(domain)) {
+						return false;
+					}
+					
+					// ignore dropbox images
+					if(domain == "www.dropbox.com" && path.indexOf("/s/") === 0) {
 						return false;
 					}
 					
