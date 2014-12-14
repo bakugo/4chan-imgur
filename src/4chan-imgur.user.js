@@ -131,9 +131,6 @@
 		var is_expanded = false;
 		var is_loadeddata = false;
 		var expand;
-		var default_size;
-		
-		default_size = [854, 480];
 		
 		expand = function(event) {
 			if(event) {
@@ -240,6 +237,11 @@
 				e_expanded.src = url;
 			}
 		};
+		
+		if(!swf_size) {
+			// default swf size, 480p
+			swf_size = [854, 480];
+		}
 		
 		e_thumbnail = main.get_thumb(file);
 		e_filethumb = e_thumbnail.parentElement;
@@ -1518,7 +1520,9 @@
 						autoplay = "0";
 					}
 					
-					swf_url = location.protocol + "//dl.dropboxusercontent.com/u/9715811/vocaroo_player.swf?playMediaID=" + id + "&autoplay=" + autoplay;
+					swf_url = "//files.b4k.co/misc/vocaroo_player.swf";
+					
+					swf_url += "?playMediaID=" + id + "&autoplay=" + autoplay;
 					
 					obj = new embed_object({
 						processor: self.name,

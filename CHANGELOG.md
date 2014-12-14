@@ -1,3 +1,10 @@
+### 1.10.0 - *2014-12-08*
+- Updated imgur processor
+ - Now always links to an image's imgur page, regardless of the link matched (imgur.com or i.imgur.com)
+ - Better handling of .gifv links
+- Improved Inline Expansion and Hover Expansion
+ - Updated the position calculation on hover-expanded images
+
 ### 1.9.0 - *2014-12-08*
 - Added Tumblr processor
  - Loads images from tumblr posts
