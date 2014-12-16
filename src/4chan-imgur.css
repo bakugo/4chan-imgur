@@ -97,6 +97,7 @@ body.imgur_no_scroll {
 					width: 220px;
 					margin-top: 3px;
 					height: 12px;
+					padding: 2px 4px 3px 4px;
 				}
 				
 				#imgur_settings .fields ul li input[type="checkbox"] {
