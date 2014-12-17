@@ -877,8 +877,8 @@
 			obj: function() {
 				var self = this;
 				
-				self.priority = 1;
 				self.name = "imgur";
+				self.priority = 1;
 				self.regex = /(?:i\.)?imgur.com\/(\w{4,7})(?:\.(jpg|png|gif|gifv))?/i;
 				self.qualifier = "imgur.com/";
 				
@@ -970,8 +970,8 @@
 			obj: function() {
 				var self = this;
 				
-				self.priority = 2;
 				self.name = "4chan";
+				self.priority = 2;
 				self.regex = /i\.4cdn\.org\/([a-zA-Z0-9]+)\/([^"&?\/ ]+)\.(jpg|png|gif|swf)/i;
 				self.qualifier = "i.4cdn.org";
 				
@@ -1044,8 +1044,8 @@
 			obj: function() {
 				var self = this;
 				
-				self.priority = 3;
 				self.name = "youtube";
+				self.priority = 3;
 				self.regex = [
 					/youtube\.com\/watch\?v=([^"&?\/ ]{11})/i,
 					/youtu\.be\/([^"&?\/ ]{11})/i
@@ -1106,8 +1106,8 @@
 			obj: function() {
 				var self = this;
 				
-				self.priority = 4;
 				self.name = "derpibooru";
+				self.priority = 4;
 				self.regex = [
 					/derpiboo(?:\.ru|ru\.org)\/(\d+)/i,
 					/derpicdn.net\/img\/(?:view\/)?(?:\d+)\/(?:\d+)\/(?:\d+)\/(\d+)/i
@@ -1217,8 +1217,8 @@
 			obj: function() {
 				var self = this;
 				
-				self.priority = 5;
 				self.name = "e621";
+				self.priority = 5;
 				self.regex = /e621\.net\/post\/show\/(\d+)\/?/i;
 				self.qualifier = "e621.net/";
 				
@@ -1324,8 +1324,8 @@
 			obj: function() {
 				var self = this;
 				
-				self.priority = 6;
 				self.name = "tumblr";
+				self.priority = 6;
 				self.regex = /https?:\/\/(\S*?).tumblr.com\/(?:post|image)\/(\d+)/i;
 				self.qualifier = ".tumblr.com/";
 				
@@ -1489,8 +1489,8 @@
 			obj: function() {
 				var self = this;
 				
-				self.priority = 7;
 				self.name = "vocaroo";
+				self.priority = 7;
 				self.regex = /vocaroo\.com\/i\/([a-z0-9]+)\b/i;
 				self.qualifier = "vocaroo.com/";
 				
@@ -1548,8 +1548,8 @@
 			obj: function() {
 				var self = this;
 				
-				self.priority = 8;
 				self.name = "generic";
+				self.priority = 8;
 				self.regex = /https?:\/\/(?:[\-A-Z0-9.]+)\.(?:[\-A-Z0-9.]+)\/(?:[\-A-Z0-9\.+&@#\/%=~_|]+)\.(?:jpe?g|png|gif)/i;
 				self.qualifier = "http";
 				
@@ -1681,7 +1681,7 @@
 		init: function() {
 			b4k.chan.register_button(
 				"Imgur Settings",
-				menu.dialog,
+				menu.open,
 				{
 					navlinks: true,
 					boardlist: true,
@@ -1693,17 +1693,17 @@
 			if(!us.config("first_run")) {
 				us.config("first_run", true);
 				
-				menu.dialog();
+				menu.open();
 			}
 		},
 		
-		dialog: function(event) {
-			var overlay;
+		open: function(event) {
+			var e_overlay;
 			var links;
-			var _menu;
-			var menu_links;
-			var menu_header;
-			var procs;
+			var e_menu;
+			var e_links;
+			var e_header;
+			var e_procs;
 			
 			links = {
 				"home": "https://github.com/bakugo/4chan-imgur",
@@ -1721,26 +1721,26 @@
 			menu.option_changed = false;
 			menu.is_open = true;
 			
-			overlay = document.createElement("div");
-			overlay.id = "imgur_overlay";
+			e_overlay = document.createElement("div");
+			e_overlay.id = "imgur_overlay";
 			
-			_menu = document.createElement("div");
-			_menu.id = "imgur_settings";
-			_menu.className = "dialog";
+			e_menu = document.createElement("div");
+			e_menu.id = "imgur_settings";
+			e_menu.className = "dialog";
 			
-			menu_links = document.createElement("div");
-			menu_links.className = "links";
+			e_links = document.createElement("div");
+			e_links.className = "links";
 			
 			for(var link in links) {
-				menu_links.innerHTML += "<a href=\"" + links[link] + "\" target=\"_blank\">" + link + "</a>";
+				e_links.innerHTML += "<a href=\"" + links[link] + "\" target=\"_blank\">" + link + "</a>";
 			}
 			
-			menu_header = document.createElement("div");
-			menu_header.className = "header";
-			menu_header.textContent = "4chan imgur thumbnail v" + GM_info.script.version;
+			e_header = document.createElement("div");
+			e_header.className = "header";
+			e_header.textContent = "4chan imgur thumbnail v" + GM_info.script.version;
 			
-			procs = document.createElement("div");
-			procs.className = "fields";
+			e_procs = document.createElement("div");
+			e_procs.className = "fields";
 			
 			for(var processor_index in processors) {
 				var processor;
@@ -1802,21 +1802,21 @@
 					ul.appendChild(li);
 				}
 				
-				procs.appendChild(ul);
+				e_procs.appendChild(ul);
 			}
 			
-			_menu.appendChild(menu_links);
-			_menu.appendChild(menu_header);
-			_menu.appendChild(procs);
+			e_menu.appendChild(e_links);
+			e_menu.appendChild(e_header);
+			e_menu.appendChild(e_procs);
 			
 			$(overlay).on("click", menu.close);
 			
-			$(_menu).on("click", function(e) {
+			$(e_menu).on("click", function(e) {
 				e.stopPropagation();
 			});
 			
-			overlay.appendChild(_menu);
-			document.body.appendChild(overlay);
+			e_overlay.appendChild(e_menu);
+			document.body.appendChild(e_overlay);
 			
 			$(document.body).addClass("imgur_no_scroll");
 		},
