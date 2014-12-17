@@ -132,20 +132,35 @@ body.imgur_no_scroll {
 	}
 	
 		.file.imgur_file .fileThumb .imgur_thumb {
+			border: 1px solid #00a !important;
+			padding: 2px;
+			max-height: 125px !important;
+			max-width: 125px !important;
 		}
 		
-			.file.imgur_file .fileThumb img.imgur_thumb {
-				border: 1px solid #00a !important;
-				padding: 2px;
-				max-height: 125px !important;
-				max-width: 125px !important;
+			.file.imgur_file .fileThumb.imgur_expanded .imgur_thumb {
+				display: none;
 			}
 			
-				.file.imgur_file .fileThumb.expanding img.imgur_thumb {
-					opacity: 0.5;
-				}
+			.file.imgur_file .fileThumb.imgur_expanding .imgur_thumb {
+				opacity: 0.5;
+			}
 		
-		.file.imgur_file .fileThumb span {
+		.file.imgur_file .fileThumb .imgur_thumb_expanded {
+			
+		}
+		
+			.file.imgur_file .fileThumb:not(.imgur_expanded) .imgur_thumb_expanded {
+				display: none;
+			}
+			
+			.file.imgur_file .fileThumb object.imgur_thumb_expanded {
+				display: block;
+				background-color: #fff;
+				margin-bottom: -4px;
+			}
+		
+		.file.imgur_file .fileThumb .imgur_thumb_close {
 			display: inline-block;
 			overflow: hidden;
 			position: absolute;
@@ -157,12 +172,6 @@ body.imgur_no_scroll {
 			width: 10px;
 			height: 10px;
 			padding: 8px 8px 2px 2px;
-		}
-		
-		.file.imgur_file .fileThumb object.imgur_thumb_expanded {
-			display: block;
-			background-color: #fff;
-			margin-bottom: -4px;
 		}
 
 .imgur_hover {
