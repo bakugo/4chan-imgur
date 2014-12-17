@@ -124,16 +124,18 @@
 	};
 	
 	inline_expand = function(file, url, is_swf, swf_size) {
-		var e_thumbnail;
+		var e_thumb;
 		var e_filethumb;
-		var e_expanded = false;
-		var e_expanded_close = false;
-		var is_expanding = false;
-		var is_expanded = false;
-		var is_loadeddata = false;
+		var e_expanded;
+		var e_expanded_close;
+		var is_expanding;
+		var is_expanded;
+		var is_cached;
+		var toggle;
 		var expand;
+		var contract;
 		
-		expand = function(event) {
+		toggle = function(event) {
 			if(event) {
 				if(event.which !== 1) {
 					return;
@@ -142,112 +144,114 @@
 				event.preventDefault();
 			}
 			
-			if(is_expanding) {
-				is_expanding = false;
-				is_expanded = false;
-				
-				b4k.element_remove(e_expanded);
-				e_expanded = false;
-				
-				$(e_filethumb).removeClass("expanding");
-				
-				return;
-			}
-			
-			if(is_expanded) {
-				is_expanded = false;
-				
-				e_expanded.style.display = "none";
-				
-				if(e_expanded_close) {
-					e_expanded_close.style.display = "none";
-				}
-				
-				e_thumbnail.style.display = "";
-				
-				main.expand_scroll_back(file);
-				
-				return;
-			}
-			
-			if(e_expanded) {
-				is_expanded = true;
-				
-				e_expanded.style.display = "";
-				
-				if(e_expanded_close) {
-					e_expanded_close.style.display = "";
-				}
-				
-				e_thumbnail.style.display = "none";
-				
-				return;
-			}
-			
-			if(is_swf) {
-				e_expanded = main.build_object(url, swf_size || default_size);
-				e_expanded.className = "imgur_thumb_expanded";
-				
-				$(e_expanded).on("click", function(event) {
-					event.preventDefault();
-					event.stopPropagation();
-				});
-				
-				e_expanded_close = document.createElement("span");
-				e_expanded_close.innerHTML = "&#215;";
-				
-				is_expanded = true;
-				
-				e_thumbnail.style.display = "none";
-				e_thumbnail.parentElement.appendChild(e_expanded_close);
-				e_thumbnail.parentElement.appendChild(e_expanded);
+			if(!(is_expanded || is_expanding)) {
+				expand();
 			} else {
-				e_expanded = document.createElement("img");
-				e_expanded.className = "imgur_thumb_expanded";
-				
-				b4k.wait_for(function() {
-					return !!e_expanded.naturalWidth;
-				}, function() {
-					if(!is_expanding || is_expanded || is_loadeddata) {
-						return;
-					}
-					
-					is_loadeddata = true;
-					
-					e_thumbnail.style.display = "none";
-					
-					$(e_filethumb).removeClass("expanding");
-					
-					e_filethumb.appendChild(e_expanded);
-					
-					is_expanding = false;
-					is_expanded = true;
-				});
-				
-				$(e_expanded).on("error", function() {
-					if(!is_expanding) {
-						return;
-					}
-					
-					expand();
-				});
-				
-				$(e_filethumb).addClass("expanding");
-				is_expanding = true;
-				
-				e_expanded.src = url;
+				contract(false);
 			}
 		};
 		
-		if(!swf_size) {
-			// default swf size, 480p
-			swf_size = [854, 480];
+		expand = function() {
+			if(is_swf) {
+				is_expanded = true;
+				
+				e_thumb.style.display = "none";
+				e_thumb.parentElement.appendChild(e_expanded_close);
+				e_thumb.parentElement.appendChild(e_expanded);
+			} else {
+				e_expanded.src = url;
+				
+				if(is_cached) {
+					e_thumb.style.display = "none";
+					e_filethumb.appendChild(e_expanded);
+					
+					is_expanded = true;
+				} else {
+					is_expanding = true;
+					
+					$(e_filethumb).addClass("expanding");
+					
+					b4k.wait_for(function() {
+						return !!e_expanded.naturalHeight;
+					}, function() {
+						if(!is_expanding || is_expanded) {
+							return;
+						}
+						
+						$(e_filethumb).removeClass("expanding");
+						
+						e_thumb.style.display = "none";
+						e_filethumb.appendChild(e_expanded);
+						
+						is_expanding = false;
+						is_expanded = true;
+						is_cached = true;
+					});
+				}
+			}
+		};
+		
+		contract = function(error) {
+			is_expanding = false;
+			is_expanded = false;
+			
+			b4k.element_remove(e_expanded);
+			
+			if(e_expanded_close) {
+				b4k.element_remove(e_expanded_close);
+			}
+			
+			if(!is_swf) {
+				e_expanded.src = "";
+			}
+			
+			$(e_filethumb).removeClass("expanding");
+			
+			e_thumb.style.display = "";
+			
+			if(!error) {
+				main.expand_scroll_back(file);
+			}
+			
+			console.log(is_expanding);
+			console.log(is_expanded);
+			console.log(is_cached);
+		};
+		
+		
+		e_thumb = main.get_thumb(file);
+		e_filethumb = e_thumb.parentElement;
+		
+		$(e_thumb.parentElement).on("click", toggle);
+		
+		
+		is_expanding = false;
+		is_expanded = false;
+		is_cached = false;
+		
+		if(is_swf) {
+			e_expanded = main.build_object(url, swf_size || [854, 480]);
+			e_expanded.className = "imgur_thumb_expanded";
+			
+			$(e_expanded).on("click", function(event) {
+				event.preventDefault();
+				event.stopPropagation();
+			});
+			
+			e_expanded_close = document.createElement("span");
+			e_expanded_close.innerHTML = "&#215;";
+		} else {
+			e_expanded = document.createElement("img");
+			e_expanded.className = "imgur_thumb_expanded";
+			
+			$(e_expanded).on("error", function() {
+				if(!is_expanding) {
+					return;
+				}
+				
+				contract(true);
+			});
 		}
-		
-		e_thumbnail = main.get_thumb(file);
-		e_filethumb = e_thumbnail.parentElement;
-		
-		$(e_thumbnail.parentElement).on("click", expand);
 	};
 	
 	thumb = function(props) {
