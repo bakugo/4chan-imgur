@@ -1,6 +1,6 @@
 ### 1.10.2 - *2014-12-17*
 - Updated the settings menu button added to the 4chan X header
- - Now uses a FontAwesome icon (`fa-info-circle´) instead of text
+ - Now uses a FontAwesome icon (`fa-info-circle`) instead of text
  - Is now placed alongside the rest of the buttons (placed on the right of the updater/thread stats, if these are enabled)
  - No longer supports non-seaweedchan forks
 - Fixed text input fields in the settings menu being too small when using OneeChan
