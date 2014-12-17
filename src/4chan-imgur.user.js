@@ -394,10 +394,7 @@
 			
 			post_no = b4k.chan.post_no(post);
 			
-			/*
-				one last check to make sure there isn't already a file in the post
-				this should fix the multiple file bug in 4chan x's search
-			*/
+			// one last check to make sure there isn't already a file in the post
 			if(b4k.chan.get_post_file(post)) {
 				return;
 			}
