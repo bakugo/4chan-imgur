@@ -1,3 +1,6 @@
+### 1.10.3 - *2014-12-18*
+- Improved inline expansion
+
 ### 1.10.2 - *2014-12-17*
 - Updated the settings menu button added to the 4chan X header
  - Now uses a FontAwesome icon (`fa-info-circle`) instead of text
