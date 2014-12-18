@@ -156,8 +156,8 @@
 				
 				$(e_filethumb).addClass("imgur_expanded");
 				
-				e_thumb.parentElement.appendChild(e_expanded_close);
-				e_thumb.parentElement.appendChild(e_expanded);
+				e_filethumb.appendChild(e_expanded_close);
+				e_filethumb.appendChild(e_expanded);
 			} else {
 				e_expanded.src = url;
 				
@@ -234,7 +234,7 @@
 			});
 			
 			e_expanded_close = document.createElement("span");
-			e_expanded_close = "imgur_thumb_close";
+			e_expanded_close.className = "imgur_thumb_close";
 			e_expanded_close.innerHTML = "&#215;";
 		} else {
 			e_expanded = document.createElement("img");
@@ -303,6 +303,7 @@
 			var img;
 			var img_load;
 			var load;
+			var error;
 			
 			load = function() {
 				img.src = self.thumb_url;
@@ -1698,8 +1699,8 @@
 		},
 		
 		open: function(event) {
-			var e_overlay;
 			var links;
+			var e_overlay;
 			var e_menu;
 			var e_links;
 			var e_header;
@@ -1809,7 +1810,7 @@
 			e_menu.appendChild(e_header);
 			e_menu.appendChild(e_procs);
 			
-			$(overlay).on("click", menu.close);
+			$(e_overlay).on("click", menu.close);
 			
 			$(e_menu).on("click", function(e) {
 				e.stopPropagation();
