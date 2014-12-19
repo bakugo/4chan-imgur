@@ -1,3 +1,6 @@
+### 1.10.5 - *2014-12-19*
+- Sorry
+
 ### 1.10.4 - *2014-12-19*
 - Fixed some cases where the 4chan X header button wasn't added
 
