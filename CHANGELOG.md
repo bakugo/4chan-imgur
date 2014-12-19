@@ -1,3 +1,6 @@
+### 1.10.4 - *2014-12-19*
+- Fixed some cases where the 4chan X header button wasn't added
+
 ### 1.10.3 - *2014-12-18*
 - Improved inline expansion
 
