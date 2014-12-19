@@ -8,8 +8,8 @@
 // @grant       GM_xmlhttpRequest
 // @grant       GM_getValue
 // @grant       GM_setValue
-// @require     http://b4k.co/code/jquery.js?862
-// @require     http://b4k.co/code/b4k.js?862
+// @require     http://b4k.co/code/jquery.js?863
+// @require     http://b4k.co/code/jquery.js?863
 // @run-at      document-end
 // @updateURL   https://github.com/bakugo/4chan-imgur/raw/master/dist/4chan-imgur.user.js
 // @downloadURL https://github.com/bakugo/4chan-imgur/raw/master/dist/4chan-imgur.user.js
@@ -1680,16 +1680,16 @@
 	
 	menu = {
 		init: function() {
-			b4k.chan.register_button(
-				"Imgur Settings",
-				menu.open,
-				{
+			b4k.chan.register_button({
+				text: "Imgur Settings",
+				callback: menu.open,
+				destinations: {
 					navlinks: true,
 					boardlist: true,
 					fourchanx_header: true,
 				},
-				"info-circle"
-			);
+				fontawesome_icon: "info-circle"
+			});
 			
 			if(!us.config("first_run")) {
 				us.config("first_run", true);
