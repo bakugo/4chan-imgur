@@ -51,68 +51,75 @@ body.imgur_no_scroll {
 		text-align: center;
 	}
 	
-	#imgur_settings .fields {
+	#imgur_settings .processors {
 		max-height: calc(100% - 40px);
 		overflow-y: scroll;
 		margin-top: 10px;
 		padding: 0 10px;
 	}
 	
-		#imgur_settings .fields ul {
-			padding: 0;
-			list-style: none;
+		#imgur_settings .processors .processor {
+			margin-top: 12px;
 		}
 		
-			#imgur_settings .fields ul:first-child {
+			#imgur_settings .processors .processor:first-child {
 				margin-top: 0;
 			}
 			
-			#imgur_settings .fields ul:last-child {
+			#imgur_settings .processors .processor:last-child {
 				margin-bottom: 10px;
 			}
 			
-			#imgur_settings .fields ul .name {
+			#imgur_settings .processors .processor .processor_name {
 				font-size: 15px;
 				margin-left: 10px;
 				font-weight: bold;
 			}
 			
-			#imgur_settings .fields ul li {
+			#imgur_settings .processors .processor .options {
 			}
 			
-				#imgur_settings .fields ul li.text {
-					margin-left: 20px;
+				#imgur_settings .processors .processor .options .option {
 				}
 				
-					#imgur_settings .fields ul li.text .description {
-						position: relative;
-						top: 1px;
+					#imgur_settings .processors .processor .options .option.text {
+						margin-left: 20px;
 					}
-				
-				#imgur_settings .fields ul li label {
-					text-decoration: underline;
-				}
-				
-				#imgur_settings .fields ul li input[type="text"] {
-					width: 220px;
-					margin-top: 3px;
-					height: 12px;
-					padding: 2px 4px 3px 4px;
-				}
-				
-				#imgur_settings .fields ul li input[type="checkbox"] {
-					position: relative;
-					top: 2px;
-				}
-				
-				#imgur_settings .fields ul li .info,
-				#imgur_settings .fields ul li .warning {
-					font-size: 11px;
-				}
-				
-				#imgur_settings .fields ul li .warning {
-					color: #f00;
-				}
+					
+						#imgur_settings .processors .processor .options .option.text .description {
+							position: relative;
+							top: 1px;
+						}
+					
+					#imgur_settings .processors .processor .options .option label {
+						cursor: default;
+					}
+					
+					#imgur_settings .processors .processor .options .option .option_name {
+						cursor: pointer;
+						text-decoration: underline;
+					}
+					
+					#imgur_settings .processors .processor .options .option input[type="text"] {
+						width: 220px;
+						margin-top: 3px;
+						height: 12px;
+						padding: 2px 4px 3px 4px;
+					}
+					
+					#imgur_settings .processors .processor .options .option input[type="checkbox"] {
+						position: relative;
+						top: 2px;
+					}
+					
+					#imgur_settings .processors .processor .options .option .description {
+						
+					}
+						
+						#imgur_settings .processors .processor .options .option .description i {
+							font-style: normal;
+							font-size: 11px;
+						}
 
 .file.imgur_file {
 }
