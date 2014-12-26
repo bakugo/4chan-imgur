@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        4chan imgur thumbnail (fix)
-// @version     1.11.0
+// @version     1.11.1
 // @namespace   b4k
 // @description Embeds image links in 4chan posts as normal thumbnails. Supports Imgur, 4chan, YouTube, Derpibooru, e621, Tumblr, Vocaroo and direct image links.
 // @include     *://boards.4chan.org/*
@@ -8,8 +8,8 @@
 // @grant       GM_xmlhttpRequest
 // @grant       GM_getValue
 // @grant       GM_setValue
-// @require     http://b4k.co/code/jquery.js?866
-// @require     http://b4k.co/code/b4k.js?866
+// @require     http://b4k.co/code/jquery.js?867
+// @require     http://b4k.co/code/b4k.js?867
 // @run-at      document-end
 // @updateURL   https://github.com/bakugo/4chan-imgur/raw/master/dist/4chan-imgur.user.js
 // @downloadURL https://github.com/bakugo/4chan-imgur/raw/master/dist/4chan-imgur.user.js
@@ -404,14 +404,17 @@
 	};
 	
 	place_object = function(options) {
+		var post;
 		var post_no;
-		var object;
+		var file;
+		
+		post = options.post;
 		
 		post_no = b4k.chan.post_no(post);
 		
-		object = options.object || build_file(post_no, options, "obj");
+		file = build_file(post_no, options, "obj");
 		
-		main.insert_file(post, object);
+		main.insert_file(post, file);
 	};
 	
 	build_file = function(post_no, options, type) {
@@ -1464,6 +1467,7 @@
 					swf_url += "?playMediaID=" + id + "&autoplay=" + autoplay;
 					
 					place_object({
+						post: post,
 						processor: self.name,
 						name: match[0],
 						link: link,

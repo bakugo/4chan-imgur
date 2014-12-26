@@ -1,3 +1,6 @@
+### 1.11.1 - *2014-12-26*
+- Fixed vocaroo processor
+
 ### 1.11.0 - *2014-12-24*
 - Code cleanup
 - Bugfixes
