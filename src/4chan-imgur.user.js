@@ -72,33 +72,39 @@
 			});
 			
 			document.body.appendChild(e_expanded);
+			
+			update();
 		};
 		
 		update = function(event) {
-			var mouse;
+			var window_size;
+			var mouse_pos;
 			var top;
 			var left;
 			var right;
 			
 			if(event) {
-				mouse = {
+				mouse_pos = {
 					x: event.clientX,
 					y: event.clientY
 				};
 			} else {
-				mouse = b4k.mouse_pos;
+				mouse_pos = b4k.mouse_pos;
 			}
 			
-			top = Math.max(0, mouse.y * (innerHeight - e_expanded.offsetHeight) / innerHeight);
-			top = Math.round(top);
-			top = top + "px";
+			window_size = {
+				width: window.innerWidth,
+				height: window.innerHeight
+			}
 			
-			if(mouse.x <= (innerWidth / 2)) {
-				left = (mouse.x + 45) + "px";
+			top = Math.round(Math.max(0, mouse_pos.y * (window_size.height - e_expanded.offsetHeight) / window_size.height)) + "px";
+			
+			if(mouse_pos.x <= (window_size.width / 2)) {
+				left = (mouse_pos.x + 45) + "px";
 				right = "";
 			} else {
 				left = "";
-				right = (innerWidth - mouse.x + 45) + "px";
+				right = (window_size.width - mouse_pos.x + 45) + "px";
 			}
 			
 			e_expanded.style.top = top;
