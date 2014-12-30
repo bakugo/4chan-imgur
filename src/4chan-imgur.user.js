@@ -310,7 +310,7 @@
 			}
 		};
 		
-		placehold = function(post) {
+		placehold = function() {
 			var click;
 			var loaded = false;
 			
@@ -562,14 +562,28 @@
 		preloaded: [],
 		files: [],
 		
-		add_processors: function() {
+		load_processors: function() {
 			for(var processor in processors) {
-				main.processors.push(
-					new processors[processor].obj
-				);
+				var processor_obj;
+				
+				processor_obj = new processors[processor].obj;
+				
+				main.processors.push(processor_obj);
 				
 				if(!data_cache[processor]) {
 					data_cache[processor] = {};
+				}
+			}
+		},
+		
+		init_processors: function() {
+			for(var i = 0; i < main.processors.length; i++) {
+				var processor_obj;
+				
+				processor_obj = main.processors[i];
+				
+				if(processor_obj.init) {
+					processor_obj.init();
 				}
 			}
 		},
@@ -667,7 +681,9 @@
 				return;
 			}
 			
-			main.add_processors();
+			main.load_processors();
+			
+			main.init_processors();
 			
 			menu();
 			
@@ -680,6 +696,8 @@
 		
 		restart: function() {
 			us.log("Restart: reprocessing all posts");
+			
+			main.init_processors();
 			
 			main.clear_files();
 			
@@ -849,7 +867,9 @@
 				self.regex = /(?:i\.)?imgur.com\/(\w{4,7})(?:\.(jpg|png|gif|gifv))?/i;
 				self.qualifier = "imgur.com/";
 				
-				self.auto_gif = main.get_config_option(self.name, "auto_gif");
+				self.init = function() {
+					self.auto_gif = main.get_config_option(self.name, "auto_gif");
+				};
 				
 				self.process = function(post, post_text) {
 					var match;
@@ -941,7 +961,9 @@
 				self.regex = /i\.4cdn\.org\/([a-zA-Z0-9]+)\/([^"&?\/ ]+)\.(jpg|png|gif|swf)/i;
 				self.qualifier = "i.4cdn.org";
 				
-				self.auto_gif = main.get_config_option(self.name, "auto_gif");
+				self.init = function() {
+					self.auto_gif = main.get_config_option(self.name, "auto_gif");
+				};
 				
 				self.process = function(post, post_text) {
 					var match;
@@ -1070,13 +1092,14 @@
 				
 				self.regex = [
 					/derpiboo(?:\.ru|ru\.org)\/(\d+)/i,
-					/derpicdn.net\/img\/(?:view\/)?(?:\d+)\/(?:\d+)\/(?:\d+)\/(\d+)/i
+					/(?:img\d\.)?derpicdn.net\/img\/(?:view\/)?(?:\d+)\/(?:\d+)\/(?:\d+)\/(\d+)(?:\.|\_\_\_|\/)/i
 				];
 				self.qualifier = "derpi";
 				
-				self.tag_blacklist = main.get_config_option(self.name, "tag_blacklist");
-				
-				self.tag_blacklist = b4k.comma_string_to_array(self.tag_blacklist);
+				self.init = function() {
+					self.tag_blacklist = main.get_config_option(self.name, "tag_blacklist");
+					self.tag_blacklist = b4k.comma_string_to_array(self.tag_blacklist);
+				};
 				
 				self.process_data = function(data, info) {
 					var extension;
@@ -1179,7 +1202,9 @@
 				self.regex = /e621\.net\/post\/show\/(\d+)\/?/i;
 				self.qualifier = "e621.net/";
 				
-				self.auto_gif = main.get_config_option(self.name, "auto_gif");
+				self.init = function() {
+					self.auto_gif = main.get_config_option(self.name, "auto_gif");
+				};
 				
 				self.process_data = function(data, info) {
 					var extension;
@@ -1445,7 +1470,9 @@
 				self.regex = /vocaroo\.com\/i\/([a-z0-9]+)\b/i;
 				self.qualifier = "vocaroo.com/";
 				
-				self.autoplay = main.get_config_option(self.name, "autoplay");
+				self.init = function() {
+					self.autoplay = main.get_config_option(self.name, "autoplay");
+				};
 				
 				self.process = function(post, post_text, init) {
 					var match;
@@ -1509,13 +1536,15 @@
 					"1.media.tumblr.com"
 				];
 				
-				self.allowed_domains = main.get_config_option(self.name, "allowed_domains");
-				self.allowed_domains = b4k.comma_string_to_array(self.allowed_domains);
-				
-				self.disallowed_domains = main.get_config_option(self.name, "disallowed_domains");
-				self.disallowed_domains = b4k.comma_string_to_array(self.disallowed_domains);
-				
-				self.whitelist_only = main.get_config_option(self.name, "whitelist_only");
+				self.init = function() {
+					self.allowed_domains = main.get_config_option(self.name, "allowed_domains");
+					self.allowed_domains = b4k.comma_string_to_array(self.allowed_domains);
+					
+					self.disallowed_domains = main.get_config_option(self.name, "disallowed_domains");
+					self.disallowed_domains = b4k.comma_string_to_array(self.disallowed_domains);
+					
+					self.whitelist_only = main.get_config_option(self.name, "whitelist_only");
+				};
 				
 				self.is_allowed_domain = function(url) {
 					var allowed;
@@ -1626,10 +1655,9 @@
 	menu = function() {
 		var links;
 		var is_open = false;
-		var option_changed = false;
 		var e_overlay;
+		var all_input_elements = [];
 		var open;
-		var change;
 		var close;
 		
 		links = [
@@ -1692,6 +1720,7 @@
 				
 				e_processor = document.createElement("div");
 				e_processor.className = "processor"
+				$(e_processor).addClass(processor.name);
 				
 				e_processor_name = document.createElement("div");
 				e_processor_name.className = "processor_name";
@@ -1711,19 +1740,17 @@
 					var e_label;
 					var e_input;
 					var e_description;
-					var conf_key;
-					var conf_key_join;
+					var option_key;
 					
 					option = processors[processor.name].options[option_index];
 					
-					conf_key = [processor.name, option_index];
-					conf_key_join = conf_key.join(".");
+					option_key = [processor.name, option_index];
 					
 					option_default = option[0];
 					option_name = option[1];
 					option_description = option[2];
 					
-					option_value = us.config(conf_key, option_default, true);
+					option_value = us.config(option_key, option_default, true);
 					
 					e_option = document.createElement("div");
 					e_option.className = "option";
@@ -1735,7 +1762,7 @@
 					e_label = document.createElement("label");
 					
 					e_input = document.createElement("input");
-					$(e_input).on("change", change);
+					$(e_input).data("option", option_key);
 					
 					e_description = document.createElement("span");
 					e_description.className = "description";
@@ -1743,7 +1770,6 @@
 					switch(typeof option_default) {
 						case "boolean":
 							e_input.type = "checkbox";
-							e_input.dataset.option = conf_key_join;
 							e_input.checked = !!option_value;
 							
 							e_label.appendChild(e_input);
@@ -1763,7 +1789,6 @@
 						
 						case "string":
 							e_input.type = "text";
-							e_input.dataset.option = conf_key_join;
 							e_input.value = option_value;
 							
 							e_label.appendChild(e_option_name);
@@ -1791,6 +1816,8 @@
 					
 					$(e_option).addClass(e_input.type);
 					
+					all_input_elements.push(e_input);
+					
 					e_options.appendChild(e_option);
 				}
 				
@@ -1805,9 +1832,7 @@
 			e_menu.appendChild(e_header);
 			e_menu.appendChild(e_processors);
 			
-			$(e_overlay).on("click", function(event) {
-				close();
-			});
+			$(e_overlay).on("click", close);
 			
 			$(e_menu).on("click", function(event) {
 				event.stopPropagation();
@@ -1818,32 +1843,38 @@
 			document.body.appendChild(e_overlay);
 			
 			$(document.body).addClass("imgur_no_scroll");
-		},
-		
-		change = function() {
-			var option;
-			var value;
-			
-			switch(this.type) {
-				case "checkbox":
-					value = this.checked;
-					break;
-				case "text":
-					value = this.value;
-					break;
-			}
-			
-			option = this.dataset.option;
-			option = option.split(".");
-			
-			us.config(option, value);
-			
-			option_changed = true;
-			
-			return value;
-		},
+		};
 		
 		close = function() {
+			var option_changed = false;
+			
+			// save all settings
+			for(var i = 0; i < all_input_elements.length; i++) {
+				var e = all_input_elements[i];
+				var option;
+				var value;
+				
+				switch(e.type) {
+					case "checkbox":
+						value = e.checked;
+						break;
+					case "text":
+						value = e.value;
+						break;
+				}
+				
+				option = $(e).data("option");
+				
+				if(us.config(option) !== value) {
+					us.config(option, value);
+					
+					option_changed = true;
+				}
+			}
+			
+			
+			all_input_elements = [];
+			
 			is_open = false;
 			
 			$(e_overlay).remove();
@@ -1854,7 +1885,7 @@
 			if(option_changed) {
 				main.restart();
 			}
-		}
+		};
 		
 		
 		b4k.chan.register_button({
