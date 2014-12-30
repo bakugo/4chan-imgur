@@ -1,3 +1,10 @@
+### 1.11.2 - *2014-12-30*
+- Minor bugfixes
+- Fixed thumbnail placeholding
+- Fixed text fields in the settings menu sometimes not being saved
+- All settings will now update without having to reload the page, including text field settings
+- Images won't be updated after closing the settings menu unless a setting has changed
+
 ### 1.11.1 - *2014-12-26*
 - Fixed vocaroo processor
 
