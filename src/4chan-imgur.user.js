@@ -1853,6 +1853,8 @@
 				var option;
 				var value;
 				
+				option = $(e).data("option");
+				
 				switch(e.type) {
 					case "checkbox":
 						value = e.checked;
@@ -1861,8 +1863,6 @@
 						value = e.value;
 						break;
 				}
-				
-				option = $(e).data("option");
 				
 				if(us.config(option) !== value) {
 					us.config(option, value);
