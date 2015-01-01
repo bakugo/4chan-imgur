@@ -1697,7 +1697,7 @@
 				a = document.createElement("a");
 				a.href = link[1];
 				a.target = "_blank";
-				a.textContent = link[0]
+				a.textContent = link[0];
 				
 				e_links.appendChild(a);
 			}
