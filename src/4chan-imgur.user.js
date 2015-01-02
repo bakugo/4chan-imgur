@@ -8,8 +8,8 @@
 // @grant       GM_xmlhttpRequest
 // @grant       GM_getValue
 // @grant       GM_setValue
-// @require     http://b4k.co/code/jquery.js?868
-// @require     http://b4k.co/code/b4k.js?868
+// @require     http://b4k.co/code/jquery.js?869
+// @require     http://b4k.co/code/b4k.js?869
 // @run-at      document-end
 // @updateURL   https://github.com/bakugo/4chan-imgur/raw/master/dist/4chan-imgur.user.js
 // @downloadURL https://github.com/bakugo/4chan-imgur/raw/master/dist/4chan-imgur.user.js
@@ -66,7 +66,7 @@
 			e_expanded.src = url;
 			
 			b4k.wait_for(function() {
-				return !!e_expanded.naturalWidth;
+				return b4k.is_image_loaded_partially(e_expanded);
 			}, function() {
 				update();
 			});
@@ -135,7 +135,6 @@
 		var e_expanded_close;
 		var is_expanding;
 		var is_expanded;
-		var is_cached;
 		var toggle;
 		var expand;
 		var contract;
@@ -166,7 +165,7 @@
 			} else {
 				e_expanded.src = url;
 				
-				if(is_cached) {
+				if(b4k.is_image_loaded_partially(e_expanded)) {
 					is_expanded = true;
 					
 					$(e_filethumb).addClass("imgur_expanded");
@@ -178,7 +177,7 @@
 					$(e_filethumb).addClass("imgur_expanding");
 					
 					b4k.wait_for(function() {
-						return !!e_expanded.naturalHeight;
+						return b4k.is_image_loaded_partially(e_expanded);
 					}, function() {
 						if(!is_expanding || is_expanded) {
 							return;
@@ -186,7 +185,6 @@
 						
 						is_expanding = false;
 						is_expanded = true;
-						is_cached = true;
 						
 						$(e_filethumb).removeClass("imgur_expanding");
 						$(e_filethumb).addClass("imgur_expanded");
@@ -225,7 +223,6 @@
 		
 		is_expanding = false;
 		is_expanded = false;
-		is_cached = false;
 		
 		$(e_filethumb).on("click", toggle);
 		
