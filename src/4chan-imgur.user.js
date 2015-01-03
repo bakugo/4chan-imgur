@@ -110,7 +110,7 @@
 			e_expanded.style.left = left;
 			e_expanded.style.right = right;
 			
-			e_expanded.style.opacity = (b4k.is_image_loaded_partially(e_expanded) ? null : "0");
+			e_expanded.style.visibility = (b4k.is_image_loaded_partially(e_expanded) ? null : "hidden");
 		},
 		
 		stop = function() {
@@ -1532,7 +1532,8 @@
 					"*.deviantart.net",
 					"i.4cdn.org",
 					"1.media.tumblr.com",
-					"puu.sh"
+					"puu.sh",
+					"a.pomf.se"
 				];
 				
 				self.init = function() {
