@@ -55,7 +55,6 @@
 	};
 	
 	hover_expand = function(file, url) {
-		var element;
 		var e_thumb;
 		var e_expanded;
 		var start;
@@ -110,6 +109,8 @@
 			e_expanded.style.top = top;
 			e_expanded.style.left = left;
 			e_expanded.style.right = right;
+			
+			e.expanded.style.display = (b4k.is_image_loaded_partially(e_expanded) ? null : "none");
 		},
 		
 		stop = function() {
