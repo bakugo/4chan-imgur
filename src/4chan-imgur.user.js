@@ -1666,7 +1666,7 @@
 			}],
 			["home", "https://github.com/bakugo/4chan-imgur"],
 			["changelog", "https://github.com/bakugo/4chan-imgur/blob/master/CHANGELOG.md"]
-		]
+		];
 		
 		
 		open = function() {
