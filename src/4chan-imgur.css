@@ -39,9 +39,9 @@ body.imgur_no_scroll {
 		right: 10px;
 		font-size: 11px;
 	}
-	
-		#imgur_settings .links a {
-			margin-left: 5px;
+		
+		#imgur_settings .links a:not(:first-of-type) {
+			margin-left: 6px;
 		}
 	
 	#imgur_settings .header {
