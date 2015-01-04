@@ -1306,6 +1306,10 @@
 				self.regex = /https?:\/\/(\S*?).tumblr.com\/(?:post|image)\/(\d+)/i;
 				self.qualifier = ".tumblr.com/";
 				
+				self.init = function() {
+					self.enable_photosets = main.get_config_option(self.name, "enable_photosets");
+				};
+				
 				self.process_data = function(data, info) {
 					var extension;
 					var thumb_url;
@@ -1322,6 +1326,10 @@
 						data_cache[self.name][data.id] = info;
 					} else {
 						info = data_cache[self.name][data.id];
+					}
+					
+					if(info.is_photoset && !self.enable_photosets) {
+						return;
 					}
 					
 					// always use the same protocol
@@ -1368,9 +1376,13 @@
 						return false;
 					}
 					
-					// check if this post is a photo post with only 1 photo
-					if(post.type !== "photo" || !post.photos || post.photos.length !== 1) {
+					// check if this post is a photo post
+					if(post.type !== "photo" || !post.photos || post.photos.length < 1) {
 						return false;
+					}
+					
+					if(post.photos.length > 1) {
+						info_s.is_photoset = true;
 					}
 					
 					photo = post.photos[0];
@@ -1452,6 +1464,7 @@
 			
 			options: {
 				enabled: [true, "Enabled", "Enable <a href=\"https://www.tumblr.com\">Tumblr</a> thumbnails"],
+				enable_photosets: [true, "Enable Photosets", "Display the first image for photoset (multiple image) posts"],
 				preload: [true, "Auto-Load", "Load thumbnail automatically instead of waiting for user action"],
 				inline_expand: [true, "Inline Expand", "Click the thumbnail to switch to the full image"],
 				hover_expand: [true, "Hover Expand", "Hover the thumbnail to show the full image"],
