@@ -1,3 +1,9 @@
+### 1.12.0 - *2015-01-08*
+- Fixed hover expansion displaying a broken image while loading on Firefox
+- Added a "reload" button to the settings menu to re-process all posts
+- Improved image load state detection for inline expansion
+- Tumblr posts with multiple images will now display the first image in the post
+
 ### 1.11.2 - *2014-12-30*
 - Minor bugfixes
 - Fixed thumbnail placeholding
