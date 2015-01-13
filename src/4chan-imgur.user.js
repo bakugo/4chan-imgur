@@ -8,8 +8,8 @@
 // @grant       GM_xmlhttpRequest
 // @grant       GM_getValue
 // @grant       GM_setValue
-// @require     http://b4k.co/code/jquery.js?1
-// @require     http://b4k.co/code/b4k.js?1
+// @require     http://b4k.co/code/jquery.js?2
+// @require     http://b4k.co/code/b4k.js?2
 // @run-at      document-end
 // @updateURL   https://github.com/bakugo/4chan-imgur/raw/master/dist/4chan-imgur.user.js
 // @downloadURL https://github.com/bakugo/4chan-imgur/raw/master/dist/4chan-imgur.user.js
@@ -706,39 +706,16 @@
 			return file.getElementsByClassName("fileThumb")[0].children[0];
 		},
 		
-		expand_scroll_back: function(e) {
+		expand_scroll_back: function(element) {
 			var post;
-			var pos_top;
-			var fourchanx;
-			var header;
+			var pos;
 			
-			fourchanx = b4k.chan.check_fourchanx();
+			post = b4k.chan.in_post(element);
 			
-			header = document.getElementById("header-bar");
+			pos = b4k.chan.get_post_scroll_pos(post);
 			
-			post = b4k.chan.in_post(e);
-			
-			pos_top = $(post).offset().top;
-			
-			// the inline extension normally scrolls to the exact top of the post,
-			// but other extensions like 4chan x scroll 8 pixels above it
-			if(fourchanx) {
-				if(fourchanx == "seaweedchan") {
-					if(
-						header &&
-						$(header).hasClass("dialog") &&
-						!$(header).hasClass("autohide") &&
-						!$(document.body.parentElement).hasClass("bottom-header")
-					) {
-						pos_top = pos_top - 26;
-					}
-				} else {
-					pos_top = pos_top - 8;
-				}
-			}
-			
-			if(b4k.scroll() > pos_top) {
-				b4k.scroll(pos_top);
+			if(b4k.scroll() > pos) {
+				b4k.scroll(pos);
 			}
 		},
 		
