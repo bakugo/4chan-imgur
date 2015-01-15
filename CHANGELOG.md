@@ -1,3 +1,6 @@
+### 1.12.1 - *2015-01-15*
+- Improve accuracy of inline expansion scrollback position
+
 ### 1.12.0 - *2015-01-08*
 - Fixed hover expansion displaying a broken image while loading on Firefox
 - Added a "reload" button to the settings menu to re-process all posts
