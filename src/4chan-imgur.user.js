@@ -1646,9 +1646,9 @@
 		var links;
 		var is_open = false;
 		var e_overlay;
-		var all_input_elements = [];
 		var open;
 		var close;
+		var tracked_options = [];
 		
 		links = [
 			["reload", function() {
@@ -1771,7 +1771,6 @@
 					e_label = document.createElement("label");
 					
 					e_input = document.createElement("input");
-					$(e_input).data("option", option_key);
 					
 					e_description = document.createElement("span");
 					e_description.className = "description";
@@ -1825,7 +1824,7 @@
 					
 					$(e_option).addClass(e_input.type);
 					
-					all_input_elements.push(e_input);
+					tracked_options.push([option_key, e_input]);
 					
 					e_options.appendChild(e_option);
 				}
@@ -1860,19 +1859,22 @@
 			var option_changed = false;
 			
 			// save all settings
-			for(var i = 0; i < all_input_elements.length; i++) {
-				var e = all_input_elements[i];
+			for(var i = 0; i < tracked_options.length; i++) {
+				var tracked_option;
 				var option;
+				var input;
 				var value;
 				
-				option = $(e).data("option");
+				tracked_option = tracked_options[i];
+				option = tracked_option[0];
+				input = tracked_option[1];
 				
-				switch(e.type) {
+				switch(input.type) {
 					case "checkbox":
-						value = e.checked;
+						value = input.checked;
 						break;
 					case "text":
-						value = e.value;
+						value = input.value;
 						break;
 				}
 				
@@ -1884,7 +1886,7 @@
 			}
 			
 			
-			all_input_elements = [];
+			tracked_options = [];
 			
 			is_open = false;
 			
