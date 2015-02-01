@@ -1066,7 +1066,7 @@
 				self.name_full = "Derpibooru";
 				
 				self.regex = [
-					/derpiboo(?:\.ru|ru\.org)\/(\d+)/i,
+					/derpiboo(?:\.ru|ru\.org)\/(?:images\/)?(\d+)/i,
 					/(?:img\d\.)?derpicdn.net\/img\/(?:view\/)?(?:\d+)\/(?:\d+)\/(?:\d+)\/(\d+)(?:\.|\_\_\_|\/)/i
 				];
 				self.qualifier = "derpi";
