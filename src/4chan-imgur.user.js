@@ -1296,7 +1296,8 @@
 						info = self.simplify_data(info);
 						
 						if(!info) {
-							us.log("failure.");
+							us.log("Tumblr post is not valid for thumbnailing.");
+							
 							return;
 						}
 						
