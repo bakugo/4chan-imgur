@@ -4,7 +4,7 @@
 // @namespace   b4k
 // @description Embeds image links in 4chan posts as normal thumbnails. Supports Imgur, 4chan, YouTube, Derpibooru, e621, Tumblr, Vocaroo and direct image links.
 // @include     *://boards.4chan.org/*
-// @include     *://b4k.co/4chan/archive_thread/*
+// @include     *://fg.b4k.co/arch/*/thread/*
 // @grant       GM_xmlhttpRequest
 // @grant       GM_getValue
 // @grant       GM_setValue
