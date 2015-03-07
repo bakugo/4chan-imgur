@@ -1,15 +1,15 @@
 // ==UserScript==
 // @name        4chan imgur thumbnail (fix)
-// @version     1.12.1
+// @version     1.12.2
 // @namespace   b4k
 // @description Embeds image links in 4chan posts as normal thumbnails. Supports Imgur, 4chan, YouTube, Derpibooru, e621, Tumblr, Vocaroo and direct image links.
 // @include     *://boards.4chan.org/*
-// @include     *://b4k.co/4chan/archive_thread/*
+// @include     *://fg.b4k.co/arch/*/thread/*
 // @grant       GM_xmlhttpRequest
 // @grant       GM_getValue
 // @grant       GM_setValue
-// @require     http://b4k.co/code/jquery.js?3
-// @require     http://b4k.co/code/b4k.js?3
+// @require     http://b4k.co/code/jquery.js?4
+// @require     http://b4k.co/code/b4k.js?4
 // @run-at      document-end
 // @updateURL   https://github.com/bakugo/4chan-imgur/raw/master/dist/4chan-imgur.user.js
 // @downloadURL https://github.com/bakugo/4chan-imgur/raw/master/dist/4chan-imgur.user.js
@@ -1066,7 +1066,7 @@
 				self.name_full = "Derpibooru";
 				
 				self.regex = [
-					/derpiboo(?:\.ru|ru\.org)\/(\d+)/i,
+					/derpiboo(?:\.ru|ru\.org)\/(?:images\/)?(\d+)/i,
 					/(?:img\d\.)?derpicdn.net\/img\/(?:view\/)?(?:\d+)\/(?:\d+)\/(?:\d+)\/(\d+)(?:\.|\_\_\_|\/)/i
 				];
 				self.qualifier = "derpi";
@@ -1296,7 +1296,8 @@
 						info = self.simplify_data(info);
 						
 						if(!info) {
-							us.log("failure.");
+							us.log("Tumblr post is not valid for thumbnailing.");
+							
 							return;
 						}
 						
@@ -1646,9 +1647,9 @@
 		var links;
 		var is_open = false;
 		var e_overlay;
-		var all_input_elements = [];
 		var open;
 		var close;
+		var tracked_options = [];
 		
 		links = [
 			["reload", function() {
@@ -1771,7 +1772,6 @@
 					e_label = document.createElement("label");
 					
 					e_input = document.createElement("input");
-					$(e_input).data("option", option_key);
 					
 					e_description = document.createElement("span");
 					e_description.className = "description";
@@ -1825,7 +1825,7 @@
 					
 					$(e_option).addClass(e_input.type);
 					
-					all_input_elements.push(e_input);
+					tracked_options.push([option_key, e_input]);
 					
 					e_options.appendChild(e_option);
 				}
@@ -1860,19 +1860,22 @@
 			var option_changed = false;
 			
 			// save all settings
-			for(var i = 0; i < all_input_elements.length; i++) {
-				var e = all_input_elements[i];
+			for(var i = 0; i < tracked_options.length; i++) {
+				var tracked_option;
 				var option;
+				var input;
 				var value;
 				
-				option = $(e).data("option");
+				tracked_option = tracked_options[i];
+				option = tracked_option[0];
+				input = tracked_option[1];
 				
-				switch(e.type) {
+				switch(input.type) {
 					case "checkbox":
-						value = e.checked;
+						value = input.checked;
 						break;
 					case "text":
-						value = e.value;
+						value = input.value;
 						break;
 				}
 				
@@ -1884,7 +1887,7 @@
 			}
 			
 			
-			all_input_elements = [];
+			tracked_options = [];
 			
 			is_open = false;
 			

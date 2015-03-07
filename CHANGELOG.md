@@ -1,3 +1,7 @@
+### 1.12.2 - *2015-03-07*
+- Support for derpibooru.org/images/ links
+- Enable script on the fg.b4k.co archive
+
 ### 1.12.1 - *2015-01-15*
 - Improve accuracy of inline expansion scrollback position
 
