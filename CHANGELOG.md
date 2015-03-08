@@ -1,3 +1,7 @@
+### 1.12.3 - *2015-03-08*
+- Fix *.media.tumblr.com images sometimes not loading
+- Rewrite settings storage (settings will be reset, sorry!)
+
 ### 1.12.2 - *2015-03-07*
 - Support for derpibooru.org/images/ links
 - Enable script on the fg.b4k.co archive

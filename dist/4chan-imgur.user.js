@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        4chan imgur thumbnail (fix)
-// @version     1.12.2
+// @version     1.12.3
 // @namespace   b4k
 // @description Embeds image links in 4chan posts as normal thumbnails. Supports Imgur, 4chan, YouTube, Derpibooru, e621, Tumblr, Vocaroo and direct image links.
 // @include     *://boards.4chan.org/*
@@ -8,8 +8,8 @@
 // @grant       GM_xmlhttpRequest
 // @grant       GM_getValue
 // @grant       GM_setValue
-// @require     http://b4k.co/code/jquery.js?4
-// @require     http://b4k.co/code/b4k.js?4
+// @require     http://b4k.co/code/jquery.js?8
+// @require     http://b4k.co/code/b4k.js?8
 // @run-at      document-end
 // @updateURL   https://github.com/bakugo/4chan-imgur/raw/master/dist/4chan-imgur.user.js
 // @downloadURL https://github.com/bakugo/4chan-imgur/raw/master/dist/4chan-imgur.user.js
@@ -827,7 +827,7 @@
 		},
 		
 		get_config_option: function(processor, option) {
-			return us.config([processor, option], processors[processor].options[option][0], true);
+			return us.config.get([processor, option], processors[processor].options[option][0]);
 		}
 	};
 	
@@ -1522,7 +1522,7 @@
 					"*.ytimg.com",
 					"*.deviantart.net",
 					"i.4cdn.org",
-					"1.media.tumblr.com",
+					"*.media.tumblr.com",
 					"puu.sh",
 					"a.pomf.se"
 				];
@@ -1591,7 +1591,7 @@
 					
 					// some of tumblr's media domains have bad certificates, so we always use 1.media.tumblr.com
 					if(b4k.match_wildcard("*.media.tumblr.com", domain)) {
-						domain = "1.media.tumblr.com";
+						//domain = "1.media.tumblr.com";
 					}
 					
 					// rebuild url with possible changes
@@ -1760,7 +1760,7 @@
 					option_name = option[1];
 					option_description = option[2];
 					
-					option_value = us.config(option_key, option_default, true);
+					option_value = us.config.get(option_key, option_default);
 					
 					e_option = document.createElement("div");
 					e_option.className = "option";
@@ -1879,8 +1879,8 @@
 						break;
 				}
 				
-				if(us.config(option) !== value) {
-					us.config(option, value);
+				if(us.config.get(option) !== value) {
+					us.config.set(option, value);
 					
 					option_changed = true;
 				}
@@ -1913,8 +1913,8 @@
 			fontawesome_icon: "info-circle"
 		});
 		
-		if(!us.config("first_run")) {
-			us.config("first_run", true);
+		if(!us.config.get("first_run")) {
+			us.config.set("first_run", true);
 			
 			open();
 		}
