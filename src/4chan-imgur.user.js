@@ -1522,7 +1522,7 @@
 					"*.ytimg.com",
 					"*.deviantart.net",
 					"i.4cdn.org",
-					"1.media.tumblr.com",
+					"*.media.tumblr.com",
 					"puu.sh",
 					"a.pomf.se"
 				];
@@ -1591,7 +1591,7 @@
 					
 					// some of tumblr's media domains have bad certificates, so we always use 1.media.tumblr.com
 					if(b4k.match_wildcard("*.media.tumblr.com", domain)) {
-						domain = "1.media.tumblr.com";
+						//domain = "1.media.tumblr.com";
 					}
 					
 					// rebuild url with possible changes
