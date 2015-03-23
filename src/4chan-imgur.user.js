@@ -440,7 +440,7 @@
 		
 		max_filename_length = 30;
 		
-		filename_truncate = Boolean(options.filename_truncate);
+		filename_truncate = !!options.filename_truncate;
 		
 		if(options.image_info) {
 			if(options.image_info.format){
