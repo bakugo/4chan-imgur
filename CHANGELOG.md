@@ -1,3 +1,6 @@
+### 1.12.4 - *2015-03-24*
+- Update b4k.js
+
 ### 1.12.3 - *2015-03-08*
 - Fix *.media.tumblr.com images sometimes not loading
 - Rewrite settings storage (settings will be reset, sorry!)
