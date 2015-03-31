@@ -431,6 +431,7 @@
 		var ft;
 		var img;
 		var image_info = [];
+		var image_info_part_e;
 		var filename_truncate;
 		var filename_full;
 		var filename_noext;
@@ -443,6 +444,10 @@
 		filename_truncate = !!options.filename_truncate;
 		
 		if(options.image_info) {
+			if(options.image_info.derpibooru_filtered_tag) {
+				image_info.push(options.image_info.derpibooru_filtered_tag);
+			}
+			
 			if(options.image_info.format){
 				image_info.push(options.image_info.format.toUpperCase());
 			}
@@ -509,8 +514,29 @@
 		link_container.appendChild(link);
 		div.appendChild(link_container);
 		
-		if(image_info.length > 0) {
-			b4k.e_append_text_node(link_container, " (" + image_info.join(", ") + ")");
+		if(image_info.length) {
+			b4k.e_append_text_node(link_container, " (");
+			
+			for(var i = 0; i < image_info.length; i++) {
+				if(image_info[i].text) {
+					image_info_part_e = document.createElement("span");
+					image_info_part_e.textContent = image_info[i].text;
+					
+					if(image_info[i].title) {
+						image_info_part_e.title = image_info[i].title;
+					}
+					
+					link_container.appendChild(image_info_part_e);
+				} else {
+					b4k.e_append_text_node(link_container, image_info[i]);
+				}
+				
+				if(i !== (image_info.length - 1)) {
+					b4k.e_append_text_node(link_container, ", ");
+				}
+			}
+			
+			b4k.e_append_text_node(link_container, ")");
 		}
 		
 		ft = document.createElement("a")
@@ -753,7 +779,7 @@
 			main.files = [];
 		},
 		
-		load_data: function(url, get, datatype, callback) {
+		get: function(url, get, datatype, callback) {
 			var request;
 			var func;
 			var current_try;
@@ -1006,10 +1032,7 @@
 				self.name = "youtube";
 				self.name_full = "YouTube";
 				
-				self.regex = [
-					/youtube\.com\/watch\?v=([^"&?\/ ]{11})/i,
-					/youtu\.be\/([^"&?\/ ]{11})/i
-				];
+				self.regex = /(?:youtube.com\/watch\?v\=|youtu.be\/)([^"&?\/ ]{11})/i;
 				self.qualifier = "youtu";
 				
 				self.process = function(post, post_text) {
@@ -1072,17 +1095,72 @@
 				self.qualifier = "derpi";
 				
 				self.init = function() {
-					self.tag_blacklist = main.get_config_option(self.name, "tag_blacklist");
-					self.tag_blacklist = b4k.comma_string_to_array(self.tag_blacklist);
+					if(main.get_config_option(self.name, "load_derpibooru_filter")) {
+						self.load_derpibooru_filter();
+					}
+					
+					self.filtered_tags = [];
+					
+					self.filtered_tags = self.filtered_tags.concat(b4k.comma_string_to_array(main.get_config_option(self.name, "filtered_tags")));
+					
+					if(main.get_config_option(self.name, "load_derpibooru_filter") && us.config.get([self.name, "derpibooru_filter", "tags"])) {
+						self.filtered_tags = self.filtered_tags.concat(us.config.get([self.name, "derpibooru_filter", "tags"]));
+					}
+				};
+				
+				self.load_derpibooru_filter = function() {
+					var domain;
+					var min_time;
+					var last_update;
+					
+					domain = "https://derpibooru.org";
+					min_time = 10 * 60; // 10 minutes
+					min_time = 60;
+					
+					last_update = us.config.get([self.name, "derpibooru_filter", "last_update"]);
+					
+					if(last_update && ((b4k.unix_timestamp() - last_update) < min_time)) {
+						console.log("LOL");
+						return;
+					}
+					
+					us.log("Attempting to update derpibooru filter");
+					
+					main.get(domain + "/about", null, "html", function(data) {
+						var filterid;
+						
+						filterid = data.match(/window\.booru\.filterID \= \"(.*?)\"/);
+						
+						if(!filterid) {
+							return;
+						}
+						
+						filterid = filterid[1];
+						
+						main.get(domain + "/filters/" + filterid, null, "html", function(data) {
+							var tags;
+							
+							tags = [];
+							
+							data.replace(/data\-tag\-name\=\"(.*?)\"/g, function(match, p1, offset, string) {
+								tags.push(p1);
+							});
+							
+							us.config.set([self.name, "derpibooru_filter", "tags"], tags);
+							us.config.set([self.name, "derpibooru_filter", "last_update"], b4k.unix_timestamp());
+							
+							us.log("Successfully updated derpibooru filter (id: " + filterid + ")");
+						});
+					});
 				};
 				
 				self.process_data = function(data, info) {
 					var extension;
 					var thumb_url;
 					var tags;
-					var blacklisted_tag;
+					var filtered_tag;
 					
-					blacklisted_tag = false;
+					filtered_tag = false;
 					
 					if(info) {
 						data_cache[self.name][data.id] = info;
@@ -1102,8 +1180,8 @@
 					tags = b4k.comma_string_to_array(tags);
 					
 					for(var i = 0; i < tags.length; i++) {
-						if(b4k.array_contains(self.tag_blacklist, tags[i])) {
-							blacklisted_tag = true;
+						if(b4k.array_contains(self.filtered_tags, tags[i])) {
+							filtered_tag = tags[i];
 							
 							break;
 						}
@@ -1119,9 +1197,10 @@
 						image_info: {
 							format: info.original_format,
 							width: info.width,
-							height: info.height
+							height: info.height,
+							derpibooru_filtered_tag: (filtered_tag ? {text: "Filtered", title: ("Filtered tag: " + filtered_tag)} : false)
 						},
-						no_preload: blacklisted_tag
+						no_preload: !!filtered_tag
 					});
 				};
 				
@@ -1149,7 +1228,7 @@
 					if(data_cache[self.name][data.id]) {
 						self.process_data(data);
 					} else {
-						main.load_data(url, null, "json", function(response) {
+						main.get(url, null, "json", function(response) {
 							self.process_data(data, response);
 						});
 					}
@@ -1161,7 +1240,8 @@
 			options: {
 				enabled: [true, "Enabled", "Enable <a href=\"https://derpibooru.org\">Derpibooru</a> thumbnails"],
 				preload: [true, "Auto-Load", "Load thumbnail automatically instead of waiting for user action"],
-				tag_blacklist: ["", "Blacklisted Tags", "Will never be auto-loaded <i>(comma-separated)</i>"],
+				filtered_tags: ["", "Filtered Tags", "Will never be auto-loaded <i>(comma-separated)</i>"],
+				load_derpibooru_filter: [false, "Load Derpibooru Filter", "Automatically load your current derpibooru filter into the script"],
 				inline_expand: [true, "Inline Expand", "Click the thumbnail to switch to the full image"],
 				hover_expand: [true, "Hover Expand", "Hover the thumbnail to show the full image"]
 			}
@@ -1255,7 +1335,7 @@
 					if(data_cache[self.name][data.id]) {
 						self.process_data(data);
 					} else {
-						main.load_data(url, {id: data.id}, "json", function(response) {
+						main.get(url, {id: data.id}, "json", function(response) {
 							self.process_data(data, response);
 						});
 					}
@@ -1428,7 +1508,7 @@
 					if(data_cache[self.name][data.id]) {
 						self.process_data(data);
 					} else {
-						main.load_data(url, {
+						main.get(url, {
 							id: post_id,
 							api_key: b4k.tumblr.api_key
 						}, "json", function(response) {
@@ -1921,6 +2001,18 @@
 	};
 	
 	b4k.add_style(css);
+	
+	// update, remove this later
+	(function() {
+		var oldvalue;
+		
+		oldvalue = us.config.get(["derpibooru", "tag_blacklist"]);
+		
+		if(oldvalue) {
+			us.config.set(["derpibooru", "filtered_tags"], oldvalue);
+			us.config.set(["derpibooru", "tag_blacklist"], null);
+		}
+	})();
 	
 	main.init();
 	
