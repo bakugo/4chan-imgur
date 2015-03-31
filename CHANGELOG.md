@@ -1,3 +1,6 @@
+### 1.13.1 - *2015-04-01*
+- Fix an issue with the settings functions that caused the script to fail on a clean install
+
 ### 1.13.0 - *2015-03-31*
 - Derpibooru processor now uses derpiboo.ru instead of derpibooru.org
 - Add "Load Derpibooru Filter" option to the Derpibooru processor
