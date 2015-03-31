@@ -1,8 +1,8 @@
-body.imgur_no_scroll {
+body.imgur-no-scroll {
 	/*overflow: hidden;*/
 }
 
-#imgur_overlay {
+#imgur-overlay {
 	background-color: rgba(0, 0, 0, 0.5);
 	display: flex;
 	position: fixed;
@@ -18,7 +18,7 @@ body.imgur_no_scroll {
 	border-color: #b7c5d9;
 }
 
-#imgur_settings {
+#imgur-settings {
 	box-shadow: 0 0 15px rgba(0, 0, 0, 0.15);
 	display: inline-block;
 	padding: 5px;
@@ -33,141 +33,141 @@ body.imgur_no_scroll {
 	font-size: 13px;
 }
 
-	#imgur_settings .links {
+	#imgur-settings .links {
 		position: absolute;
 		top: 4px;
 		right: 10px;
 		font-size: 11px;
 	}
 		
-		#imgur_settings .links a:not(:first-of-type) {
+		#imgur-settings .links a:not(:first-of-type) {
 			margin-left: 6px;
 		}
 	
-	#imgur_settings .header {
+	#imgur-settings .header {
 		font-size: 16px;
 		font-weight: bold;
 		margin-top: 6px;
 		text-align: center;
 	}
 	
-	#imgur_settings .processors {
+	#imgur-settings .processors {
 		max-height: calc(100% - 40px);
 		overflow-y: scroll;
 		margin-top: 10px;
 		padding: 0 10px;
 	}
 	
-		#imgur_settings .processors .processor {
+		#imgur-settings .processors .processor {
 			margin-top: 12px;
 		}
 		
-			#imgur_settings .processors .processor:first-child {
+			#imgur-settings .processors .processor:first-child {
 				margin-top: 0;
 			}
 			
-			#imgur_settings .processors .processor:last-child {
+			#imgur-settings .processors .processor:last-child {
 				margin-bottom: 10px;
 			}
 			
-			#imgur_settings .processors .processor .processor_name {
+			#imgur-settings .processors .processor .processor-name {
 				font-size: 15px;
 				margin-left: 10px;
 				font-weight: bold;
 			}
 			
-			#imgur_settings .processors .processor .options {
+			#imgur-settings .processors .processor .options {
 			}
 			
-				#imgur_settings .processors .processor .options .option {
+				#imgur-settings .processors .processor .options .option {
 				}
 				
-					#imgur_settings .processors .processor .options .option.text {
+					#imgur-settings .processors .processor .options .option.text {
 						margin-left: 20px;
 					}
 					
-						#imgur_settings .processors .processor .options .option.text .description {
+						#imgur-settings .processors .processor .options .option.text .description {
 							position: relative;
 							top: 1px;
 						}
 					
-					#imgur_settings .processors .processor .options .option label {
+					#imgur-settings .processors .processor .options .option label {
 						cursor: default;
 					}
 					
-					#imgur_settings .processors .processor .options .option .option_name {
+					#imgur-settings .processors .processor .options .option .option_name {
 						cursor: pointer;
 						text-decoration: underline;
 					}
 					
-					#imgur_settings .processors .processor .options .option input[type="text"] {
+					#imgur-settings .processors .processor .options .option input[type="text"] {
 						width: 220px;
 						margin-top: 3px;
 						height: 12px;
 						padding: 2px 4px 3px 4px;
 					}
 					
-					#imgur_settings .processors .processor .options .option input[type="checkbox"] {
+					#imgur-settings .processors .processor .options .option input[type="checkbox"] {
 						position: relative;
 						top: 2px;
 					}
 					
-					#imgur_settings .processors .processor .options .option .description {
+					#imgur-settings .processors .processor .options .option .description {
 						
 					}
 						
-						#imgur_settings .processors .processor .options .option .description i {
+						#imgur-settings .processors .processor .options .option .description i {
 							font-style: normal;
 							font-size: 11px;
 						}
 
-.file.imgur_file {
+.file.imgur-file {
 }
 
-	.file.imgur_file .fileText {
+	.file.imgur-file .fileText {
 	}
 	
-		.file.imgur_file .fileText a img {
+		.file.imgur-file .fileText a img {
 			position: relative;
 			top: 3px;
 			padding-left: 3px;
 			padding-right: 1px;
 		}
 	
-	.file.imgur_file .fileThumb {
+	.file.imgur-file .fileThumb {
 		position: relative;
 	}
 	
-		.file.imgur_file .fileThumb .imgur_thumb {
+		.file.imgur-file .fileThumb .imgur-thumb {
 			border: 1px solid #00a !important;
 			padding: 2px;
 			max-height: 125px !important;
 			max-width: 125px !important;
 		}
 		
-			.file.imgur_file .fileThumb.imgur_expanded .imgur_thumb {
+			.file.imgur-file .fileThumb.imgur_expanded .imgur-thumb {
 				display: none;
 			}
 			
-			.file.imgur_file .fileThumb.imgur_expanding .imgur_thumb {
+			.file.imgur-file .fileThumb.imgur_expanding .imgur-thumb {
 				opacity: 0.5;
 			}
 		
-		.file.imgur_file .fileThumb .imgur_thumb_expanded {
+		.file.imgur-file .fileThumb .imgur-thumb-expanded {
 			
 		}
 		
-			.file.imgur_file .fileThumb:not(.imgur_expanded) .imgur_thumb_expanded {
+			.file.imgur-file .fileThumb:not(.imgur_expanded) .imgur-thumb-expanded {
 				display: none;
 			}
 			
-			.file.imgur_file .fileThumb object.imgur_thumb_expanded {
+			.file.imgur-file .fileThumb object.imgur-thumb-expanded {
 				display: block;
 				background-color: #fff;
 				margin-bottom: -4px;
 			}
 		
-		.file.imgur_file .fileThumb .imgur_thumb_close {
+		.file.imgur-file .fileThumb .imgur-thumb-close {
 			display: inline-block;
 			overflow: hidden;
 			position: absolute;
@@ -181,7 +181,7 @@ body.imgur_no_scroll {
 			padding: 8px 8px 2px 2px;
 		}
 
-.imgur_hover {
+.imgur-hover {
 	position: fixed;
 	max-height: 97%;
 	max-width: 75%;
