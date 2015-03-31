@@ -444,8 +444,11 @@
 		filename_truncate = !!options.filename_truncate;
 		
 		if(options.image_info) {
-			if(options.image_info.derpibooru_filtered_tag) {
-				image_info.push(options.image_info.derpibooru_filtered_tag);
+			if(options.image_info.filtered_tag) {
+				image_info.push({
+					text: "Filtered",
+					title: ("Filtered tag: " + options.image_info.filtered_tag)
+				});
 			}
 			
 			if(options.image_info.format){
@@ -779,7 +782,7 @@
 			main.files = [];
 		},
 		
-		get: function(url, get, datatype, callback) {
+		get: function(url, get, datatype, callback_done, callback_fail) {
 			var request;
 			var func;
 			var current_try;
@@ -801,7 +804,9 @@
 				request.done(function(data, textstatus, jqxhr) {
 					us.log("[get] Loaded successfully: \"" + url + "\"");
 					
-					callback(data, textstatus, jqxhr);
+					if(callback_done) {
+						callback_done(data, textstatus, jqxhr);
+					}
 				});
 				
 				request.fail(function(jqxhr, textstatus, errorthrown) {
@@ -809,6 +814,10 @@
 					
 					if(current_try >= max_tries) {
 						us.log("[get] Failed " + current_try + " times, aborting");
+						
+						if(callback_fail) {
+							callback_fail(jqxhr, textstatus, errorthrown);
+						}
 					} else {
 						us.log("[get] Retrying in " + retry_time + "ms");
 						
@@ -1095,16 +1104,24 @@
 				self.qualifier = "derpi";
 				
 				self.init = function() {
+					var derpibooru_filter_tags;
+					
+					self.load_derpibooru_filter();
+					
+					self.update_filtered_tags();
+				};
+				
+				self.update_filtered_tags = function() {
+					var derpibooru_filter_tags;
+					
+					self.filtered_tags = b4k.comma_string_to_array(main.get_config_option(self.name, "filtered_tags"));
+					
 					if(main.get_config_option(self.name, "load_derpibooru_filter")) {
-						self.load_derpibooru_filter();
-					}
-					
-					self.filtered_tags = [];
-					
-					self.filtered_tags = self.filtered_tags.concat(b4k.comma_string_to_array(main.get_config_option(self.name, "filtered_tags")));
-					
-					if(main.get_config_option(self.name, "load_derpibooru_filter") && us.config.get([self.name, "derpibooru_filter", "tags"])) {
-						self.filtered_tags = self.filtered_tags.concat(us.config.get([self.name, "derpibooru_filter", "tags"]));
+						derpibooru_filter_tags = us.config.get([self.name, "derpibooru_filter", "tags"]);
+						
+						if(derpibooru_filter_tags) {
+							self.filtered_tags = self.filtered_tags.concat(derpibooru_filter_tags);
+						}
 					}
 				};
 				
@@ -1112,13 +1129,33 @@
 					var domain;
 					var min_time;
 					var last_update;
+					var fail;
 					
 					domain = "https://derpiboo.ru";
 					min_time = 10 * 60; // 10 minutes
 					
+					fail = function() {
+						us.log("Failed to update derpibooru filter");
+						
+						self.derpibooru_filter_ready = true;
+					};
+					
+					self.derpibooru_filter_ready = false;
+					
+					if(!main.get_config_option(self.name, "load_derpibooru_filter")) {
+						us.config.set([self.name, "derpibooru_filter", "tags"], null);
+						us.config.set([self.name, "derpibooru_filter", "last_update"], null);
+						
+						self.derpibooru_filter_ready = true;
+						
+						return;
+					}
+					
 					last_update = us.config.get([self.name, "derpibooru_filter", "last_update"]);
 					
 					if(last_update && ((b4k.unix_timestamp() - last_update) < min_time)) {
+						self.derpibooru_filter_ready = true;
+						
 						return;
 					}
 					
@@ -1148,57 +1185,65 @@
 							us.config.set([self.name, "derpibooru_filter", "last_update"], b4k.unix_timestamp());
 							
 							us.log("Successfully updated derpibooru filter (id: " + filterid + ")");
-						});
-					});
+							
+							self.update_filtered_tags();
+							
+							self.derpibooru_filter_ready = true;
+						}, fail);
+					}, fail);
 				};
 				
 				self.process_data = function(data, info) {
-					var extension;
-					var thumb_url;
-					var tags;
-					var filtered_tag;
-					
-					filtered_tag = false;
-					
-					if(info) {
-						data_cache[self.name][data.id] = info;
-					} else {
-						info = data_cache[self.name][data.id];
-					}
-					
-					if(!info.image) {
-						return;
-					}
-					
-					extension = info.original_format;
-					
-					thumb_url = info.representations.thumb;
-					
-					tags = info.tags;
-					tags = b4k.comma_string_to_array(tags);
-					
-					for(var i = 0; i < tags.length; i++) {
-						if(b4k.array_contains(self.filtered_tags, tags[i])) {
-							filtered_tag = tags[i];
-							
-							break;
+					b4k.wait_for(function() {
+						return !!self.derpibooru_filter_ready;
+					}, function() {
+						var extension;
+						var thumb_url;
+						var tags;
+						var filtered_tag;
+						
+						filtered_tag = false;
+						
+						if(info) {
+							data_cache[self.name][data.id] = info;
+						} else {
+							info = data_cache[self.name][data.id];
 						}
-					}
-					
-					place_thumb({
-						post: data.post,
-						processor: self.name,
-						name: data.name,
-						link: data.link,
-						image_url: info.representations.full,
-						thumb_url: thumb_url,
-						image_info: {
-							format: info.original_format,
-							width: info.width,
-							height: info.height,
-							derpibooru_filtered_tag: (filtered_tag ? {text: "Filtered", title: ("Filtered tag: " + filtered_tag)} : false)
-						},
-						no_preload: !!filtered_tag
+						
+						if(!info.image) {
+							return;
+						}
+						
+						extension = info.original_format;
+						
+						thumb_url = info.representations.thumb;
+						
+						tags = info.tags;
+						tags = b4k.comma_string_to_array(tags);
+						
+						for(var i = 0; i < tags.length; i++) {
+							if(b4k.array_contains(self.filtered_tags, tags[i])) {
+								filtered_tag = tags[i];
+								
+								break;
+							}
+						}
+						
+						place_thumb({
+							post: data.post,
+							processor: self.name,
+							name: data.name,
+							link: data.link,
+							image_url: info.representations.full,
+							thumb_url: thumb_url,
+							image_info: {
+								format: info.original_format,
+								width: info.width,
+								height: info.height,
+								filtered_tag: filtered_tag
+							},
+							no_preload: !!filtered_tag
+						});
 					});
 				};
 				
@@ -1224,7 +1269,7 @@
 					url = data.link + ".json";
 					
 					if(data_cache[self.name][data.id]) {
-						self.process_data(data);
+						self.process_data(data, null);
 					} else {
 						main.get(url, null, "json", function(response) {
 							self.process_data(data, response);
@@ -1239,7 +1284,7 @@
 				enabled: [true, "Enabled", "Enable <a href=\"https://derpiboo.ru\">Derpibooru</a> thumbnails"],
 				preload: [true, "Auto-Load", "Load thumbnail automatically instead of waiting for user action"],
 				filtered_tags: ["", "Filtered Tags", "Will never be auto-loaded <i>(comma-separated)</i>"],
-				load_derpibooru_filter: [false, "Load Derpibooru Filter", "Automatically load your current derpibooru filter into the script <i>(hover for info)</i>", "The browser must be logged in to derpiboo.ru, other domains will not work.\nIf not logged in, the default derpibooru filter will still be used!\nThe filter is updated on page load, with a minimum of 10 minutes between updates.\nFilter changes may require more than one page refresh to take effect."],
+				load_derpibooru_filter: [false, "Load Derpibooru Filter", "Automatically load your current derpibooru filter into the script <i>(hover for info)</i>", "The browser must be logged in to derpiboo.ru, other domains will not work.\nIf not logged in, the default derpibooru filter will still be used!\nThe filter is updated on page load, with a minimum of 10 minutes between updates."],
 				inline_expand: [true, "Inline Expand", "Click the thumbnail to switch to the full image"],
 				hover_expand: [true, "Hover Expand", "Hover the thumbnail to show the full image"]
 			}
@@ -1730,13 +1775,10 @@
 		var tracked_options = [];
 		
 		links = [
-			["reload", function() {
-				close(true);
-			}],
+			["reload", function() { close(true); }],
 			["home", "https://github.com/bakugo/4chan-imgur"],
 			["changelog", "https://github.com/bakugo/4chan-imgur/blob/master/CHANGELOG.md"]
 		];
-		
 		
 		open = function() {
 			var e_menu;
@@ -1940,7 +1982,7 @@
 			$(document.body).addClass("imgur_no_scroll");
 		};
 		
-		close = function(force_reload) {
+		close = function(force_restart) {
 			var option_changed = false;
 			
 			// save all settings
@@ -1980,7 +2022,7 @@
 			
 			$(document.body).removeClass("imgur_no_scroll");
 			
-			if(option_changed || force_reload) {
+			if(option_changed || force_restart) {
 				main.restart();
 			}
 		};
