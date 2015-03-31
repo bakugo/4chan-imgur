@@ -1113,7 +1113,7 @@
 					var min_time;
 					var last_update;
 					
-					domain = "https://derpibooru.org";
+					domain = "https://derpiboo.ru";
 					min_time = 10 * 60; // 10 minutes
 					min_time = 60;
 					
@@ -1216,7 +1216,7 @@
 						return false;
 					}
 					
-					domain = "derpibooru.org";
+					domain = "derpiboo.ru";
 					
 					data.post = post;
 					data.id = match[1];
