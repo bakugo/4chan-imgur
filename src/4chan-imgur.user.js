@@ -1115,12 +1115,10 @@
 					
 					domain = "https://derpiboo.ru";
 					min_time = 10 * 60; // 10 minutes
-					min_time = 60;
 					
 					last_update = us.config.get([self.name, "derpibooru_filter", "last_update"]);
 					
 					if(last_update && ((b4k.unix_timestamp() - last_update) < min_time)) {
-						console.log("LOL");
 						return;
 					}
 					
@@ -1238,10 +1236,10 @@
 			},
 			
 			options: {
-				enabled: [true, "Enabled", "Enable <a href=\"https://derpibooru.org\">Derpibooru</a> thumbnails"],
+				enabled: [true, "Enabled", "Enable <a href=\"https://derpiboo.ru\">Derpibooru</a> thumbnails"],
 				preload: [true, "Auto-Load", "Load thumbnail automatically instead of waiting for user action"],
 				filtered_tags: ["", "Filtered Tags", "Will never be auto-loaded <i>(comma-separated)</i>"],
-				load_derpibooru_filter: [false, "Load Derpibooru Filter", "Automatically load your current derpibooru filter into the script"],
+				load_derpibooru_filter: [false, "Load Derpibooru Filter", "Automatically load your current derpibooru filter into the script <i>(hover for info)</i>", "The browser must be logged in to derpiboo.ru, other domains will not work.\nIf not logged in, the default derpibooru filter will still be used!\nThe filter is updated on page load, with a minimum of 10 minutes between updates.\nFilter changes may require more than one page refresh to take effect."],
 				inline_expand: [true, "Inline Expand", "Click the thumbnail to switch to the full image"],
 				hover_expand: [true, "Hover Expand", "Hover the thumbnail to show the full image"]
 			}
@@ -1824,6 +1822,7 @@
 					var option_default;
 					var option_name;
 					var option_description;
+					var option_description_hover;
 					var option_value;
 					var e_option;
 					var e_option_name;
@@ -1839,6 +1838,7 @@
 					option_default = option[0];
 					option_name = option[1];
 					option_description = option[2];
+					option_description_hover = option[3];
 					
 					option_value = us.config.get(option_key, option_default);
 					
@@ -1870,6 +1870,10 @@
 								b4k.e_append_text_node(e_option, ": ");
 								
 								e_description.innerHTML = option_description;
+								
+								if(option_description_hover) {
+									e_description.title = option_description_hover;
+								}
 								
 								e_option.appendChild(e_description);
 							}
