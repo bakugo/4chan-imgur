@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        4chan imgur thumbnail (fix)
-// @version     1.12.4
+// @version     1.13.0
 // @namespace   b4k
 // @description Embeds image links in 4chan posts as normal thumbnails. Supports Imgur, 4chan, YouTube, Derpibooru, e621, Tumblr, Vocaroo and direct image links.
 // @include     *://boards.4chan.org/*
@@ -8,8 +8,8 @@
 // @grant       GM_xmlhttpRequest
 // @grant       GM_getValue
 // @grant       GM_setValue
-// @require     http://b4k.co/code/jquery.js?9
-// @require     http://b4k.co/code/b4k.js?9
+// @require     http://b4k.co/code/jquery.js?10
+// @require     http://b4k.co/code/b4k.js?10
 // @run-at      document-end
 // @updateURL   https://github.com/bakugo/4chan-imgur/raw/master/dist/4chan-imgur.user.js
 // @downloadURL https://github.com/bakugo/4chan-imgur/raw/master/dist/4chan-imgur.user.js
@@ -44,7 +44,7 @@
 	var processors;
 	var data_cache = {};
 	
-	css = "body.imgur_no_scroll {\r\n\t\/*overflow: hidden;*\/\r\n}\r\n\r\n#imgur_overlay {\r\n\tbackground-color: rgba(0, 0, 0, 0.5);\r\n\tdisplay: flex;\r\n\tposition: fixed;\r\n\ttop: 0;\r\n\tleft: 0;\r\n\theight: 100%;\r\n\twidth: 100%;\r\n\tz-index: 100;\r\n}\r\n\r\n.dialog {\r\n\tbackground-color: #d6daf0;\r\n\tborder-color: #b7c5d9;\r\n}\r\n\r\n#imgur_settings {\r\n\tbox-shadow: 0 0 15px rgba(0, 0, 0, 0.15);\r\n\tdisplay: inline-block;\r\n\tpadding: 5px;\r\n\tposition: relative;\r\n\ttext-align: left;\r\n\tvertical-align: middle;\r\n\tmargin: auto;\r\n\twidth: 660px;\r\n\theight: 500px;\r\n\tmax-width: 100%;\r\n\tmax-height: 80%;\r\n\tfont-size: 13px;\r\n}\r\n\r\n\t#imgur_settings .links {\r\n\t\tposition: absolute;\r\n\t\ttop: 4px;\r\n\t\tright: 10px;\r\n\t\tfont-size: 11px;\r\n\t}\r\n\t\t\r\n\t\t#imgur_settings .links a:not(:first-of-type) {\r\n\t\t\tmargin-left: 6px;\r\n\t\t}\r\n\t\r\n\t#imgur_settings .header {\r\n\t\tfont-size: 16px;\r\n\t\tfont-weight: bold;\r\n\t\tmargin-top: 6px;\r\n\t\ttext-align: center;\r\n\t}\r\n\t\r\n\t#imgur_settings .processors {\r\n\t\tmax-height: calc(100% - 40px);\r\n\t\toverflow-y: scroll;\r\n\t\tmargin-top: 10px;\r\n\t\tpadding: 0 10px;\r\n\t}\r\n\t\r\n\t\t#imgur_settings .processors .processor {\r\n\t\t\tmargin-top: 12px;\r\n\t\t}\r\n\t\t\r\n\t\t\t#imgur_settings .processors .processor:first-child {\r\n\t\t\t\tmargin-top: 0;\r\n\t\t\t}\r\n\t\t\t\r\n\t\t\t#imgur_settings .processors .processor:last-child {\r\n\t\t\t\tmargin-bottom: 10px;\r\n\t\t\t}\r\n\t\t\t\r\n\t\t\t#imgur_settings .processors .processor .processor_name {\r\n\t\t\t\tfont-size: 15px;\r\n\t\t\t\tmargin-left: 10px;\r\n\t\t\t\tfont-weight: bold;\r\n\t\t\t}\r\n\t\t\t\r\n\t\t\t#imgur_settings .processors .processor .options {\r\n\t\t\t}\r\n\t\t\t\r\n\t\t\t\t#imgur_settings .processors .processor .options .option {\r\n\t\t\t\t}\r\n\t\t\t\t\r\n\t\t\t\t\t#imgur_settings .processors .processor .options .option.text {\r\n\t\t\t\t\t\tmargin-left: 20px;\r\n\t\t\t\t\t}\r\n\t\t\t\t\t\r\n\t\t\t\t\t\t#imgur_settings .processors .processor .options .option.text .description {\r\n\t\t\t\t\t\t\tposition: relative;\r\n\t\t\t\t\t\t\ttop: 1px;\r\n\t\t\t\t\t\t}\r\n\t\t\t\t\t\r\n\t\t\t\t\t#imgur_settings .processors .processor .options .option label {\r\n\t\t\t\t\t\tcursor: default;\r\n\t\t\t\t\t}\r\n\t\t\t\t\t\r\n\t\t\t\t\t#imgur_settings .processors .processor .options .option .option_name {\r\n\t\t\t\t\t\tcursor: pointer;\r\n\t\t\t\t\t\ttext-decoration: underline;\r\n\t\t\t\t\t}\r\n\t\t\t\t\t\r\n\t\t\t\t\t#imgur_settings .processors .processor .options .option input[type=\"text\"] {\r\n\t\t\t\t\t\twidth: 220px;\r\n\t\t\t\t\t\tmargin-top: 3px;\r\n\t\t\t\t\t\theight: 12px;\r\n\t\t\t\t\t\tpadding: 2px 4px 3px 4px;\r\n\t\t\t\t\t}\r\n\t\t\t\t\t\r\n\t\t\t\t\t#imgur_settings .processors .processor .options .option input[type=\"checkbox\"] {\r\n\t\t\t\t\t\tposition: relative;\r\n\t\t\t\t\t\ttop: 2px;\r\n\t\t\t\t\t}\r\n\t\t\t\t\t\r\n\t\t\t\t\t#imgur_settings .processors .processor .options .option .description {\r\n\t\t\t\t\t\t\r\n\t\t\t\t\t}\r\n\t\t\t\t\t\t\r\n\t\t\t\t\t\t#imgur_settings .processors .processor .options .option .description i {\r\n\t\t\t\t\t\t\tfont-style: normal;\r\n\t\t\t\t\t\t\tfont-size: 11px;\r\n\t\t\t\t\t\t}\r\n\r\n.file.imgur_file {\r\n}\r\n\r\n\t.file.imgur_file .fileText {\r\n\t}\r\n\t\r\n\t\t.file.imgur_file .fileText a img {\r\n\t\t\tposition: relative;\r\n\t\t\ttop: 3px;\r\n\t\t\tpadding-left: 3px;\r\n\t\t\tpadding-right: 1px;\r\n\t\t}\r\n\t\r\n\t.file.imgur_file .fileThumb {\r\n\t\tposition: relative;\r\n\t}\r\n\t\r\n\t\t.file.imgur_file .fileThumb .imgur_thumb {\r\n\t\t\tborder: 1px solid #00a !important;\r\n\t\t\tpadding: 2px;\r\n\t\t\tmax-height: 125px !important;\r\n\t\t\tmax-width: 125px !important;\r\n\t\t}\r\n\t\t\r\n\t\t\t.file.imgur_file .fileThumb.imgur_expanded .imgur_thumb {\r\n\t\t\t\tdisplay: none;\r\n\t\t\t}\r\n\t\t\t\r\n\t\t\t.file.imgur_file .fileThumb.imgur_expanding .imgur_thumb {\r\n\t\t\t\topacity: 0.5;\r\n\t\t\t}\r\n\t\t\r\n\t\t.file.imgur_file .fileThumb .imgur_thumb_expanded {\r\n\t\t\t\r\n\t\t}\r\n\t\t\r\n\t\t\t.file.imgur_file .fileThumb:not(.imgur_expanded) .imgur_thumb_expanded {\r\n\t\t\t\tdisplay: none;\r\n\t\t\t}\r\n\t\t\t\r\n\t\t\t.file.imgur_file .fileThumb object.imgur_thumb_expanded {\r\n\t\t\t\tdisplay: block;\r\n\t\t\t\tbackground-color: #fff;\r\n\t\t\t\tmargin-bottom: -4px;\r\n\t\t\t}\r\n\t\t\r\n\t\t.file.imgur_file .fileThumb .imgur_thumb_close {\r\n\t\t\tdisplay: inline-block;\r\n\t\t\toverflow: hidden;\r\n\t\t\tposition: absolute;\r\n\t\t\ttop: 0;\r\n\t\t\tright: 0;\r\n\t\t\tcolor: #F00;\r\n\t\t\tfont-size: 26px;\r\n\t\t\tline-height: 4px;\r\n\t\t\twidth: 10px;\r\n\t\t\theight: 10px;\r\n\t\t\tpadding: 8px 8px 2px 2px;\r\n\t\t}\r\n\r\n.imgur_hover {\r\n\tposition: fixed;\r\n\tmax-height: 97%;\r\n\tmax-width: 75%;\r\n\tpadding-bottom: 18px;\r\n\tz-index: 100;\r\n\tpointer-events: none;\r\n}";
+	css = "body.imgur-no-scroll {\r\n\t\/*overflow: hidden;*\/\r\n}\r\n\r\n#imgur-overlay {\r\n\tbackground-color: rgba(0, 0, 0, 0.5);\r\n\tdisplay: flex;\r\n\tposition: fixed;\r\n\ttop: 0;\r\n\tleft: 0;\r\n\theight: 100%;\r\n\twidth: 100%;\r\n\tz-index: 100;\r\n}\r\n\r\n.dialog {\r\n\tbackground-color: #d6daf0;\r\n\tborder-color: #b7c5d9;\r\n}\r\n\r\n#imgur-settings {\r\n\tbox-shadow: 0 0 15px rgba(0, 0, 0, 0.15);\r\n\tdisplay: inline-block;\r\n\tpadding: 5px;\r\n\tposition: relative;\r\n\ttext-align: left;\r\n\tvertical-align: middle;\r\n\tmargin: auto;\r\n\twidth: 660px;\r\n\theight: 500px;\r\n\tmax-width: 100%;\r\n\tmax-height: 80%;\r\n\tfont-size: 13px;\r\n}\r\n\r\n\t#imgur-settings .links {\r\n\t\tposition: absolute;\r\n\t\ttop: 4px;\r\n\t\tright: 10px;\r\n\t\tfont-size: 11px;\r\n\t}\r\n\t\t\r\n\t\t#imgur-settings .links a:not(:first-of-type) {\r\n\t\t\tmargin-left: 6px;\r\n\t\t}\r\n\t\r\n\t#imgur-settings .header {\r\n\t\tfont-size: 16px;\r\n\t\tfont-weight: bold;\r\n\t\tmargin-top: 6px;\r\n\t\ttext-align: center;\r\n\t}\r\n\t\r\n\t#imgur-settings .processors {\r\n\t\tmax-height: calc(100% - 40px);\r\n\t\toverflow-y: scroll;\r\n\t\tmargin-top: 10px;\r\n\t\tpadding: 0 10px;\r\n\t}\r\n\t\r\n\t\t#imgur-settings .processors .processor {\r\n\t\t\tmargin-top: 12px;\r\n\t\t}\r\n\t\t\r\n\t\t\t#imgur-settings .processors .processor:first-child {\r\n\t\t\t\tmargin-top: 0;\r\n\t\t\t}\r\n\t\t\t\r\n\t\t\t#imgur-settings .processors .processor:last-child {\r\n\t\t\t\tmargin-bottom: 10px;\r\n\t\t\t}\r\n\t\t\t\r\n\t\t\t#imgur-settings .processors .processor .processor-name {\r\n\t\t\t\tfont-size: 15px;\r\n\t\t\t\tmargin-left: 10px;\r\n\t\t\t\tfont-weight: bold;\r\n\t\t\t}\r\n\t\t\t\r\n\t\t\t#imgur-settings .processors .processor .options {\r\n\t\t\t}\r\n\t\t\t\r\n\t\t\t\t#imgur-settings .processors .processor .options .option {\r\n\t\t\t\t}\r\n\t\t\t\t\r\n\t\t\t\t\t#imgur-settings .processors .processor .options .option.text {\r\n\t\t\t\t\t\tmargin-left: 20px;\r\n\t\t\t\t\t}\r\n\t\t\t\t\t\r\n\t\t\t\t\t\t#imgur-settings .processors .processor .options .option.text .description {\r\n\t\t\t\t\t\t\tposition: relative;\r\n\t\t\t\t\t\t\ttop: 1px;\r\n\t\t\t\t\t\t}\r\n\t\t\t\t\t\r\n\t\t\t\t\t#imgur-settings .processors .processor .options .option label {\r\n\t\t\t\t\t\tcursor: default;\r\n\t\t\t\t\t}\r\n\t\t\t\t\t\r\n\t\t\t\t\t#imgur-settings .processors .processor .options .option .option_name {\r\n\t\t\t\t\t\tcursor: pointer;\r\n\t\t\t\t\t\ttext-decoration: underline;\r\n\t\t\t\t\t}\r\n\t\t\t\t\t\r\n\t\t\t\t\t#imgur-settings .processors .processor .options .option input[type=\"text\"] {\r\n\t\t\t\t\t\twidth: 220px;\r\n\t\t\t\t\t\tmargin-top: 3px;\r\n\t\t\t\t\t\theight: 12px;\r\n\t\t\t\t\t\tpadding: 2px 4px 3px 4px;\r\n\t\t\t\t\t}\r\n\t\t\t\t\t\r\n\t\t\t\t\t#imgur-settings .processors .processor .options .option input[type=\"checkbox\"] {\r\n\t\t\t\t\t\tposition: relative;\r\n\t\t\t\t\t\ttop: 2px;\r\n\t\t\t\t\t}\r\n\t\t\t\t\t\r\n\t\t\t\t\t#imgur-settings .processors .processor .options .option .description {\r\n\t\t\t\t\t\t\r\n\t\t\t\t\t}\r\n\t\t\t\t\t\t\r\n\t\t\t\t\t\t#imgur-settings .processors .processor .options .option .description i {\r\n\t\t\t\t\t\t\tfont-style: normal;\r\n\t\t\t\t\t\t\tfont-size: 11px;\r\n\t\t\t\t\t\t}\r\n\r\n.file.imgur-file {\r\n}\r\n\r\n\t.file.imgur-file .fileText {\r\n\t}\r\n\t\r\n\t\t.file.imgur-file .fileText a img {\r\n\t\t\tposition: relative;\r\n\t\t\ttop: 3px;\r\n\t\t\tpadding-left: 3px;\r\n\t\t\tpadding-right: 1px;\r\n\t\t}\r\n\t\r\n\t.file.imgur-file .fileThumb {\r\n\t\tposition: relative;\r\n\t}\r\n\t\r\n\t\t.file.imgur-file .fileThumb .imgur-thumb {\r\n\t\t\tborder: 1px solid #00a !important;\r\n\t\t\tpadding: 2px;\r\n\t\t\tmax-height: 125px !important;\r\n\t\t\tmax-width: 125px !important;\r\n\t\t}\r\n\t\t\r\n\t\t\t.file.imgur-file .fileThumb.imgur_expanded .imgur-thumb {\r\n\t\t\t\tdisplay: none;\r\n\t\t\t}\r\n\t\t\t\r\n\t\t\t.file.imgur-file .fileThumb.imgur_expanding .imgur-thumb {\r\n\t\t\t\topacity: 0.5;\r\n\t\t\t}\r\n\t\t\r\n\t\t.file.imgur-file .fileThumb .imgur-thumb-expanded {\r\n\t\t\t\r\n\t\t}\r\n\t\t\r\n\t\t\t.file.imgur-file .fileThumb:not(.imgur_expanded) .imgur-thumb-expanded {\r\n\t\t\t\tdisplay: none;\r\n\t\t\t}\r\n\t\t\t\r\n\t\t\t.file.imgur-file .fileThumb object.imgur-thumb-expanded {\r\n\t\t\t\tdisplay: block;\r\n\t\t\t\tbackground-color: #fff;\r\n\t\t\t\tmargin-bottom: -4px;\r\n\t\t\t}\r\n\t\t\r\n\t\t.file.imgur-file .fileThumb .imgur-thumb-close {\r\n\t\t\tdisplay: inline-block;\r\n\t\t\toverflow: hidden;\r\n\t\t\tposition: absolute;\r\n\t\t\ttop: 0;\r\n\t\t\tright: 0;\r\n\t\t\tcolor: #F00;\r\n\t\t\tfont-size: 26px;\r\n\t\t\tline-height: 4px;\r\n\t\t\twidth: 10px;\r\n\t\t\theight: 10px;\r\n\t\t\tpadding: 8px 8px 2px 2px;\r\n\t\t}\r\n\r\n.imgur-hover {\r\n\tposition: fixed;\r\n\tmax-height: 97%;\r\n\tmax-width: 75%;\r\n\tpadding-bottom: 18px;\r\n\tz-index: 100;\r\n\tpointer-events: none;\r\n}";
 	
 	resources = {
 		thumb_placeholder: "data:image/png;base64,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",
@@ -120,7 +120,7 @@
 		};
 		
 		e_expanded = document.createElement("img");
-		e_expanded.className = "imgur_hover";
+		e_expanded.className = "imgur-hover";
 		
 		e_thumb = main.get_thumb(file);
 		
@@ -229,7 +229,7 @@
 		
 		if(is_swf) {
 			e_expanded = build_object(url, swf_size || [854, 480]);
-			e_expanded.className = "imgur_thumb_expanded";
+			e_expanded.className = "imgur-thumb-expanded";
 			
 			$(e_expanded).on("click", function(event) {
 				event.preventDefault();
@@ -237,11 +237,11 @@
 			});
 			
 			e_expanded_close = document.createElement("span");
-			e_expanded_close.className = "imgur_thumb_close";
+			e_expanded_close.className = "imgur-thumb-close";
 			e_expanded_close.innerHTML = "&#215;";
 		} else {
 			e_expanded = document.createElement("img");
-			e_expanded.className = "imgur_thumb_expanded";
+			e_expanded.className = "imgur-thumb-expanded";
 			
 			$(e_expanded).on("error", function() {
 				if(!is_expanding) {
@@ -431,6 +431,7 @@
 		var ft;
 		var img;
 		var image_info = [];
+		var image_info_part_e;
 		var filename_truncate;
 		var filename_full;
 		var filename_noext;
@@ -443,6 +444,13 @@
 		filename_truncate = !!options.filename_truncate;
 		
 		if(options.image_info) {
+			if(options.image_info.filtered_tag) {
+				image_info.push({
+					text: "Filtered",
+					title: ("Filtered tag: " + options.image_info.filtered_tag)
+				});
+			}
+			
 			if(options.image_info.format){
 				image_info.push(options.image_info.format.toUpperCase());
 			}
@@ -468,7 +476,7 @@
 		}
 		
 		container = document.createElement("div");
-		container.className = "file imgur_file";
+		container.className = "file imgur-file";
 		container.id = "f" + post_no;
 		
 		/*
@@ -509,8 +517,29 @@
 		link_container.appendChild(link);
 		div.appendChild(link_container);
 		
-		if(image_info.length > 0) {
-			b4k.e_append_text_node(link_container, " (" + image_info.join(", ") + ")");
+		if(image_info.length) {
+			b4k.e_append_text_node(link_container, " (");
+			
+			for(var i = 0; i < image_info.length; i++) {
+				if(image_info[i].text) {
+					image_info_part_e = document.createElement("span");
+					image_info_part_e.textContent = image_info[i].text;
+					
+					if(image_info[i].title) {
+						image_info_part_e.title = image_info[i].title;
+					}
+					
+					link_container.appendChild(image_info_part_e);
+				} else {
+					b4k.e_append_text_node(link_container, image_info[i]);
+				}
+				
+				if(i !== (image_info.length - 1)) {
+					b4k.e_append_text_node(link_container, ", ");
+				}
+			}
+			
+			b4k.e_append_text_node(link_container, ")");
 		}
 		
 		ft = document.createElement("a")
@@ -520,7 +549,7 @@
 		
 		if(type == "img") {
 			img = document.createElement("img");
-			img.className = "imgur_thumb";
+			img.className = "imgur-thumb";
 		}
 		
 		if(type == "obj") {
@@ -753,7 +782,7 @@
 			main.files = [];
 		},
 		
-		load_data: function(url, get, datatype, callback) {
+		get: function(url, get, datatype, callback_done, callback_fail) {
 			var request;
 			var func;
 			var current_try;
@@ -775,7 +804,9 @@
 				request.done(function(data, textstatus, jqxhr) {
 					us.log("[get] Loaded successfully: \"" + url + "\"");
 					
-					callback(data, textstatus, jqxhr);
+					if(callback_done) {
+						callback_done(data, textstatus, jqxhr);
+					}
 				});
 				
 				request.fail(function(jqxhr, textstatus, errorthrown) {
@@ -783,6 +814,10 @@
 					
 					if(current_try >= max_tries) {
 						us.log("[get] Failed " + current_try + " times, aborting");
+						
+						if(callback_fail) {
+							callback_fail(jqxhr, textstatus, errorthrown);
+						}
 					} else {
 						us.log("[get] Retrying in " + retry_time + "ms");
 						
@@ -1006,10 +1041,7 @@
 				self.name = "youtube";
 				self.name_full = "YouTube";
 				
-				self.regex = [
-					/youtube\.com\/watch\?v=([^"&?\/ ]{11})/i,
-					/youtu\.be\/([^"&?\/ ]{11})/i
-				];
+				self.regex = /(?:youtube.com\/watch\?v\=|youtu.be\/)([^"&?\/ ]{11})/i;
 				self.qualifier = "youtu";
 				
 				self.process = function(post, post_text) {
@@ -1072,56 +1104,146 @@
 				self.qualifier = "derpi";
 				
 				self.init = function() {
-					self.tag_blacklist = main.get_config_option(self.name, "tag_blacklist");
-					self.tag_blacklist = b4k.comma_string_to_array(self.tag_blacklist);
+					var derpibooru_filter_tags;
+					
+					self.load_derpibooru_filter();
+					
+					self.update_filtered_tags();
 				};
 				
-				self.process_data = function(data, info) {
-					var extension;
-					var thumb_url;
-					var tags;
-					var blacklisted_tag;
+				self.update_filtered_tags = function() {
+					var derpibooru_filter_tags;
 					
-					blacklisted_tag = false;
+					self.filtered_tags = b4k.comma_string_to_array(main.get_config_option(self.name, "filtered_tags"));
 					
-					if(info) {
-						data_cache[self.name][data.id] = info;
-					} else {
-						info = data_cache[self.name][data.id];
+					if(main.get_config_option(self.name, "load_derpibooru_filter")) {
+						derpibooru_filter_tags = us.config.get([self.name, "derpibooru_filter", "tags"]);
+						
+						if(derpibooru_filter_tags) {
+							self.filtered_tags = self.filtered_tags.concat(derpibooru_filter_tags);
+						}
 					}
+				};
+				
+				self.load_derpibooru_filter = function() {
+					var domain;
+					var min_time;
+					var last_update;
+					var fail;
 					
-					if(!info.image) {
+					domain = "https://derpiboo.ru";
+					min_time = 10 * 60; // 10 minutes
+					
+					fail = function() {
+						us.log("Failed to update derpibooru filter");
+						
+						self.derpibooru_filter_ready = true;
+					};
+					
+					self.derpibooru_filter_ready = false;
+					
+					if(!main.get_config_option(self.name, "load_derpibooru_filter")) {
+						us.config.set([self.name, "derpibooru_filter", "tags"], null);
+						us.config.set([self.name, "derpibooru_filter", "last_update"], null);
+						
+						self.derpibooru_filter_ready = true;
+						
 						return;
 					}
 					
-					extension = info.original_format;
+					last_update = us.config.get([self.name, "derpibooru_filter", "last_update"]);
 					
-					thumb_url = info.representations.thumb;
-					
-					tags = info.tags;
-					tags = b4k.comma_string_to_array(tags);
-					
-					for(var i = 0; i < tags.length; i++) {
-						if(b4k.array_contains(self.tag_blacklist, tags[i])) {
-							blacklisted_tag = true;
-							
-							break;
-						}
+					if(last_update && ((b4k.unix_timestamp() - last_update) < min_time)) {
+						self.derpibooru_filter_ready = true;
+						
+						return;
 					}
 					
-					place_thumb({
-						post: data.post,
-						processor: self.name,
-						name: data.name,
-						link: data.link,
-						image_url: info.representations.full,
-						thumb_url: thumb_url,
-						image_info: {
-							format: info.original_format,
-							width: info.width,
-							height: info.height
-						},
-						no_preload: blacklisted_tag
+					us.log("Attempting to update derpibooru filter");
+					
+					main.get(domain + "/about", null, "html", function(data) {
+						var filterid;
+						
+						filterid = data.match(/window\.booru\.filterID \= \"(.*?)\"/);
+						
+						if(!filterid) {
+							return;
+						}
+						
+						filterid = filterid[1];
+						
+						main.get(domain + "/filters/" + filterid, null, "html", function(data) {
+							var tags;
+							
+							tags = [];
+							
+							data.replace(/data\-tag\-name\=\"(.*?)\"/g, function(match, p1, offset, string) {
+								tags.push(p1);
+							});
+							
+							us.config.set([self.name, "derpibooru_filter", "tags"], tags);
+							us.config.set([self.name, "derpibooru_filter", "last_update"], b4k.unix_timestamp());
+							
+							us.log("Successfully updated derpibooru filter (id: " + filterid + ")");
+							
+							self.update_filtered_tags();
+							
+							self.derpibooru_filter_ready = true;
+						}, fail);
+					}, fail);
+				};
+				
+				self.process_data = function(data, info) {
+					b4k.wait_for(function() {
+						return !!self.derpibooru_filter_ready;
+					}, function() {
+						var extension;
+						var thumb_url;
+						var tags;
+						var filtered_tag;
+						
+						filtered_tag = false;
+						
+						if(info) {
+							data_cache[self.name][data.id] = info;
+						} else {
+							info = data_cache[self.name][data.id];
+						}
+						
+						if(!info.image) {
+							return;
+						}
+						
+						extension = info.original_format;
+						
+						thumb_url = info.representations.thumb;
+						
+						tags = info.tags;
+						tags = b4k.comma_string_to_array(tags);
+						
+						for(var i = 0; i < tags.length; i++) {
+							if(b4k.array_contains(self.filtered_tags, tags[i])) {
+								filtered_tag = tags[i];
+								
+								break;
+							}
+						}
+						
+						place_thumb({
+							post: data.post,
+							processor: self.name,
+							name: data.name,
+							link: data.link,
+							image_url: info.representations.full,
+							thumb_url: thumb_url,
+							image_info: {
+								format: info.original_format,
+								width: info.width,
+								height: info.height,
+								filtered_tag: filtered_tag
+							},
+							no_preload: !!filtered_tag
+						});
 					});
 				};
 				
@@ -1137,7 +1259,7 @@
 						return false;
 					}
 					
-					domain = "derpibooru.org";
+					domain = "derpiboo.ru";
 					
 					data.post = post;
 					data.id = match[1];
@@ -1147,9 +1269,9 @@
 					url = data.link + ".json";
 					
 					if(data_cache[self.name][data.id]) {
-						self.process_data(data);
+						self.process_data(data, null);
 					} else {
-						main.load_data(url, null, "json", function(response) {
+						main.get(url, null, "json", function(response) {
 							self.process_data(data, response);
 						});
 					}
@@ -1159,9 +1281,10 @@
 			},
 			
 			options: {
-				enabled: [true, "Enabled", "Enable <a href=\"https://derpibooru.org\">Derpibooru</a> thumbnails"],
+				enabled: [true, "Enabled", "Enable <a href=\"https://derpiboo.ru\">Derpibooru</a> thumbnails"],
 				preload: [true, "Auto-Load", "Load thumbnail automatically instead of waiting for user action"],
-				tag_blacklist: ["", "Blacklisted Tags", "Will never be auto-loaded <i>(comma-separated)</i>"],
+				filtered_tags: ["", "Filtered Tags", "Will never be auto-loaded <i>(comma-separated)</i>"],
+				load_derpibooru_filter: [false, "Load Derpibooru Filter", "Automatically load your current derpibooru filter into the script <i>(hover for info)</i>", "The browser must be logged in to derpiboo.ru, other domains will not work.\nIf not logged in, the default derpibooru filter will still be used!\nThe filter is updated on page load, with a minimum of 10 minutes between updates."],
 				inline_expand: [true, "Inline Expand", "Click the thumbnail to switch to the full image"],
 				hover_expand: [true, "Hover Expand", "Hover the thumbnail to show the full image"]
 			}
@@ -1255,7 +1378,7 @@
 					if(data_cache[self.name][data.id]) {
 						self.process_data(data);
 					} else {
-						main.load_data(url, {id: data.id}, "json", function(response) {
+						main.get(url, {id: data.id}, "json", function(response) {
 							self.process_data(data, response);
 						});
 					}
@@ -1428,7 +1551,7 @@
 					if(data_cache[self.name][data.id]) {
 						self.process_data(data);
 					} else {
-						main.load_data(url, {
+						main.get(url, {
 							id: post_id,
 							api_key: b4k.tumblr.api_key
 						}, "json", function(response) {
@@ -1652,13 +1775,10 @@
 		var tracked_options = [];
 		
 		links = [
-			["reload", function() {
-				close(true);
-			}],
+			["reload", function() { close(true); }],
 			["home", "https://github.com/bakugo/4chan-imgur"],
 			["changelog", "https://github.com/bakugo/4chan-imgur/blob/master/CHANGELOG.md"]
 		];
-		
 		
 		open = function() {
 			var e_menu;
@@ -1673,10 +1793,10 @@
 			is_open = true;
 			
 			e_overlay = document.createElement("div");
-			e_overlay.id = "imgur_overlay";
+			e_overlay.id = "imgur-overlay";
 			
 			e_menu = document.createElement("div");
-			e_menu.id = "imgur_settings";
+			e_menu.id = "imgur-settings";
 			e_menu.className = "dialog";
 			
 			e_links = document.createElement("div");
@@ -1733,7 +1853,7 @@
 				$(e_processor).addClass(processor.name);
 				
 				e_processor_name = document.createElement("div");
-				e_processor_name.className = "processor_name";
+				e_processor_name.className = "processor-name";
 				e_processor_name.textContent = processor.name_full;
 				
 				e_options = document.createElement("div");
@@ -1744,6 +1864,7 @@
 					var option_default;
 					var option_name;
 					var option_description;
+					var option_description_hover;
 					var option_value;
 					var e_option;
 					var e_option_name;
@@ -1759,6 +1880,7 @@
 					option_default = option[0];
 					option_name = option[1];
 					option_description = option[2];
+					option_description_hover = option[3];
 					
 					option_value = us.config.get(option_key, option_default);
 					
@@ -1790,6 +1912,10 @@
 								b4k.e_append_text_node(e_option, ": ");
 								
 								e_description.innerHTML = option_description;
+								
+								if(option_description_hover) {
+									e_description.title = option_description_hover;
+								}
 								
 								e_option.appendChild(e_description);
 							}
@@ -1853,10 +1979,10 @@
 			
 			document.body.appendChild(e_overlay);
 			
-			$(document.body).addClass("imgur_no_scroll");
+			$(document.body).addClass("imgur-no-scroll");
 		};
 		
-		close = function(force_reload) {
+		close = function(force_restart) {
 			var option_changed = false;
 			
 			// save all settings
@@ -1894,9 +2020,9 @@
 			$(e_overlay).remove();
 			e_overlay = false;
 			
-			$(document.body).removeClass("imgur_no_scroll");
+			$(document.body).removeClass("imgur-no-scroll");
 			
-			if(option_changed || force_reload) {
+			if(option_changed || force_restart) {
 				main.restart();
 			}
 		};
@@ -1921,6 +2047,18 @@
 	};
 	
 	b4k.add_style(css);
+	
+	// update, remove this later
+	(function() {
+		var oldvalue;
+		
+		oldvalue = us.config.get(["derpibooru", "tag_blacklist"]);
+		
+		if(oldvalue) {
+			us.config.set(["derpibooru", "filtered_tags"], oldvalue);
+			us.config.set(["derpibooru", "tag_blacklist"], null);
+		}
+	})();
 	
 	main.init();
 	

@@ -1,3 +1,11 @@
+### 1.13.0 - *2015-03-31*
+- Derpibooru processor now uses derpiboo.ru instead of derpibooru.org
+- Add "Load Derpibooru Filter" option to the Derpibooru processor
+ - Automatically loads the current filter from Derpibooru and uses it to filter images
+ - Filter is redownloaded and applied on each page load, with a minimum delay of 10 minutes between reloads
+ - Must be logged in to [derpiboo.ru](https://derpiboo.ru/), other domains (derpibooru.org, etc.) will not work. If not logged in, the default Derpibooru filter will still be used
+- Derpibooru filtered images will now have a "Filtered" tag in the file info, hovering over it will display the filtered tag
+
 ### 1.12.4 - *2015-03-24*
 - Update b4k.js
 
