@@ -1,3 +1,7 @@
+### 1.13.2 - *2015-04-01*
+- Update metadata
+ - Use a metadata-only (.meta.js) file to check for updates
+
 ### 1.13.1 - *2015-04-01*
 - Fix an issue with the settings functions that caused the script to fail on a clean install
 

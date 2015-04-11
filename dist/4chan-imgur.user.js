@@ -1,28 +1,28 @@
 // ==UserScript==
 // @name        4chan imgur thumbnail (fix)
-// @version     1.13.1
+// @version     1.13.2
 // @namespace   b4k
 // @description Embeds image links in 4chan posts as normal thumbnails. Supports Imgur, 4chan, YouTube, Derpibooru, e621, Tumblr, Vocaroo and direct image links.
-// @include     *://boards.4chan.org/*
-// @include     *://fg.b4k.co/arch/*/thread/*
+// @match       *://boards.4chan.org/*
+// @match       *://fg.b4k.co/arch/*/thread/*
 // @grant       GM_xmlhttpRequest
 // @grant       GM_getValue
 // @grant       GM_setValue
-// @require     http://b4k.co/code/jquery.js?11
-// @require     http://b4k.co/code/b4k.js?11
+// @require     http://b4k.co/code/jquery.js?12
+// @require     http://b4k.co/code/b4k.js?12
 // @run-at      document-end
-// @updateURL   https://github.com/bakugo/4chan-imgur/raw/master/dist/4chan-imgur.user.js
+// @updateURL   https://github.com/bakugo/4chan-imgur/raw/master/dist/4chan-imgur.meta.js
 // @downloadURL https://github.com/bakugo/4chan-imgur/raw/master/dist/4chan-imgur.user.js
 // ==/UserScript==
 
-/*
-	The original maker of this script stopped working on it and it recently became broken.
-	I fixed it and now I guess I can maintain it.
-	
-	Original script can be found at:
-		https://userscripts.org/scripts/show/161995
-		http://murkeli.kapsi.fi/userscripts/4chanimgur.user.js
-*/
+/**
+ * The original maker of this script stopped working on it and it eventually became broken.
+ * I fixed it and now I guess I can maintain it.
+ *
+ * Original script can be found here:
+ * https://userscripts.org/scripts/show/161995
+ * http://murkeli.kapsi.fi/userscripts/4chanimgur.user.js
+ */
 
 (function() {
 	"use strict";
@@ -479,10 +479,10 @@
 		container.className = "file imgur-file";
 		container.id = "f" + post_no;
 		
-		/*
-			stop propagation of click events
-			prevents the inline extension from picking up these events and breaking the image
-		*/
+		/**
+		 * stop propagation of click events
+		 * prevents the inline extension from picking up these events and breaking the image
+		 */
 		$(container).on("click", function(e) {
 			e.stopPropagation();
 		});
@@ -904,14 +904,14 @@
 					}
 					
 					if(!extension) {
-						/*
+						/**
 						 * todo: use the imgur api to find the file extension
 						 * for now we just assume it to be .jpg if it's not present, which prevents auto-gif on extension-less links
 						 */
 						extension = "jpg";
 					}
 					
-					/*
+					/**
 					 * gifv is a shitty idea and shouldn't exist.
 					 * it's not even a real format. it's literally an .mp4 file in a <video> tag.
 					 */
@@ -2047,18 +2047,6 @@
 	};
 	
 	b4k.add_style(css);
-	
-	// update, remove this later
-	(function() {
-		var oldvalue;
-		
-		oldvalue = us.config.get(["derpibooru", "tag_blacklist"]);
-		
-		if(oldvalue) {
-			us.config.set(["derpibooru", "filtered_tags"], oldvalue);
-			us.config.set(["derpibooru", "tag_blacklist"], null);
-		}
-	})();
 	
 	main.init();
 	
