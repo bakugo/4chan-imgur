@@ -1182,6 +1182,11 @@
 					main.get(domain + "/about", null, "html", function(data) {
 						var filterid;
 						
+						if(data.match(/window\.booru\.userID \= \"null\"/)) {
+							// user is not logged in
+							return;
+						}
+						
 						filterid = data.match(/window\.booru\.filterID \= \"(.*?)\"/);
 						
 						if(!filterid) {
