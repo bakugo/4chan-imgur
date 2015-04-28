@@ -420,14 +420,14 @@
 	};
 	
 	build_file = function(post_no, options, type) {
-		var container;
-		var div;
-		var link_container;
-		var link;
-		var link_filename;
-		var ext_img;
-		var ft;
-		var img;
+		var e_file;
+		var e_filetext;
+		var e_fileinfo;
+		var e_fileinfo_link;
+		var e_fileinfo_link_filename;
+		var e_fileinfo_link_icon;
+		var e_filethumb;
+		var e_img;
 		var file_info;
 		var file_info_p;
 		var filename_truncate;
@@ -461,7 +461,7 @@
 			}
 			
 			if(file_info.score) {
-				file_info_p.push("S:" + file_info.score);
+				file_info_p.push("Score: " + file_info.score);
 			}
 			
 			if(file_info.format){
@@ -488,50 +488,50 @@
 			}
 		}
 		
-		container = document.createElement("div");
-		container.className = "file imgur-file";
-		container.id = "f" + post_no;
+		e_file = document.createElement("div");
+		e_file.className = "file imgur-file";
+		e_file.id = "f" + post_no;
 		
 		/**
 		 * stop propagation of click events
 		 * prevents the inline extension from picking up these events and breaking the image
 		 */
-		$(container).on("click", function(e) {
+		$(e_file).on("click", function(e) {
 			e.stopPropagation();
 		});
 		
-		div = document.createElement("div");
-		div.className = "fileText";
-		div.id = "fT" + post_no;
+		e_filetext = document.createElement("div");
+		e_filetext.className = "fileText";
+		e_filetext.id = "fT" + post_no;
 		
-		link_container = document.createElement("span");
-		link_container.textContent = "Link: ";
+		e_fileinfo = document.createElement("span");
+		e_fileinfo.textContent = "Link: ";
 		
-		link = document.createElement("a");
-		link.target = "_blank";
-		link.href = options.link;
+		e_fileinfo_link = document.createElement("a");
+		e_fileinfo_link.target = "_blank";
+		e_fileinfo_link.href = options.link;
 		
-		link_filename = document.createElement("span");
-		link_filename.textContent = (filename_truncated || filename_full);
+		e_fileinfo_link_filename = document.createElement("span");
+		e_fileinfo_link_filename.textContent = (filename_truncated || filename_full);
 		
 		if(filename_truncated) {
-			$(link_container).hover(function() {
-				link_filename.textContent = filename_full;
+			$(e_fileinfo).hover(function() {
+				e_fileinfo_link_filename.textContent = filename_full;
 			}, function() {
-				link_filename.textContent = filename_truncated;
+				e_fileinfo_link_filename.textContent = filename_truncated;
 			});
 		}
 		
-		ext_img = document.createElement("img");
-		ext_img.src = resources.link_icon;
+		e_fileinfo_link_icon = document.createElement("img");
+		e_fileinfo_link_icon.src = resources.link_icon;
 		
-		link.appendChild(link_filename);
-		link.appendChild(ext_img);
-		link_container.appendChild(link);
-		div.appendChild(link_container);
+		e_fileinfo_link.appendChild(e_fileinfo_link_filename);
+		e_fileinfo_link.appendChild(e_fileinfo_link_icon);
+		e_fileinfo.appendChild(e_fileinfo_link);
+		e_filetext.appendChild(e_fileinfo);
 		
 		if(file_info_p && file_info_p.length) {
-			b4k.e_append_text_node(link_container, " (");
+			b4k.e_append_text_node(e_fileinfo, " (");
 			
 			for(var i = 0; i < file_info_p.length; i++) {
 				(function() {
@@ -548,40 +548,40 @@
 							e.title = part.title;
 						}
 						
-						link_container.appendChild(e);
+						e_fileinfo.appendChild(e);
 					} else {
-						b4k.e_append_text_node(link_container ,part);
+						b4k.e_append_text_node(e_fileinfo, part);
 					}
 					
 					if(i !== (file_info_p.length - 1)) {
-						b4k.e_append_text_node(link_container, ", ");
+						b4k.e_append_text_node(e_fileinfo, ", ");
 					}
 				})();
 			}
 			
-			b4k.e_append_text_node(link_container, ")");
+			b4k.e_append_text_node(e_fileinfo, ")");
 		}
 		
-		ft = document.createElement("a")
-		ft.target = "_blank";
-		ft.href = options.link;
-		ft.className = "fileThumb";
+		e_filethumb = document.createElement("a")
+		e_filethumb.target = "_blank";
+		e_filethumb.href = options.link;
+		e_filethumb.className = "fileThumb";
 		
 		if(type == "img") {
-			img = document.createElement("img");
-			img.className = "imgur-thumb";
+			e_img = document.createElement("img");
+			e_img.className = "imgur-thumb";
 		}
 		
 		if(type == "obj") {
-			img = build_object(options.url, options.size || false);
+			e_img = build_object(options.url, options.size || false);
 		}
 		
-		ft.appendChild(img);
+		e_filethumb.appendChild(e_img);
 		
-		container.appendChild(div);
-		container.appendChild(ft);
+		e_file.appendChild(e_filetext);
+		e_file.appendChild(e_filethumb);
 		
-		return container;
+		return e_file;
 	};
 	
 	build_object = function(url, size) {
