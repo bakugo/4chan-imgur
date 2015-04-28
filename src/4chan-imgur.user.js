@@ -1130,49 +1130,34 @@
 				};
 				
 				self.update_filtered_tags = function() {
-					var derpibooru_filter_tags;
+					self.filtered_tags = [];
 					
-					self.filtered_tags = b4k.comma_string_to_array(main.get_config_option(self.name, "filtered_tags"));
+					self.filtered_tags = self.filtered_tags.concat(b4k.comma_string_to_array(main.get_config_option(self.name, "filtered_tags")));
 					
 					if(main.get_config_option(self.name, "load_derpibooru_filter")) {
-						derpibooru_filter_tags = us.config.get([self.name, "derpibooru_filter", "tags"]);
-						
-						if(derpibooru_filter_tags) {
-							self.filtered_tags = self.filtered_tags.concat(derpibooru_filter_tags);
+						if(self.derpibooru_filter_tags) {
+							self.filtered_tags = self.filtered_tags.concat(self.derpibooru_filter_tags);
 						}
 					}
 				};
 				
 				self.load_derpibooru_filter = function() {
 					var domain;
-					var min_time;
-					var last_update;
 					var fail;
 					
 					domain = "https://derpiboo.ru";
-					min_time = 10 * 60; // 10 minutes
 					
 					fail = function() {
 						us.log("Failed to update derpibooru filter");
 						
-						self.derpibooru_filter_ready = true;
+						self.derpibooru_filter_tags = [];
 					};
 					
-					self.derpibooru_filter_ready = false;
+					
+					self.derpibooru_filter_tags = null;
 					
 					if(!main.get_config_option(self.name, "load_derpibooru_filter")) {
-						us.config.set([self.name, "derpibooru_filter", "tags"], null);
-						us.config.set([self.name, "derpibooru_filter", "last_update"], null);
-						
-						self.derpibooru_filter_ready = true;
-						
-						return;
-					}
-					
-					last_update = us.config.get([self.name, "derpibooru_filter", "last_update"]);
-					
-					if(last_update && ((b4k.unix_timestamp() - last_update) < min_time)) {
-						self.derpibooru_filter_ready = true;
+						self.derpibooru_filter_tags = [];
 						
 						return;
 					}
@@ -1204,8 +1189,7 @@
 								tags.push(p1);
 							});
 							
-							us.config.set([self.name, "derpibooru_filter", "tags"], tags);
-							us.config.set([self.name, "derpibooru_filter", "last_update"], b4k.unix_timestamp());
+							self.derpibooru_filter_tags = tags;
 							
 							us.log("Successfully updated derpibooru filter (id: " + filterid + ")");
 							
@@ -1218,7 +1202,7 @@
 				
 				self.process_data = function(data, info) {
 					b4k.wait_for(function() {
-						return !!self.derpibooru_filter_ready;
+						return !!self.derpibooru_filter_tags;
 					}, function() {
 						var extension;
 						var thumb_url;
@@ -1311,7 +1295,7 @@
 				enabled: [true, "Enabled", "Enable <a href=\"https://derpiboo.ru\">Derpibooru</a> thumbnails"],
 				preload: [true, "Auto-Load", "Load thumbnail automatically instead of waiting for user action"],
 				filtered_tags: ["", "Filtered Tags", "Will never be auto-loaded <i>(comma-separated)</i>"],
-				load_derpibooru_filter: [false, "Load Derpibooru Filter", "Automatically load your current derpibooru filter into the script <i>(hover for info)</i>", "The browser must be logged in to derpiboo.ru, other domains will not work.\nIf not logged in, no filter will be used (beware of expired sessions!).\nThe filter is updated on page load, with a minimum of 10 minutes between updates."],
+				load_derpibooru_filter: [false, "Load Derpibooru Filter", "Automatically load your current derpibooru filter into the script <i>(hover for info)</i>", "The browser must be logged in to derpiboo.ru, other domains will not work.\nIf not logged in, no filter will be used (beware of expired sessions!).\nThe filter is updated on each page load."],
 				inline_expand: [true, "Inline Expand", "Click the thumbnail to switch to the full image"],
 				hover_expand: [true, "Hover Expand", "Hover the thumbnail to show the full image"]
 			}
