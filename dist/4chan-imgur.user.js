@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        4chan imgur thumbnail (fix)
-// @version     1.13.2
+// @version     1.14.0
 // @namespace   b4k
 // @description Embeds image links in 4chan posts as normal thumbnails. Supports Imgur, 4chan, YouTube, Derpibooru, e621, Tumblr, Vocaroo and direct image links.
 // @match       *://boards.4chan.org/*
@@ -8,8 +8,8 @@
 // @grant       GM_xmlhttpRequest
 // @grant       GM_getValue
 // @grant       GM_setValue
-// @require     http://b4k.co/code/jquery.js?12
-// @require     http://b4k.co/code/b4k.js?12
+// @require     http://b4k.co/code/jquery.js?13
+// @require     http://b4k.co/code/b4k.js?13
 // @run-at      document-end
 // @updateURL   https://github.com/bakugo/4chan-imgur/raw/master/dist/4chan-imgur.meta.js
 // @downloadURL https://github.com/bakugo/4chan-imgur/raw/master/dist/4chan-imgur.user.js
@@ -378,12 +378,10 @@
 			}
 		}
 		
-		if(options.image_info && options.image_info.format == "jpeg") {
+		if(options.file_info && options.file_info.format == "jpeg") {
 			// replace jpeg with jpg
-			options.image_info.format = "jpg";
+			options.file_info.format = "jpg";
 		}
-		
-		
 		
 		post = options.post;
 		
@@ -422,16 +420,16 @@
 	};
 	
 	build_file = function(post_no, options, type) {
-		var container;
-		var div;
-		var link_container;
-		var link;
-		var link_filename;
-		var ext_img;
-		var ft;
-		var img;
-		var image_info = [];
-		var image_info_part_e;
+		var e_file;
+		var e_filetext;
+		var e_fileinfo;
+		var e_fileinfo_link;
+		var e_fileinfo_link_filename;
+		var e_fileinfo_link_icon;
+		var e_filethumb;
+		var e_img;
+		var file_info;
+		var file_info_p;
 		var filename_truncate;
 		var filename_full;
 		var filename_noext;
@@ -443,24 +441,39 @@
 		
 		filename_truncate = !!options.filename_truncate;
 		
-		if(options.image_info) {
-			if(options.image_info.filtered_tag) {
-				image_info.push({
+		file_info = options.file_info;
+		
+		if(options.file_info) {
+			file_info_p = [];
+			
+			if(file_info.filtered_tag) {
+				file_info_p.push({
 					text: "Filtered",
-					title: ("Filtered tag: " + options.image_info.filtered_tag)
+					title: ("Filtered tag: " + file_info.filtered_tag)
 				});
 			}
 			
-			if(options.image_info.format){
-				image_info.push(options.image_info.format.toUpperCase());
+			if(file_info.tags) {
+				file_info_p.push({
+					text: "Tags",
+					title: ("Tags: " + file_info.tags.join(", "))
+				});
 			}
 			
-			if(options.image_info.filesize) {
-				image_info.push(b4k.format_filesize(options.image_info.filesize));
+			if(file_info.score) {
+				file_info_p.push("Score: " + file_info.score);
 			}
 			
-			if(options.image_info.width && options.image_info.height) {
-				image_info.push(options.image_info.width + "x" + options.image_info.height);
+			if(file_info.format){
+				file_info_p.push(file_info.format.toUpperCase());
+			}
+			
+			if(file_info.filesize) {
+				file_info_p.push(b4k.format_filesize(file_info.filesize));
+			}
+			
+			if(file_info.dimensions) {
+				file_info_p.push(file_info.dimensions.width + "x" + file_info.dimensions.height);
 			}
 		}
 		
@@ -475,93 +488,100 @@
 			}
 		}
 		
-		container = document.createElement("div");
-		container.className = "file imgur-file";
-		container.id = "f" + post_no;
+		e_file = document.createElement("div");
+		e_file.className = "file imgur-file";
+		e_file.id = "f" + post_no;
 		
 		/**
 		 * stop propagation of click events
 		 * prevents the inline extension from picking up these events and breaking the image
 		 */
-		$(container).on("click", function(e) {
+		$(e_file).on("click", function(e) {
 			e.stopPropagation();
 		});
 		
-		div = document.createElement("div");
-		div.className = "fileText";
-		div.id = "fT" + post_no;
+		e_filetext = document.createElement("div");
+		e_filetext.className = "fileText";
+		e_filetext.id = "fT" + post_no;
 		
-		link_container = document.createElement("span");
-		link_container.textContent = "Link: ";
+		e_fileinfo = document.createElement("span");
+		e_fileinfo.textContent = "Link: ";
 		
-		link = document.createElement("a");
-		link.target = "_blank";
-		link.href = options.link;
+		e_fileinfo_link = document.createElement("a");
+		e_fileinfo_link.target = "_blank";
+		e_fileinfo_link.href = options.link;
 		
-		link_filename = document.createElement("span");
-		link_filename.textContent = (filename_truncated || filename_full);
+		e_fileinfo_link_filename = document.createElement("span");
+		e_fileinfo_link_filename.textContent = (filename_truncated || filename_full);
 		
 		if(filename_truncated) {
-			$(link_container).hover(function() {
-				link_filename.textContent = filename_full;
+			$(e_fileinfo).hover(function() {
+				e_fileinfo_link_filename.textContent = filename_full;
 			}, function() {
-				link_filename.textContent = filename_truncated;
+				e_fileinfo_link_filename.textContent = filename_truncated;
 			});
 		}
 		
-		ext_img = document.createElement("img");
-		ext_img.src = resources.link_icon;
+		e_fileinfo_link_icon = document.createElement("img");
+		e_fileinfo_link_icon.src = resources.link_icon;
 		
-		link.appendChild(link_filename);
-		link.appendChild(ext_img);
-		link_container.appendChild(link);
-		div.appendChild(link_container);
+		e_fileinfo_link.appendChild(e_fileinfo_link_filename);
+		e_fileinfo_link.appendChild(e_fileinfo_link_icon);
+		e_fileinfo.appendChild(e_fileinfo_link);
+		e_filetext.appendChild(e_fileinfo);
 		
-		if(image_info.length) {
-			b4k.e_append_text_node(link_container, " (");
+		if(file_info_p && file_info_p.length) {
+			b4k.e_append_text_node(e_fileinfo, " (");
 			
-			for(var i = 0; i < image_info.length; i++) {
-				if(image_info[i].text) {
-					image_info_part_e = document.createElement("span");
-					image_info_part_e.textContent = image_info[i].text;
+			for(var i = 0; i < file_info_p.length; i++) {
+				(function() {
+					var e;
+					var part;
 					
-					if(image_info[i].title) {
-						image_info_part_e.title = image_info[i].title;
+					part = file_info_p[i];
+					
+					if(part.text) {
+						e = document.createElement("span");
+						e.textContent = part.text;
+						
+						if(part.title) {
+							e.title = part.title;
+						}
+						
+						e_fileinfo.appendChild(e);
+					} else {
+						b4k.e_append_text_node(e_fileinfo, part);
 					}
 					
-					link_container.appendChild(image_info_part_e);
-				} else {
-					b4k.e_append_text_node(link_container, image_info[i]);
-				}
-				
-				if(i !== (image_info.length - 1)) {
-					b4k.e_append_text_node(link_container, ", ");
-				}
+					if(i !== (file_info_p.length - 1)) {
+						b4k.e_append_text_node(e_fileinfo, ", ");
+					}
+				})();
 			}
 			
-			b4k.e_append_text_node(link_container, ")");
+			b4k.e_append_text_node(e_fileinfo, ")");
 		}
 		
-		ft = document.createElement("a")
-		ft.target = "_blank";
-		ft.href = options.link;
-		ft.className = "fileThumb";
+		e_filethumb = document.createElement("a")
+		e_filethumb.target = "_blank";
+		e_filethumb.href = options.link;
+		e_filethumb.className = "fileThumb";
 		
 		if(type == "img") {
-			img = document.createElement("img");
-			img.className = "imgur-thumb";
+			e_img = document.createElement("img");
+			e_img.className = "imgur-thumb";
 		}
 		
 		if(type == "obj") {
-			img = build_object(options.url, options.size || false);
+			e_img = build_object(options.url, options.size || false);
 		}
 		
-		ft.appendChild(img);
+		e_filethumb.appendChild(e_img);
 		
-		container.appendChild(div);
-		container.appendChild(ft);
+		e_file.appendChild(e_filetext);
+		e_file.appendChild(e_filethumb);
 		
-		return container;
+		return e_file;
 	};
 	
 	build_object = function(url, size) {
@@ -1015,7 +1035,7 @@
 						link: link,
 						image_url: link,
 						thumb_url: thumb_url,
-						image_info: {
+						file_info: {
 							format: extension
 						},
 						is_swf: (extension == "swf")
@@ -1104,58 +1124,45 @@
 				self.qualifier = "derpi";
 				
 				self.init = function() {
-					var derpibooru_filter_tags;
-					
 					self.load_derpibooru_filter();
 					
 					self.update_filtered_tags();
 				};
 				
 				self.update_filtered_tags = function() {
-					var derpibooru_filter_tags;
+					self.filtered_tags = [];
 					
-					self.filtered_tags = b4k.comma_string_to_array(main.get_config_option(self.name, "filtered_tags"));
+					self.filtered_tags = self.filtered_tags.concat(b4k.comma_string_to_array(main.get_config_option(self.name, "filtered_tags")));
 					
 					if(main.get_config_option(self.name, "load_derpibooru_filter")) {
-						derpibooru_filter_tags = us.config.get([self.name, "derpibooru_filter", "tags"]);
-						
-						if(derpibooru_filter_tags) {
-							self.filtered_tags = self.filtered_tags.concat(derpibooru_filter_tags);
+						if(self.derpibooru_filter_tags) {
+							self.filtered_tags = self.filtered_tags.concat(self.derpibooru_filter_tags);
 						}
 					}
 				};
 				
 				self.load_derpibooru_filter = function() {
 					var domain;
-					var min_time;
-					var last_update;
-					var fail;
+					var cancel;
+					var request_fail;
 					
 					domain = "https://derpiboo.ru";
-					min_time = 10 * 60; // 10 minutes
 					
-					fail = function() {
-						us.log("Failed to update derpibooru filter");
-						
-						self.derpibooru_filter_ready = true;
+					cancel = function() {
+						self.derpibooru_filter_tags = [];
 					};
 					
-					self.derpibooru_filter_ready = false;
+					request_fail = function() {
+						us.log("Failed to update derpibooru filter");
+						
+						cancel();
+					};
+					
+					
+					self.derpibooru_filter_tags = null;
 					
 					if(!main.get_config_option(self.name, "load_derpibooru_filter")) {
-						us.config.set([self.name, "derpibooru_filter", "tags"], null);
-						us.config.set([self.name, "derpibooru_filter", "last_update"], null);
-						
-						self.derpibooru_filter_ready = true;
-						
-						return;
-					}
-					
-					last_update = us.config.get([self.name, "derpibooru_filter", "last_update"]);
-					
-					if(last_update && ((b4k.unix_timestamp() - last_update) < min_time)) {
-						self.derpibooru_filter_ready = true;
-						
+						cancel();
 						return;
 					}
 					
@@ -1164,9 +1171,16 @@
 					main.get(domain + "/about", null, "html", function(data) {
 						var filterid;
 						
+						if(data.match(/window\.booru\.userID \= \"null\"/)) {
+							// user is not logged in
+							cancel();
+							return;
+						}
+						
 						filterid = data.match(/window\.booru\.filterID \= \"(.*?)\"/);
 						
 						if(!filterid) {
+							cancel();
 							return;
 						}
 						
@@ -1181,21 +1195,20 @@
 								tags.push(p1);
 							});
 							
-							us.config.set([self.name, "derpibooru_filter", "tags"], tags);
-							us.config.set([self.name, "derpibooru_filter", "last_update"], b4k.unix_timestamp());
+							self.derpibooru_filter_tags = tags;
 							
 							us.log("Successfully updated derpibooru filter (id: " + filterid + ")");
 							
 							self.update_filtered_tags();
 							
 							self.derpibooru_filter_ready = true;
-						}, fail);
-					}, fail);
+						}, request_fail);
+					}, request_fail);
 				};
 				
 				self.process_data = function(data, info) {
 					b4k.wait_for(function() {
-						return !!self.derpibooru_filter_ready;
+						return !!self.derpibooru_filter_tags;
 					}, function() {
 						var extension;
 						var thumb_url;
@@ -1236,10 +1249,14 @@
 							link: data.link,
 							image_url: info.representations.full,
 							thumb_url: thumb_url,
-							image_info: {
+							file_info: {
 								format: info.original_format,
-								width: info.width,
-								height: info.height,
+								dimensions: {
+									width: info.width,
+									height: info.height
+								},
+								tags: tags,
+								score: info.score,
 								filtered_tag: filtered_tag
 							},
 							no_preload: !!filtered_tag
@@ -1284,7 +1301,7 @@
 				enabled: [true, "Enabled", "Enable <a href=\"https://derpiboo.ru\">Derpibooru</a> thumbnails"],
 				preload: [true, "Auto-Load", "Load thumbnail automatically instead of waiting for user action"],
 				filtered_tags: ["", "Filtered Tags", "Will never be auto-loaded <i>(comma-separated)</i>"],
-				load_derpibooru_filter: [false, "Load Derpibooru Filter", "Automatically load your current derpibooru filter into the script <i>(hover for info)</i>", "The browser must be logged in to derpiboo.ru, other domains will not work.\nIf not logged in, the default derpibooru filter will still be used!\nThe filter is updated on page load, with a minimum of 10 minutes between updates."],
+				load_derpibooru_filter: [false, "Load Derpibooru Filter", "Automatically load your current derpibooru filter into the script <i>(hover for info)</i>", "The browser must be logged in to derpiboo.ru, other domains will not work.\nIf not logged in, no filter will be used (beware of expired sessions!).\nThe filter is updated on each page load."],
 				inline_expand: [true, "Inline Expand", "Click the thumbnail to switch to the full image"],
 				hover_expand: [true, "Hover Expand", "Hover the thumbnail to show the full image"]
 			}
@@ -1340,11 +1357,13 @@
 						link: data.link,
 						image_url: info.file_url,
 						thumb_url: thumb_url,
-						image_info: {
+						file_info: {
 							format: info.file_ext,
 							filesize: info.file_size,
-							width: info.width,
-							height: info.height
+							dimensions: {
+								width: info.width,
+								height: info.height
+							}
 						},
 						is_swf: (extension == "swf"),
 						no_expansion: no_expansion,
@@ -1444,7 +1463,7 @@
 						link: data.link,
 						image_url: info.image_url,
 						thumb_url: info.thumb_url,
-						image_info: {
+						file_info: {
 							format: b4k.get_extension(info.image_url),
 							width: info.width,
 							height: info.height
