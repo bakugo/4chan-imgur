@@ -1,3 +1,8 @@
+### 1.14.0 - *2015-04-28*
+- Remove timeout for loading derpibooru filters (will now be loaded on every page load)
+- Ignore derpibooru filters if the user is not logged in
+- Add tags and score to derpibooru file info
+
 ### 1.13.2 - *2015-04-01*
 - Update metadata
  - Use a metadata-only (.meta.js) file to check for updates
