@@ -1143,22 +1143,26 @@
 				
 				self.load_derpibooru_filter = function() {
 					var domain;
-					var fail;
+					var cancel;
+					var request_fail;
 					
 					domain = "https://derpiboo.ru";
 					
-					fail = function() {
+					cancel = function() {
+						self.derpibooru_filter_tags = [];
+					};
+					
+					request_fail = function() {
 						us.log("Failed to update derpibooru filter");
 						
-						self.derpibooru_filter_tags = [];
+						cancel();
 					};
 					
 					
 					self.derpibooru_filter_tags = null;
 					
 					if(!main.get_config_option(self.name, "load_derpibooru_filter")) {
-						self.derpibooru_filter_tags = [];
-						
+						cancel();
 						return;
 					}
 					
@@ -1169,12 +1173,14 @@
 						
 						if(data.match(/window\.booru\.userID \= \"null\"/)) {
 							// user is not logged in
+							cancel();
 							return;
 						}
 						
 						filterid = data.match(/window\.booru\.filterID \= \"(.*?)\"/);
 						
 						if(!filterid) {
+							cancel();
 							return;
 						}
 						
@@ -1196,8 +1202,8 @@
 							self.update_filtered_tags();
 							
 							self.derpibooru_filter_ready = true;
-						}, fail);
-					}, fail);
+						}, request_fail);
+					}, request_fail);
 				};
 				
 				self.process_data = function(data, info) {
