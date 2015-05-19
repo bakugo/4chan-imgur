@@ -813,7 +813,7 @@
 			retry_time = 3000;
 			
 			func = function() {
-				us.log("[get] Loading: \"" + url + "\" (try " + current_try + " of " + max_tries + ")");
+				us.log("[GET] Loading: \"" + url + "\" (try " + current_try + " of " + max_tries + ")");
 				
 				request = $.ajax({
 					url: url,
@@ -822,7 +822,7 @@
 				});
 				
 				request.done(function(data, textstatus, jqxhr) {
-					us.log("[get] Loaded successfully: \"" + url + "\"");
+					us.log("[GET] Loaded successfully: \"" + url + "\"");
 					
 					if(callback_done) {
 						callback_done(data, textstatus, jqxhr);
@@ -830,16 +830,16 @@
 				});
 				
 				request.fail(function(jqxhr, textstatus, errorthrown) {
-					us.log("[get] Failed to load: \"" + url + "\" (" + jqxhr.status + " " + jqxhr.statusText + ")");
+					us.log("[GET] Failed to load: \"" + url + "\" (" + jqxhr.status + " " + jqxhr.statusText + ")");
 					
 					if(current_try >= max_tries) {
-						us.log("[get] Failed " + current_try + " times, aborting");
+						us.log("[GET] Failed " + current_try + " times, aborting");
 						
 						if(callback_fail) {
 							callback_fail(jqxhr, textstatus, errorthrown);
 						}
 					} else {
-						us.log("[get] Retrying in " + retry_time + "ms");
+						us.log("[GET] Retrying in " + retry_time + "ms");
 						
 						current_try++;
 						
@@ -1153,8 +1153,7 @@
 					};
 					
 					request_fail = function() {
-						us.log("Failed to update derpibooru filter");
-						
+						us.log("[Derpibooru Filter] Failed to update filter");
 						cancel();
 					};
 					
@@ -1166,13 +1165,14 @@
 						return;
 					}
 					
-					us.log("Attempting to update derpibooru filter");
+					us.log("[Derpibooru Filter] Attempting to update filter");
 					
 					main.get(domain + "/about", null, "html", function(data) {
 						var filterid;
 						
 						if(data.match(/window\.booru\.userID \= \"null\"/)) {
 							// user is not logged in
+							us.log("[Derpibooru Filter] User is not logged in, ignoring filter");
 							cancel();
 							return;
 						}
@@ -1180,6 +1180,7 @@
 						filterid = data.match(/window\.booru\.filterID \= \"(.*?)\"/);
 						
 						if(!filterid) {
+							us.log("[Derpibooru Filter] No valid filter found");
 							cancel();
 							return;
 						}
@@ -1195,9 +1196,13 @@
 								tags.push(p1);
 							});
 							
+							if(!tags.length) {
+								us.log("[Derpibooru Filter] (Notice) No tags found in filter");
+							}
+							
 							self.derpibooru_filter_tags = tags;
 							
-							us.log("Successfully updated derpibooru filter (id: " + filterid + ")");
+							us.log("[Derpibooru Filter] Successfully updated filter (id: " + filterid + ")");
 							
 							self.update_filtered_tags();
 							
