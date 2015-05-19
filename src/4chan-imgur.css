@@ -14,8 +14,6 @@ body.imgur-no-scroll {
 }
 
 #imgur-settings {
-	background-color: #d6daf0;
-	border-color: #b7c5d9;
 	box-shadow: 0 0 15px rgba(0, 0, 0, 0.15);
 	display: inline-block;
 	padding: 5px;
@@ -30,12 +28,13 @@ body.imgur-no-scroll {
 	font-size: 13px;
 }
 
-	body.yotsuba_new #imgur-settings { background-color: #f00d6; border-color: #d9bfb7; }
-	body.yotsuba_b_new #imgur-settings { background-color: #d6daf0; border-color: #b7c5d9; }
-	body.futaba #imgur-settings { background-color: #f0e0d6; border: none; }
-	body.burichan #imgur-settings { background-color: #d6daf0; border: none; }
-	body.tomorrow #imgur-settings { background-color: #282a2e; border-color: #282a2e; }
-	body.photon #imgur-settings { background-color: #ddd; border-color: #ccc; }
+	:root:not(.fourchan-x) #imgur-settings { background-color: #d6daf0; border-color: #b7c5d9; }
+	:root:not(.fourchan-x) body.yotsuba_new #imgur-settings { background-color: #f00d6; border-color: #d9bfb7; }
+	:root:not(.fourchan-x) body.yotsuba_b_new #imgur-settings { background-color: #d6daf0; border-color: #b7c5d9; }
+	:root:not(.fourchan-x) body.futaba #imgur-settings { background-color: #f0e0d6; border: none; }
+	:root:not(.fourchan-x) body.burichan #imgur-settings { background-color: #d6daf0; border: none; }
+	:root:not(.fourchan-x) body.tomorrow #imgur-settings { background-color: #282a2e; border-color: #282a2e; }
+	:root:not(.fourchan-x) body.photon #imgur-settings { background-color: #ddd; border-color: #ccc; }
 	
 	#imgur-settings .links {
 		position: absolute;
