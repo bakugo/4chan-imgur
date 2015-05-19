@@ -1,3 +1,6 @@
+### 1.14.1 - *2015-05-19*
+- Settings dialog will now use correct background colors according to the current theme when using the native extension
+
 ### 1.14.0 - *2015-04-28*
 - Remove timeout for loading derpibooru filters (will now be loaded on every page load)
 - Ignore derpibooru filters if the user is not logged in
