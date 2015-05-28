@@ -8,8 +8,8 @@
 // @grant       GM_xmlhttpRequest
 // @grant       GM_getValue
 // @grant       GM_setValue
-// @require     http://b4k.co/code/jquery.js?14
-// @require     http://b4k.co/code/b4k.js?14
+// @require     http://b4k.co/code/lib/jquery/2.1.4/jquery.min.js
+// @require     http://b4k.co/code/lib/b4k-js/1.0.0-beta.1/b4k.min.js
 // @run-at      document-end
 // @updateURL   https://github.com/bakugo/4chan-imgur/raw/master/dist/4chan-imgur.meta.js
 // @downloadURL https://github.com/bakugo/4chan-imgur/raw/master/dist/4chan-imgur.user.js
