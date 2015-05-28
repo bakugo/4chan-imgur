@@ -21,6 +21,7 @@
  *
  * Original script can be found here:
  * http://murkeli.kapsi.fi/userscripts/4chanimgur.user.js
+ * https://bitbucket.org/murkeli/userscripts
  */
 
 (function() {
