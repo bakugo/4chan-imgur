@@ -20,7 +20,6 @@
  * I fixed it and now I guess I can maintain it.
  *
  * Original script can be found here:
- * https://userscripts.org/scripts/show/161995
  * http://murkeli.kapsi.fi/userscripts/4chanimgur.user.js
  */
 
