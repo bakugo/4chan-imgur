@@ -1,3 +1,6 @@
+### 1.15.0 - *2015-05-30*
+- Use specific asset versions in @require scripts
+
 ### 1.14.1 - *2015-05-19*
 - Settings dialog will now use correct background colors according to the current theme when using the native extension
 
