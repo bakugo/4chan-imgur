@@ -443,20 +443,20 @@
 		
 		file_info = options.file_info;
 		
-		if(options.file_info) {
+		if(file_info) {
 			file_info_p = [];
 			
-			if(file_info.filtered_tag) {
+			if(file_info.filtered_tags && file_info.filtered_tags.length) {
 				file_info_p.push({
 					text: "Filtered",
-					title: ("Filtered tag: " + file_info.filtered_tag)
+					title: ("Filtered tags: " + (file_info.filtered_tags.join(", ")))
 				});
 			}
 			
-			if(file_info.tags) {
+			if(file_info.tags &&  file_info.tags.length) {
 				file_info_p.push({
 					text: "Tags",
-					title: ("Tags: " + file_info.tags.join(", "))
+					title: ("Tags: " + (file_info.tags.join(", ")))
 				});
 			}
 			
@@ -1218,9 +1218,7 @@
 						var extension;
 						var thumb_url;
 						var tags;
-						var filtered_tag;
-						
-						filtered_tag = false;
+						var filtered_tags;
 						
 						if(info) {
 							data_cache[self.name][data.id] = info;
@@ -1239,11 +1237,11 @@
 						tags = info.tags;
 						tags = b4k.comma_string_to_array(tags);
 						
+						filtered_tags = [];
+						
 						for(var i = 0; i < tags.length; i++) {
 							if(b4k.array_contains(self.filtered_tags, tags[i])) {
-								filtered_tag = tags[i];
-								
-								break;
+								filtered_tags.push(tags[i]);
 							}
 						}
 						
@@ -1262,9 +1260,9 @@
 								},
 								tags: tags,
 								score: info.score,
-								filtered_tag: filtered_tag
+								filtered_tags: filtered_tags
 							},
-							no_preload: !!filtered_tag
+							no_preload: !!filtered_tags.length
 						});
 					});
 				};
