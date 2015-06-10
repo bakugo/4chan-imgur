@@ -811,7 +811,7 @@
 			func = function() {
 				us.log("[GET] Loading: \"" + url + "\" (try " + current_try + " of " + settings.max_tries + ")");
 				
-				request = $.ajax({
+				$.ajax({
 					url: url,
 					data: get,
 					dataType: datatype,
