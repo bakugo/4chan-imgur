@@ -9,7 +9,7 @@
 // @grant       GM_getValue
 // @grant       GM_setValue
 // @require     http://b4k.co/code/lib/jquery/2.1.4/jquery.min.js
-// @require     http://b4k.co/code/lib/b4k-js/1.0.0-beta.1/b4k.min.js
+// @require     http://b4k.co/code/lib/b4k-js/1.0.0-beta.4/b4k.min.js
 // @run-at      document-end
 // @updateURL   https://github.com/bakugo/4chan-imgur/raw/master/dist/4chan-imgur.meta.js
 // @downloadURL https://github.com/bakugo/4chan-imgur/raw/master/dist/4chan-imgur.user.js
@@ -720,11 +720,7 @@
 		},
 		
 		init: function() {
-			var info;
-			
-			info = b4k.chan.get_info();
-			
-			if(!info) {
+			if(!b4k.chan.get_info()) {
 				return;
 			}
 			
@@ -1428,6 +1424,11 @@
 				self.regex = /https?:\/\/(\S*?).tumblr.com\/(?:post|image)\/(\d+)/i;
 				self.qualifier = ".tumblr.com/";
 				
+				self.tumblr_api = {
+					url: "https://api.tumblr.com/v2/",
+					key: "fuiKNFp9vQFvjLNvx4sUwti4Yb5yGutBN4Xh10LXZhhRKjWlV4"
+				};
+				
 				self.init = function() {
 					self.enable_photosets = main.get_config_option(self.name, "enable_photosets");
 				};
@@ -1566,7 +1567,7 @@
 					data.link = "http://" + data.name;
 					
 					url = b4k.format("{api_url}blog/{blog}.tumblr.com/posts", {
-						api_url: b4k.tumblr.api_url,
+						api_url: self.tumblr_api.url,
 						blog: blog_name
 					});
 					
@@ -1575,7 +1576,7 @@
 					} else {
 						main.get(url, {
 							id: post_id,
-							api_key: b4k.tumblr.api_key
+							api_key: self.tumblr_api.key
 						}, "json", function(response) {
 							self.process_data(data, response);
 						});
