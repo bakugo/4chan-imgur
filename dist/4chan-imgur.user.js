@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        4chan imgur thumbnail (fix)
-// @version     1.15.0
+// @version     1.15.1
 // @namespace   b4k
 // @description Embeds image links in 4chan posts as normal thumbnails. Supports Imgur, 4chan, YouTube, Derpibooru, e621, Tumblr, Vocaroo and direct image links.
 // @match       *://boards.4chan.org/*
@@ -9,7 +9,7 @@
 // @grant       GM_getValue
 // @grant       GM_setValue
 // @require     http://b4k.co/code/lib/jquery/2.1.4/jquery.min.js
-// @require     http://b4k.co/code/lib/b4k-js/1.0.0-beta.1/b4k.min.js
+// @require     http://b4k.co/code/lib/b4k-js/1.0.0-beta.4/b4k.min.js
 // @run-at      document-end
 // @updateURL   https://github.com/bakugo/4chan-imgur/raw/master/dist/4chan-imgur.meta.js
 // @downloadURL https://github.com/bakugo/4chan-imgur/raw/master/dist/4chan-imgur.user.js
@@ -443,20 +443,20 @@
 		
 		file_info = options.file_info;
 		
-		if(options.file_info) {
+		if(file_info) {
 			file_info_p = [];
 			
-			if(file_info.filtered_tag) {
+			if(file_info.filtered_tags && file_info.filtered_tags.length) {
 				file_info_p.push({
 					text: "Filtered",
-					title: ("Filtered tag: " + file_info.filtered_tag)
+					title: ("Filtered tags: " + (file_info.filtered_tags.join(", ")))
 				});
 			}
 			
-			if(file_info.tags) {
+			if(file_info.tags &&  file_info.tags.length) {
 				file_info_p.push({
 					text: "Tags",
-					title: ("Tags: " + file_info.tags.join(", "))
+					title: ("Tags: " + (file_info.tags.join(", ")))
 				});
 			}
 			
@@ -720,11 +720,7 @@
 		},
 		
 		init: function() {
-			var info;
-			
-			info = b4k.chan.get_info();
-			
-			if(!info) {
+			if(!b4k.chan.get_info()) {
 				return;
 			}
 			
@@ -803,49 +799,49 @@
 		},
 		
 		get: function(url, get, datatype, callback_done, callback_fail) {
-			var request;
-			var func;
+			var settings;
 			var current_try;
-			var max_tries;
-			var retry_time;
+			var func;
 			
-			max_tries = 5;
-			retry_time = 3000;
+			settings = {
+				max_tries: 5,
+				retry_time: 3000
+			};
 			
 			func = function() {
-				us.log("[GET] Loading: \"" + url + "\" (try " + current_try + " of " + max_tries + ")");
+				us.log("[GET] Loading: \"" + url + "\" (try " + current_try + " of " + settings.max_tries + ")");
 				
-				request = $.ajax({
+				$.ajax({
 					url: url,
 					data: get,
-					dataType: datatype
-				});
-				
-				request.done(function(data, textstatus, jqxhr) {
-					us.log("[GET] Loaded successfully: \"" + url + "\"");
+					dataType: datatype,
 					
-					if(callback_done) {
-						callback_done(data, textstatus, jqxhr);
-					}
-				});
-				
-				request.fail(function(jqxhr, textstatus, errorthrown) {
-					us.log("[GET] Failed to load: \"" + url + "\" (" + jqxhr.status + " " + jqxhr.statusText + ")");
-					
-					if(current_try >= max_tries) {
-						us.log("[GET] Failed " + current_try + " times, aborting");
+					success: function(data, textstatus, jqxhr) {
+						us.log("[GET] Loaded successfully: \"" + url + "\"");
 						
-						if(callback_fail) {
-							callback_fail(jqxhr, textstatus, errorthrown);
+						if(callback_done) {
+							callback_done(data, textstatus, jqxhr);
 						}
-					} else {
-						us.log("[GET] Retrying in " + retry_time + "ms");
+					},
+					
+					error: function(jqxhr, textstatus, errorthrown) {
+						us.log("[GET] Failed to load: \"" + url + "\" (" + jqxhr.status + " " + jqxhr.statusText + ")");
 						
-						current_try++;
-						
-						setTimeout(function() {
-							func();
-						}, retry_time);
+						if(current_try >= settings.max_tries) {
+							us.log("[GET] Failed " + current_try + " times, aborting");
+							
+							if(callback_fail) {
+								callback_fail(jqxhr, textstatus, errorthrown);
+							}
+						} else {
+							us.log("[GET] Retrying in " + settings.retry_time + "ms");
+							
+							current_try++;
+							
+							setTimeout(function() {
+								func();
+							}, settings.retry_time);
+						}
 					}
 				});
 			};
@@ -1218,9 +1214,7 @@
 						var extension;
 						var thumb_url;
 						var tags;
-						var filtered_tag;
-						
-						filtered_tag = false;
+						var filtered_tags;
 						
 						if(info) {
 							data_cache[self.name][data.id] = info;
@@ -1239,11 +1233,11 @@
 						tags = info.tags;
 						tags = b4k.comma_string_to_array(tags);
 						
+						filtered_tags = [];
+						
 						for(var i = 0; i < tags.length; i++) {
 							if(b4k.array_contains(self.filtered_tags, tags[i])) {
-								filtered_tag = tags[i];
-								
-								break;
+								filtered_tags.push(tags[i]);
 							}
 						}
 						
@@ -1262,9 +1256,9 @@
 								},
 								tags: tags,
 								score: info.score,
-								filtered_tag: filtered_tag
+								filtered_tags: filtered_tags
 							},
-							no_preload: !!filtered_tag
+							no_preload: !!filtered_tags.length
 						});
 					});
 				};
@@ -1430,6 +1424,11 @@
 				self.regex = /https?:\/\/(\S*?).tumblr.com\/(?:post|image)\/(\d+)/i;
 				self.qualifier = ".tumblr.com/";
 				
+				self.tumblr_api = {
+					url: "https://api.tumblr.com/v2/",
+					key: "fuiKNFp9vQFvjLNvx4sUwti4Yb5yGutBN4Xh10LXZhhRKjWlV4"
+				};
+				
 				self.init = function() {
 					self.enable_photosets = main.get_config_option(self.name, "enable_photosets");
 				};
@@ -1568,7 +1567,7 @@
 					data.link = "http://" + data.name;
 					
 					url = b4k.format("{api_url}blog/{blog}.tumblr.com/posts", {
-						api_url: b4k.tumblr.api_url,
+						api_url: self.tumblr_api.url,
 						blog: blog_name
 					});
 					
@@ -1577,7 +1576,7 @@
 					} else {
 						main.get(url, {
 							id: post_id,
-							api_key: b4k.tumblr.api_key
+							api_key: self.tumblr_api.key
 						}, "json", function(response) {
 							self.process_data(data, response);
 						});

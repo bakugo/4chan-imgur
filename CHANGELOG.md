@@ -1,3 +1,7 @@
+### 1.15.1 - *2015-06-10*
+- Fix settings button not being present in the 4chan catalog
+- Always show all filtered tags instead of only the first one found
+
 ### 1.15.0 - *2015-05-30*
 - Use specific asset versions in @require scripts
 
