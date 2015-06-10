@@ -799,49 +799,49 @@
 		},
 		
 		get: function(url, get, datatype, callback_done, callback_fail) {
-			var request;
-			var func;
+			var settings;
 			var current_try;
-			var max_tries;
-			var retry_time;
+			var func;
 			
-			max_tries = 5;
-			retry_time = 3000;
+			settings = {
+				max_tries: 5,
+				retry_time: 3000
+			};
 			
 			func = function() {
-				us.log("[GET] Loading: \"" + url + "\" (try " + current_try + " of " + max_tries + ")");
+				us.log("[GET] Loading: \"" + url + "\" (try " + current_try + " of " + settings.max_tries + ")");
 				
 				request = $.ajax({
 					url: url,
 					data: get,
-					dataType: datatype
-				});
-				
-				request.done(function(data, textstatus, jqxhr) {
-					us.log("[GET] Loaded successfully: \"" + url + "\"");
+					dataType: datatype,
 					
-					if(callback_done) {
-						callback_done(data, textstatus, jqxhr);
-					}
-				});
-				
-				request.fail(function(jqxhr, textstatus, errorthrown) {
-					us.log("[GET] Failed to load: \"" + url + "\" (" + jqxhr.status + " " + jqxhr.statusText + ")");
-					
-					if(current_try >= max_tries) {
-						us.log("[GET] Failed " + current_try + " times, aborting");
+					success: function(data, textstatus, jqxhr) {
+						us.log("[GET] Loaded successfully: \"" + url + "\"");
 						
-						if(callback_fail) {
-							callback_fail(jqxhr, textstatus, errorthrown);
+						if(callback_done) {
+							callback_done(data, textstatus, jqxhr);
 						}
-					} else {
-						us.log("[GET] Retrying in " + retry_time + "ms");
+					},
+					
+					error: function(jqxhr, textstatus, errorthrown) {
+						us.log("[GET] Failed to load: \"" + url + "\" (" + jqxhr.status + " " + jqxhr.statusText + ")");
 						
-						current_try++;
-						
-						setTimeout(function() {
-							func();
-						}, retry_time);
+						if(current_try >= settings.max_tries) {
+							us.log("[GET] Failed " + current_try + " times, aborting");
+							
+							if(callback_fail) {
+								callback_fail(jqxhr, textstatus, errorthrown);
+							}
+						} else {
+							us.log("[GET] Retrying in " + settings.retry_time + "ms");
+							
+							current_try++;
+							
+							setTimeout(function() {
+								func();
+							}, settings.retry_time);
+						}
 					}
 				});
 			};
