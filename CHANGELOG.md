@@ -1,3 +1,6 @@
+### 1.15.2 - *2015-06-11*
+- Update b4k.js
+
 ### 1.15.1 - *2015-06-10*
 - Fix settings button not being present in the 4chan catalog
 - Always show all filtered tags instead of only the first one found
