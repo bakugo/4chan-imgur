@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        4chan imgur thumbnail (fix)
-// @version     1.15.2
+// @version     1.15.3
 // @namespace   b4k
 // @description Embeds image links in 4chan posts as normal thumbnails. Supports Imgur, 4chan, YouTube, Derpibooru, e621, Tumblr, Vocaroo and direct image links.
 // @match       *://boards.4chan.org/*
@@ -1115,7 +1115,7 @@
 				
 				self.regex = [
 					/derpiboo(?:\.ru|ru\.org)\/(?:images\/)?(\d+)/i,
-					/(?:img\d\.)?derpicdn.net\/img\/(?:view\/)?(?:\d+)\/(?:\d+)\/(?:\d+)\/(\d+)(?:\.|\_\_\_|\/)/i
+					/(?:img\d\.)?derpicdn.net\/img\/(?:view\/)?(?:\d+)\/(?:\d+)\/(?:\d+)\/(\d+)(?:\.|\_\_|\/)/i
 				];
 				self.qualifier = "derpi";
 				
