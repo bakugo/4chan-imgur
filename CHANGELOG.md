@@ -1,3 +1,6 @@
+### 1.15.3 - *2015-06-13*
+- Fix derpibooru regexp not matching some full direct image urls
+
 ### 1.15.2 - *2015-06-11*
 - Update b4k.js
 
