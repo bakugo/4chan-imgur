@@ -460,7 +460,7 @@
 				});
 			}
 			
-			if(file_info.score) {
+			if(Number.isInteger(parseInt(file_info.score))) {
 				file_info_p.push("Score: " + file_info.score);
 			}
 			
