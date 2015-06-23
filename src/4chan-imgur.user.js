@@ -1359,10 +1359,7 @@
 						file_info: {
 							format: info.file_ext,
 							filesize: info.file_size,
-							dimensions: {
-								width: info.width,
-								height: info.height
-							}
+							dimensions: (info.width ? {width: info.width, height: info.height} : null),
 						},
 						is_swf: (extension == "swf"),
 						no_expansion: no_expansion,
