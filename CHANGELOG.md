@@ -1,3 +1,8 @@
+### 1.15.4 - *2015-06-24*
+- Fix dimensions displaying as `nullxnull` for e621 webms, they are not provided by the API so they should not display
+- Fix scores not displaying at all when they were `0`
+- Add tags and score to e621 link file info
+
 ### 1.15.3 - *2015-06-13*
 - Fix derpibooru regexp not matching some full direct image urls
 

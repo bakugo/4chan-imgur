@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        4chan imgur thumbnail (fix)
-// @version     1.15.3
+// @version     1.15.4
 // @namespace   b4k
 // @description Embeds image links in 4chan posts as normal thumbnails. Supports Imgur, 4chan, YouTube, Derpibooru, e621, Tumblr, Vocaroo and direct image links.
 // @match       *://boards.4chan.org/*
@@ -129,7 +129,7 @@
 		$(e_thumb).on("mouseout", stop);
 	};
 	
-	inline_expand = function(file, url, is_swf, swf_size) {
+	inline_expand = function(file, url, dimensions, is_swf) {
 		var e_thumb;
 		var e_filethumb;
 		var e_expanded;
@@ -228,7 +228,7 @@
 		$(e_filethumb).on("click", toggle);
 		
 		if(is_swf) {
-			e_expanded = build_object(url, swf_size || [854, 480]);
+			e_expanded = build_object(url, (dimensions || [854, 480]));
 			e_expanded.className = "imgur-thumb-expanded";
 			
 			$(e_expanded).on("click", function(event) {
@@ -279,7 +279,7 @@
 					}
 					
 					if(main.get_config_option(options.processor, "inline_expand")) {
-						inline_expand(file, options.image_url, options.is_swf, options.swf_size);
+						inline_expand(file, options.image_url, options.dimensions, options.is_swf);
 					}
 				}
 			};
@@ -310,7 +310,9 @@
 		
 		placehold = function() {
 			var click;
-			var loaded = false;
+			var loaded;
+			
+			loaded = false;
 			
 			img.src = resources.thumb_placeholder;
 			
@@ -340,7 +342,7 @@
 		
 		
 		options.is_swf = !!options.is_swf;
-		options.swf_size = options.swf_size || false;
+		options.dimensions = (options.dimensions || null);
 		
 		// remove protocol from link name
 		if(options.name) {
@@ -460,7 +462,7 @@
 				});
 			}
 			
-			if(file_info.score) {
+			if(Number.isInteger(parseInt(file_info.score))) {
 				file_info_p.push("Score: " + file_info.score);
 			}
 			
@@ -584,17 +586,17 @@
 		return e_file;
 	};
 	
-	build_object = function(url, size) {
+	build_object = function(url, dimensions) {
 		var object;
 		
 		object = document.createElement("object");
 		
-		if(size && size.length == 2) {
-			object.width = size[0];
-			object.height = size[1];
+		if(dimensions) {
+			object.width = dimensions.width;
+			object.height = dimensions.height;
 			
-			object.style.width = size[0] + "px";
-			object.style.height = size[1] + "px";
+			object.style.width = dimensions.width + "px";
+			object.style.height = dimensions.height + "px";
 		}
 		
 		object.setAttribute("wmode", "transparent");
@@ -1250,10 +1252,7 @@
 							thumb_url: thumb_url,
 							file_info: {
 								format: info.original_format,
-								dimensions: {
-									width: info.width,
-									height: info.height
-								},
+								dimensions: {width: info.width, height: info.height},
 								tags: tags,
 								score: info.score,
 								filtered_tags: filtered_tags
@@ -1324,6 +1323,7 @@
 					var extension;
 					var thumb_url;
 					var no_expansion;
+					var tags;
 					
 					no_expansion = false;
 					
@@ -1349,6 +1349,9 @@
 						no_expansion = true;
 					};
 					
+					tags = info.tags;
+					tags = b4k.comma_string_to_array(tags);
+					
 					place_thumb({
 						post: data.post,
 						processor: self.name,
@@ -1359,14 +1362,13 @@
 						file_info: {
 							format: info.file_ext,
 							filesize: info.file_size,
-							dimensions: {
-								width: info.width,
-								height: info.height
-							}
+							dimensions: (info.width ? {width: info.width, height: info.height} : null),
+							tags: tags,
+							score: info.score
 						},
+						dimensions: {width: info.width, height: info.height},
 						is_swf: (extension == "swf"),
-						no_expansion: no_expansion,
-						swf_size: [info.width, info.height]
+						no_expansion: no_expansion
 					});
 				};
 				
