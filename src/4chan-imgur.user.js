@@ -1324,6 +1324,7 @@
 					var extension;
 					var thumb_url;
 					var no_expansion;
+					var tags;
 					
 					no_expansion = false;
 					
@@ -1349,6 +1350,9 @@
 						no_expansion = true;
 					};
 					
+					tags = info.tags;
+					tags = b4k.comma_string_to_array(tags);
+					
 					place_thumb({
 						post: data.post,
 						processor: self.name,
@@ -1360,6 +1364,8 @@
 							format: info.file_ext,
 							filesize: info.file_size,
 							dimensions: (info.width ? {width: info.width, height: info.height} : null),
+							tags: tags,
+							score: info.score
 						},
 						is_swf: (extension == "swf"),
 						no_expansion: no_expansion,
