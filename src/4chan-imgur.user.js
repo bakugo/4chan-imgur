@@ -537,20 +537,20 @@
 			
 			for(var i = 0; i < file_info_p.length; i++) {
 				(function() {
-					var e;
+					var element;
 					var part;
 					
 					part = file_info_p[i];
 					
 					if(part.text) {
-						e = document.createElement("span");
-						e.textContent = part.text;
+						element = document.createElement("span");
+						element.textContent = part.text;
 						
 						if(part.title) {
-							e.title = part.title;
+							element.title = part.title;
 						}
 						
-						e_fileinfo.appendChild(e);
+						e_fileinfo.appendChild(element);
 					} else {
 						b4k.e_append_text_node(e_fileinfo, part);
 					}
