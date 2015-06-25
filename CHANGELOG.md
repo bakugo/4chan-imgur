@@ -1,3 +1,6 @@
+### 1.15.5 - *2015-06-25*
+- Fix the inline extension's post menu not opening on posts with embedded links
+
 ### 1.15.4 - *2015-06-24*
 - Fix dimensions displaying as `nullxnull` for e621 webms, they are not provided by the API so they should not display
 - Fix scores not displaying at all when they were `0`

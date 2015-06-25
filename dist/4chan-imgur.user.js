@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        4chan imgur thumbnail (fix)
-// @version     1.15.4
+// @version     1.15.5
 // @namespace   b4k
 // @description Embeds image links in 4chan posts as normal thumbnails. Supports Imgur, 4chan, YouTube, Derpibooru, e621, Tumblr, Vocaroo and direct image links.
 // @match       *://boards.4chan.org/*
@@ -492,7 +492,7 @@
 		
 		e_file = document.createElement("div");
 		e_file.className = "file imgur-file";
-		e_file.id = "f" + post_no;
+		//e_file.id = ("f" + post_no);
 		
 		/**
 		 * stop propagation of click events
@@ -504,7 +504,7 @@
 		
 		e_filetext = document.createElement("div");
 		e_filetext.className = "fileText";
-		e_filetext.id = "fT" + post_no;
+		//e_filetext.id = ("fT" + post_no);
 		
 		e_fileinfo = document.createElement("span");
 		e_fileinfo.textContent = "Link: ";
@@ -537,20 +537,20 @@
 			
 			for(var i = 0; i < file_info_p.length; i++) {
 				(function() {
-					var e;
+					var element;
 					var part;
 					
 					part = file_info_p[i];
 					
 					if(part.text) {
-						e = document.createElement("span");
-						e.textContent = part.text;
+						element = document.createElement("span");
+						element.textContent = part.text;
 						
 						if(part.title) {
-							e.title = part.title;
+							element.title = part.title;
 						}
 						
-						e_fileinfo.appendChild(e);
+						e_fileinfo.appendChild(element);
 					} else {
 						b4k.e_append_text_node(e_fileinfo, part);
 					}
