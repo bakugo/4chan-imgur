@@ -492,7 +492,7 @@
 		
 		e_file = document.createElement("div");
 		e_file.className = "file imgur-file";
-		e_file.id = "f" + post_no;
+		//e_file.id = ("f" + post_no);
 		
 		/**
 		 * stop propagation of click events
@@ -504,7 +504,7 @@
 		
 		e_filetext = document.createElement("div");
 		e_filetext.className = "fileText";
-		e_filetext.id = "fT" + post_no;
+		//e_filetext.id = ("fT" + post_no);
 		
 		e_fileinfo = document.createElement("span");
 		e_fileinfo.textContent = "Link: ";
