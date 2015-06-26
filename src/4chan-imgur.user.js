@@ -575,7 +575,7 @@
 		}
 		
 		if(type == "obj") {
-			e_img = build_object(options.url, options.size || false);
+			e_img = build_object(options.url, (options.dimensions || false));
 		}
 		
 		e_filethumb.appendChild(e_img);
@@ -1641,7 +1641,7 @@
 						processor: self.name,
 						name: match[0],
 						link: link,
-						size: [125, 38],
+						dimensions: {width: 125, height: 38},
 						url: swf_url
 					});
 					
