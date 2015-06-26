@@ -1,3 +1,6 @@
+### 1.15.6 - *2015-06-26*
+- Fix vocaroo embeds having incorrect dimensions
+
 ### 1.15.5 - *2015-06-25*
 - Fix the inline extension's post menu not opening on posts with embedded links
 
