@@ -1,3 +1,7 @@
+### 1.16.0 - *2015-07-09*
+- Major code refactoring
+- Direct links to e621 images with md5 filenames will now be resolved to the post page (similar to derpibooru links)
+
 ### 1.15.6 - *2015-06-26*
 - Fix vocaroo embeds having incorrect dimensions
 
@@ -134,7 +138,7 @@
 - Fix/update b4k.js
 
 ### 1.8.0 - *2014-11-22*
-- Code refractoring
+- Code refactoring
 - Improved loading of derpibooru and e261 image data: if loading fails, the script will try again after 3 seconds (up to 5 times)
  - This should make derpibooru images fail to load less often when the servers are being slow
 - Static derpibooru image links (derpicdn.net) are now recognized and embedded as normal derpibooru links
