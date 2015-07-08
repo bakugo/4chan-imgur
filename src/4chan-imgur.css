@@ -89,7 +89,7 @@ body.imgur-no-scroll {
 						margin-left: 20px;
 					}
 					
-						#imgur-settings .processors .processor .options .option.text .description {
+						#imgur-settings .processors .processor .options .option.text .option-description {
 							position: relative;
 							top: 1px;
 						}
@@ -98,7 +98,7 @@ body.imgur-no-scroll {
 						cursor: default;
 					}
 					
-					#imgur-settings .processors .processor .options .option .option_name {
+					#imgur-settings .processors .processor .options .option .option-name {
 						cursor: pointer;
 						text-decoration: underline;
 					}
@@ -115,11 +115,11 @@ body.imgur-no-scroll {
 						top: 2px;
 					}
 					
-					#imgur-settings .processors .processor .options .option .description {
+					#imgur-settings .processors .processor .options .option .option-description {
 						
 					}
 						
-						#imgur-settings .processors .processor .options .option .description i {
+						#imgur-settings .processors .processor .options .option .option-description i {
 							font-style: normal;
 							font-size: 11px;
 						}
@@ -148,11 +148,11 @@ body.imgur-no-scroll {
 			max-width: 125px !important;
 		}
 		
-			.file.imgur-file .fileThumb.imgur_expanded .imgur-thumb {
+			.file.imgur-file .fileThumb.imgur-expanded .imgur-thumb {
 				display: none;
 			}
 			
-			.file.imgur-file .fileThumb.imgur_expanding .imgur-thumb {
+			.file.imgur-file .fileThumb.imgur-expanding .imgur-thumb {
 				opacity: 0.5;
 			}
 		
@@ -160,7 +160,7 @@ body.imgur-no-scroll {
 			
 		}
 		
-			.file.imgur-file .fileThumb:not(.imgur_expanded) .imgur-thumb-expanded {
+			.file.imgur-file .fileThumb:not(.imgur-expanded) .imgur-thumb-expanded {
 				display: none;
 			}
 			
