@@ -449,7 +449,7 @@
 				eImg.src = resources.thumbLoading;
 				
 				if (options.imageThumbURL) {
-					eImgLoad = new Image();
+					eImgLoad = document.createElement("img");
 					
 					$(eImgLoad).on("load", onLoad);
 					$(eImgLoad).on("error", onError);
