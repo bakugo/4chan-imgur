@@ -1622,7 +1622,7 @@
 						dimensions: {width: info.width, height: info.height},
 						isSwf: isSwf,
 						noExpansion: noExpansion,
-						file_info: {
+						fileInfo: {
 							format: info.file_ext,
 							filesize: info.file_size,
 							dimensions: (info.width ? {width: info.width, height: info.height} : null),
@@ -1725,7 +1725,7 @@
 						imageURL: info.imageURL,
 						imageThumbURL: info.imageThumbURL,
 						noFixProtocol: true,
-						file_info: {
+						fileInfo: {
 							format: b4k.getExtensionFromPath(info.imageURL),
 							width: info.width,
 							height: info.height
