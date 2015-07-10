@@ -1,3 +1,6 @@
+### 1.16.1 - *2015-07-10*
+- Fix fileinfo not displaying for e621 and tumblr images
+
 ### 1.16.0 - *2015-07-09*
 - Major code refactoring
 - Direct links to e621 images with md5 filenames will now be resolved to the post page (similar to derpibooru links)

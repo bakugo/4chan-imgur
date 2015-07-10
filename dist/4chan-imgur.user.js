@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        4chan imgur thumbnail (fix)
-// @version     1.16.0
+// @version     1.16.1
 // @namespace   b4k
 // @description Embeds image links in 4chan posts as normal thumbnails. Supports Imgur, 4chan, YouTube, Derpibooru, e621, Tumblr, Vocaroo and direct image links.
 // @match       *://boards.4chan.org/*
@@ -38,13 +38,6 @@
 	var menu;
 	var processors;
 	var dataCache;
-	
-	/*var func.placeThumb;
-	var func.placeObject;
-	var build_file;
-	var build_object;
-	var hoverExpand;
-	var inlineExpand;*/
 	
 	css = "body.imgur-no-scroll {\r\n\t\/*overflow: hidden;*\/\r\n}\r\n\r\n#imgur-overlay {\r\n\tbackground-color: rgba(0, 0, 0, 0.5);\r\n\tdisplay: flex;\r\n\tposition: fixed;\r\n\ttop: 0;\r\n\tleft: 0;\r\n\theight: 100%;\r\n\twidth: 100%;\r\n\tz-index: 100;\r\n}\r\n\r\n#imgur-settings {\r\n\tbox-shadow: 0 0 15px rgba(0, 0, 0, 0.15);\r\n\tdisplay: inline-block;\r\n\tpadding: 5px;\r\n\tposition: relative;\r\n\ttext-align: left;\r\n\tvertical-align: middle;\r\n\tmargin: auto;\r\n\twidth: 660px;\r\n\theight: 500px;\r\n\tmax-width: 100%;\r\n\tmax-height: 80%;\r\n\tfont-size: 13px;\r\n}\r\n\r\n\t:root:not(.fourchan-x) #imgur-settings { background-color: #d6daf0; border-color: #b7c5d9; }\r\n\t:root:not(.fourchan-x) body.yotsuba_new #imgur-settings { background-color: #f00d6; border-color: #d9bfb7; }\r\n\t:root:not(.fourchan-x) body.yotsuba_b_new #imgur-settings { background-color: #d6daf0; border-color: #b7c5d9; }\r\n\t:root:not(.fourchan-x) body.futaba #imgur-settings { background-color: #f0e0d6; border: none; }\r\n\t:root:not(.fourchan-x) body.burichan #imgur-settings { background-color: #d6daf0; border: none; }\r\n\t:root:not(.fourchan-x) body.tomorrow #imgur-settings { background-color: #282a2e; border-color: #282a2e; }\r\n\t:root:not(.fourchan-x) body.photon #imgur-settings { background-color: #ddd; border-color: #ccc; }\r\n\t\r\n\t#imgur-settings .links {\r\n\t\tposition: absolute;\r\n\t\ttop: 4px;\r\n\t\tright: 10px;\r\n\t\tfont-size: 11px;\r\n\t}\r\n\t\t\r\n\t\t#imgur-settings .links a:not(:first-of-type) {\r\n\t\t\tmargin-left: 6px;\r\n\t\t}\r\n\t\r\n\t#imgur-settings .header {\r\n\t\tfont-size: 16px;\r\n\t\tfont-weight: bold;\r\n\t\tmargin-top: 6px;\r\n\t\ttext-align: center;\r\n\t}\r\n\t\r\n\t#imgur-settings .processors {\r\n\t\tmax-height: calc(100% - 40px);\r\n\t\toverflow-y: scroll;\r\n\t\tmargin-top: 10px;\r\n\t\tpadding: 0 10px;\r\n\t}\r\n\t\r\n\t\t#imgur-settings .processors .processor {\r\n\t\t\tmargin-top: 12px;\r\n\t\t}\r\n\t\t\r\n\t\t\t#imgur-settings .processors .processor:first-child {\r\n\t\t\t\tmargin-top: 0;\r\n\t\t\t}\r\n\t\t\t\r\n\t\t\t#imgur-settings .processors .processor:last-child {\r\n\t\t\t\tmargin-bottom: 10px;\r\n\t\t\t}\r\n\t\t\t\r\n\t\t\t#imgur-settings .processors .processor .processor-name {\r\n\t\t\t\tfont-size: 15px;\r\n\t\t\t\tmargin-left: 10px;\r\n\t\t\t\tfont-weight: bold;\r\n\t\t\t}\r\n\t\t\t\r\n\t\t\t#imgur-settings .processors .processor .options {\r\n\t\t\t}\r\n\t\t\t\r\n\t\t\t\t#imgur-settings .processors .processor .options .option {\r\n\t\t\t\t}\r\n\t\t\t\t\r\n\t\t\t\t\t#imgur-settings .processors .processor .options .option.text {\r\n\t\t\t\t\t\tmargin-left: 20px;\r\n\t\t\t\t\t}\r\n\t\t\t\t\t\r\n\t\t\t\t\t\t#imgur-settings .processors .processor .options .option.text .option-description {\r\n\t\t\t\t\t\t\tposition: relative;\r\n\t\t\t\t\t\t\ttop: 1px;\r\n\t\t\t\t\t\t}\r\n\t\t\t\t\t\r\n\t\t\t\t\t#imgur-settings .processors .processor .options .option label {\r\n\t\t\t\t\t\tcursor: default;\r\n\t\t\t\t\t}\r\n\t\t\t\t\t\r\n\t\t\t\t\t#imgur-settings .processors .processor .options .option .option-name {\r\n\t\t\t\t\t\tcursor: pointer;\r\n\t\t\t\t\t\ttext-decoration: underline;\r\n\t\t\t\t\t}\r\n\t\t\t\t\t\r\n\t\t\t\t\t#imgur-settings .processors .processor .options .option input[type=\"text\"] {\r\n\t\t\t\t\t\twidth: 220px;\r\n\t\t\t\t\t\tmargin-top: 3px;\r\n\t\t\t\t\t\theight: 12px;\r\n\t\t\t\t\t\tpadding: 2px 4px 3px 4px;\r\n\t\t\t\t\t}\r\n\t\t\t\t\t\r\n\t\t\t\t\t#imgur-settings .processors .processor .options .option input[type=\"checkbox\"] {\r\n\t\t\t\t\t\tposition: relative;\r\n\t\t\t\t\t\ttop: 2px;\r\n\t\t\t\t\t}\r\n\t\t\t\t\t\r\n\t\t\t\t\t#imgur-settings .processors .processor .options .option .option-description {\r\n\t\t\t\t\t\t\r\n\t\t\t\t\t}\r\n\t\t\t\t\t\t\r\n\t\t\t\t\t\t#imgur-settings .processors .processor .options .option .option-description i {\r\n\t\t\t\t\t\t\tfont-style: normal;\r\n\t\t\t\t\t\t\tfont-size: 11px;\r\n\t\t\t\t\t\t}\r\n\r\n.file.imgur-file {\r\n}\r\n\r\n\t.file.imgur-file .fileText {\r\n\t}\r\n\t\r\n\t\t.file.imgur-file .fileText a img {\r\n\t\t\tposition: relative;\r\n\t\t\ttop: 3px;\r\n\t\t\tpadding-left: 3px;\r\n\t\t\tpadding-right: 1px;\r\n\t\t}\r\n\t\r\n\t.file.imgur-file .fileThumb {\r\n\t\tposition: relative;\r\n\t}\r\n\t\r\n\t\t.file.imgur-file .fileThumb .imgur-thumb {\r\n\t\t\tborder: 1px solid #00a !important;\r\n\t\t\tpadding: 2px;\r\n\t\t\tmax-height: 125px !important;\r\n\t\t\tmax-width: 125px !important;\r\n\t\t}\r\n\t\t\r\n\t\t\t.file.imgur-file .fileThumb.imgur-expanded .imgur-thumb {\r\n\t\t\t\tdisplay: none;\r\n\t\t\t}\r\n\t\t\t\r\n\t\t\t.file.imgur-file .fileThumb.imgur-expanding .imgur-thumb {\r\n\t\t\t\topacity: 0.5;\r\n\t\t\t}\r\n\t\t\r\n\t\t.file.imgur-file .fileThumb .imgur-thumb-expanded {\r\n\t\t\t\r\n\t\t}\r\n\t\t\r\n\t\t\t.file.imgur-file .fileThumb:not(.imgur-expanded) .imgur-thumb-expanded {\r\n\t\t\t\tdisplay: none;\r\n\t\t\t}\r\n\t\t\t\r\n\t\t\t.file.imgur-file .fileThumb object.imgur-thumb-expanded {\r\n\t\t\t\tdisplay: block;\r\n\t\t\t\tbackground-color: #fff;\r\n\t\t\t\tmargin-bottom: -4px;\r\n\t\t\t}\r\n\t\t\r\n\t\t.file.imgur-file .fileThumb .imgur-thumb-close {\r\n\t\t\tdisplay: inline-block;\r\n\t\t\toverflow: hidden;\r\n\t\t\tposition: absolute;\r\n\t\t\ttop: 0;\r\n\t\t\tright: 0;\r\n\t\t\tcolor: #F00;\r\n\t\t\tfont-size: 26px;\r\n\t\t\tline-height: 4px;\r\n\t\t\twidth: 10px;\r\n\t\t\theight: 10px;\r\n\t\t\tpadding: 8px 8px 2px 2px;\r\n\t\t}\r\n\r\n.imgur-hover {\r\n\tposition: fixed;\r\n\tmax-height: 97%;\r\n\tmax-width: 75%;\r\n\tpadding-bottom: 18px;\r\n\tz-index: 100;\r\n\tpointer-events: none;\r\n}\r\n";
 	
@@ -456,7 +449,7 @@
 				eImg.src = resources.thumbLoading;
 				
 				if (options.imageThumbURL) {
-					eImgLoad = new Image();
+					eImgLoad = document.createElement("img");
 					
 					$(eImgLoad).on("load", onLoad);
 					$(eImgLoad).on("error", onError);
@@ -1629,7 +1622,7 @@
 						dimensions: {width: info.width, height: info.height},
 						isSwf: isSwf,
 						noExpansion: noExpansion,
-						file_info: {
+						fileInfo: {
 							format: info.file_ext,
 							filesize: info.file_size,
 							dimensions: (info.width ? {width: info.width, height: info.height} : null),
@@ -1732,10 +1725,9 @@
 						imageURL: info.imageURL,
 						imageThumbURL: info.imageThumbURL,
 						noFixProtocol: true,
-						file_info: {
+						fileInfo: {
 							format: b4k.getExtensionFromPath(info.imageURL),
-							width: info.width,
-							height: info.height
+							dimensions: {width: info.width, height: info.height}
 						}
 					});
 				};
