@@ -1727,8 +1727,7 @@
 						noFixProtocol: true,
 						fileInfo: {
 							format: b4k.getExtensionFromPath(info.imageURL),
-							width: info.width,
-							height: info.height
+							dimensions: {width: info.width, height: info.height}
 						}
 					});
 				};
