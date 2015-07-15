@@ -1,3 +1,9 @@
+### 1.16.2 - *2015-07-15*
+- Add support for Appchan X
+ - Fix script not running at all when using Appchan X
+ - Fix settings button not being displayed anywhere when using Appchan X (it will now be added to the header)
+ - Note: Appchan X's styling breaks the settings menu, this will not be fixed. Disable Appchan X if you want to change the settings properly
+
 ### 1.16.1 - *2015-07-10*
 - Fix fileinfo not displaying for e621 and tumblr images
 
