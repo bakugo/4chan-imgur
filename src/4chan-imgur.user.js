@@ -57,6 +57,8 @@
 				return;
 			}
 			
+			us.log("Starting");
+			
 			main.data = {
 				processors: [],
 				files: [],
