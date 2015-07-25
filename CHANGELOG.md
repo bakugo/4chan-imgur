@@ -1,3 +1,6 @@
+### 1.16.3 - *2015-07-25*
+- Fix e621 SWFs not being expandable
+
 ### 1.16.2 - *2015-07-15*
 - Add support for Appchan X
  - Fix script not running at all when using Appchan X
