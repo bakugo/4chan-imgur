@@ -733,9 +733,6 @@
 			object = document.createElement("object");
 			
 			if (dimensions) {
-				object.width = dimensions.width;
-				object.height = dimensions.height;
-				
 				object.style.width = dimensions.width + "px";
 				object.style.height = dimensions.height + "px";
 			}
