@@ -1586,6 +1586,7 @@
 					var isSwf;
 					
 					noExpansion = false;
+					isSwf = false;
 					
 					if (info) {
 						dataCache[_this.name][data.postId] = info;
@@ -1605,6 +1606,7 @@
 					}
 					
 					if (imageExtension == "swf") {
+						isSwf = true;
 						imageThumbURL = resources.thumbFlash;
 					}
 					
