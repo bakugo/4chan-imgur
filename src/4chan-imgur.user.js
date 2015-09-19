@@ -9,7 +9,7 @@
 // @grant       GM_getValue
 // @grant       GM_setValue
 // @require     http://b4k.co/code/lib/jquery/2.1.4/jquery.min.js
-// @require     http://b4k.co/code/lib/b4k-js/1.0.0-beta.7/b4k.min.js
+// @require     http://b4k.co/code/lib/b4k-js/1.0.0-beta.9/b4k.min.js
 // @run-at      document-end
 // @updateURL   https://github.com/bakugo/4chan-imgur/raw/master/dist/4chan-imgur.meta.js
 // @downloadURL https://github.com/bakugo/4chan-imgur/raw/master/dist/4chan-imgur.user.js
@@ -617,7 +617,7 @@
 				}
 				
 				if (fileInfo.filesize) {
-					fileInfoProcessed.push(b4k.formatFilesize(fileInfo.filesize));
+					fileInfoProcessed.push(b4k.formatBytes(fileInfo.filesize));
 				}
 				
 				if (fileInfo.dimensions) {
