@@ -1530,7 +1530,7 @@
 					
 					data.post = post;
 					data.imageId = match[1];
-					data.domain = "derpiboo.ru";
+					data.domain = "derpibooru.org";
 					data.imageTitle = (data.domain + "/" + data.imageId);
 					data.imageLink = ("https://" + data.imageTitle);
 					
