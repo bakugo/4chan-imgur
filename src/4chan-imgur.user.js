@@ -1403,74 +1403,109 @@
 				};
 				
 				_this.loadDerpibooruFilter = function () {
-					var basePath;
-					var cancel;
+					var domains;
+					var continueWithoutFilter;
 					var onRequestFail;
+					var checkNextDomain;
+					var currentDomainIndex;
 					
-					basePath = "https://derpiboo.ru";
+					domains = [
+						"derpibooru.org",
+						"derpiboo.ru"
+					];
 					
-					cancel = function () {
+					checkNextDomain = function () {
+						var currentDomain;
+						var currentDomainPath;
+						
+						if (currentDomainIndex === null) {
+							currentDomainIndex = 0;
+						} else {
+							currentDomainIndex++;
+						}
+						
+						if (currentDomainIndex > (domains.length - 1)) {
+							us.log("[Derpibooru Filter] No logged in domains, continuing without filter");
+							continueWithoutFilter();
+							return;
+						}
+						
+						currentDomain = domains[currentDomainIndex];
+						currentDomainPath = ("https://" + currentDomain);
+						
+						us.log("[Derpibooru Filter] Attempting to fetch filter (domain: " + currentDomain + ")");
+						
+						func.get((currentDomainPath + "/about"), null, "html", function (data) {
+							var filterId;
+							
+							if (data.match(/window\.booru\.userID \= \"null\"/)) {
+								us.log("[Derpibooru Filter] User is not logged in on domain, skipping");
+								checkNextDomain();
+								return;
+							}
+							
+							us.log("[Derpibooru Filter] User is logged in on domain, proceeding");
+							
+							filterId = data.match(/window\.booru\.filterID \= \"(.*?)\"/);
+							
+							if (!filterId) {
+								us.log("[Derpibooru Filter] No filter found, continuing without filter");
+								continueWithoutFilter();
+								return;
+							}
+							
+							filterId = filterId[1];
+							
+							us.log("[Derpibooru Filter] Loading filter data");
+							
+							func.get((currentDomainPath + "/filters/" + filterId + ".json"), null, "json", function (data) {
+								var filterTags;
+								
+								us.log("[Derpibooru Filter] Filter loaded successfully, parsing");
+								
+								filterTags = [];
+								
+								filterTags = filterTags.concat(b4k.commaSeparatedStringToArray(data.spoilered_tags));
+								filterTags = filterTags.concat(b4k.commaSeparatedStringToArray(data.hidden_tags));
+								
+								if (!filterTags.length) {
+									us.log("[Derpibooru Filter] Notice: no tags found in filter");
+								}
+								
+								_this.derpibooruFilterTags = filterTags;
+								
+								us.log("[Derpibooru Filter] Successfully fetched and applied filter (id: " + filterId + ")");
+								
+								_this.updateFilteredTags();
+							}, onRequestFail);
+						}, onRequestFail);
+					};
+					
+					continueWithoutFilter = function () {
 						_this.derpibooruFilterTags = [];
 					};
 					
 					onRequestFail = function () {
-						us.log("[Derpibooru Filter] Failed to update filter");
-						cancel();
+						us.log("[Derpibooru Filter] Request failed, skipping");
+						checkNextDomain();
 					};
 					
 					
 					_this.derpibooruFilterTags = null;
 					
 					if (!func.getConfigOption(_this.name, "loadDerpibooruFilter")) {
-						cancel();
+						continueWithoutFilter();
 						return;
 					}
 					
-					us.log("[Derpibooru Filter] Attempting to update filter");
+					currentDomainIndex = null;
 					
-					func.get((basePath + "/about"), null, "html", function (data) {
-						var filterId;
-						
-						if (data.match(/window\.booru\.userID \= \"null\"/)) {
-							us.log("[Derpibooru Filter] User is not logged in, ignoring filter");
-							cancel();
-							return;
-						}
-						
-						filterId = data.match(/window\.booru\.filterID \= \"(.*?)\"/);
-						
-						if (!filterId) {
-							us.log("[Derpibooru Filter] No valid filter found");
-							cancel();
-							return;
-						}
-						
-						filterId = filterId[1];
-						
-						func.get((basePath + "/filters/" + filterId + ".json"), null, "json", function (data) {
-							var filterTags;
-							
-							filterTags = [];
-							
-							filterTags = filterTags.concat(b4k.commaSeparatedStringToArray(data.spoilered_tags));
-							filterTags = filterTags.concat(b4k.commaSeparatedStringToArray(data.hidden_tags));
-							
-							if (!filterTags.length) {
-								us.log("[Derpibooru Filter] (Notice) No tags found in filter");
-							}
-							
-							_this.derpibooruFilterTags = filterTags;
-							
-							us.log("[Derpibooru Filter] Successfully updated filter (id: " + filterId + ")");
-							
-							_this.updateFilteredTags();
-						}, onRequestFail);
-					}, onRequestFail);
+					checkNextDomain();
 				};
 				
 				_this.processData = function (data, info) {
 					b4k.waitFor(function () {
-						return !!_this.derpibooruFilterTags;
+						return (_this.derpibooruFilterTags !== null);
 					}, function () {
 						var tags;
 						var filteredTags;
@@ -1549,10 +1584,10 @@
 			},
 			
 			options: {
-				enabled: [true, "Enabled", "Enable <a href=\"https://derpiboo.ru\">Derpibooru</a> thumbnails"],
+				enabled: [true, "Enabled", "Enable <a href=\"https://derpibooru.org\">Derpibooru</a> thumbnails"],
 				preload: [true, "Auto-Load", "Load thumbnail automatically instead of waiting for user action"],
 				filteredTags: ["", "Filtered Tags", "Will never be auto-loaded <i>(comma-separated)</i>"],
-				loadDerpibooruFilter: [false, "Load Derpibooru Filter", "Automatically load your current derpibooru filter into the script <i>(hover for info)</i>", "The browser must be logged in to derpiboo.ru, other domains will not work.\nIf not logged in, no filter will be used (beware of expired sessions!).\nThe filter is updated on each page load."],
+				loadDerpibooruFilter: [false, "Load Derpibooru Filter", "Automatically load your current derpibooru filter into the script <i>(hover for info)</i>", "The browser must be logged in to derpibooru.\nIf not logged in, no filter will be used (beware of expired sessions!).\nThe filter is fetched on each page load."],
 				inlineExpand: [true, "Inline Expand", "Click the thumbnail to switch to the full image"],
 				hoverExpand: [true, "Hover Expand", "Hover the thumbnail to show the full image"]
 			}
