@@ -2039,32 +2039,6 @@
 		}
 	};
 	
-	(function() {
-		(function() {
-			var processorOptions;
-			var option;
-			var option_i_new;
-			for(var processor_i in processors) {
-				processorOptions = us.config.get([processor_i]);
-				for(var option_i in processorOptions) {
-					option_i_new = b4k.dashesToCamelCase(b4k.stringReplaceAll(option_i, "_", "-"));
-					if(option_i !== option_i_new) {
-						if(us.config.get([processor_i, option_i_new]) === null) {
-							us.config.set([processor_i, option_i_new], processorOptions[option_i]);
-							us.config.set([processor_i, option_i], null);
-						}
-					}
-				}
-			}
-		})();
-		(function() {
-			if(us.config.get(["first_run"])) {
-				us.config.set(["firstRun"], true);
-				us.config.set(["first_run"], null);
-			}
-		})();
-	})();
-	
 	main.init();
 	
 })();
