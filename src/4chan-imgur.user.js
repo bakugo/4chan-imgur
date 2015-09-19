@@ -644,8 +644,8 @@
 			 * stop propagation of click events
 			 * prevents the inline extension from picking up these events and breaking the image
 			 */
-			$(eFile).on("click", function (e) {
-				e.stopPropagation();
+			$(eFile).on("click", function (event) {
+				event.stopPropagation();
 			});
 			
 			eFiletext = document.createElement("div");
@@ -803,7 +803,7 @@
 			$(comment).before(file);
 		},
 		
-		get: function (url, get, datatype, callbackDone, callbackFail) {
+		get: function (url, data, dataType, callbackDone, callbackFail) {
 			var settings;
 			var currentAttempt;
 			var tryToLoad;
@@ -814,12 +814,12 @@
 			};
 			
 			tryToLoad = function () {
-				us.log("[GET] Loading: \"" + url + "\" (try " + currentAttempt + " of " + settings.maxAttempts + ")");
+				us.log("[GET] Loading: \"" + url + "\" (attempt " + currentAttempt + " of " + settings.maxAttempts + ")");
 				
 				$.ajax({
 					url: url,
-					data: get,
-					dataType: datatype,
+					data: data,
+					dataType: dataType,
 					
 					success: function (data, textstatus, jqxhr) {
 						us.log("[GET] Loaded successfully: \"" + url + "\"");
@@ -851,8 +851,8 @@
 				});
 			};
 			
-			get = (get || {});
-			datatype = (datatype || null);
+			data = (data || {});
+			dataType = (dataType || null);
 			
 			currentAttempt = 1;
 			
@@ -1912,7 +1912,7 @@
 				_this.regex = /https?:\/\/(?:[\-A-Z0-9.]+)\.(?:[\-A-Z0-9.]+)\/(?:[\-A-Z0-9\.+&@#\/%=~_|]+)\.(?:jpe?g|png|gif)/i;
 				_this.qualifier = "http";
 				
-				_this.https_domains = [
+				_this.httpsDomains = [
 					"derpicdn.net",
 					"*.ytimg.com",
 					"*.deviantart.net",
@@ -2004,8 +2004,8 @@
 					
 					fixProtocol = false;
 					
-					for (var i = 0; i < _this.https_domains.length; i++) {
-						if (b4k.wildcardMatch(_this.https_domains[i], domain)) {
+					for (var i = 0; i < _this.httpsDomains.length; i++) {
+						if (b4k.wildcardMatch(_this.httpsDomains[i], domain)) {
 							fixProtocol = true;
 							
 							break;
