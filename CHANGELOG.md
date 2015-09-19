@@ -1,6 +1,6 @@
 ### 1.17.0 - *2015-09-19*
-- Changed main derpibooru domain to (derpibooru.org)[https://derpibooru.org] (as per the [api documentation](https://derpibooru.org/api))
-- Derpibooru filters can now be loaded from either (derpibooru.org)[https://derpibooru.org] or (derpiboo.ru)[https://derpiboo.ru]
+- Change main derpibooru domain to [derpibooru.org](https://derpibooru.org) (as per the [api documentation](https://derpibooru.org/api))
+- Derpibooru filters can now be loaded from either [derpibooru.org](https://derpibooru.org) or [derpiboo.ru](https://derpiboo.ru)
  - Each domain will be checked in that order, the first logged in domain found will be used to load the filter
 
 ### 1.16.3 - *2015-07-25*
