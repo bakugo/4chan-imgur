@@ -383,7 +383,7 @@
 			$(eFileThumb).on("click", toggle);
 			
 			if (isSwf) {
-				eExpanded = func.buildObject(url, (dimensions || [854, 480]));
+				eExpanded = func.buildObject(url, (dimensions || {width: 854, height: 480}));
 				eExpanded.className = "imgur-thumb-expanded";
 				
 				$(eExpanded).on("click", function (event) {
