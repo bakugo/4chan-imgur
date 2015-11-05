@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        4chan imgur thumbnail (fix)
-// @version     1.17.0
+// @version     1.17.1
 // @namespace   b4k
 // @description Embeds image links in 4chan posts as normal thumbnails. Supports Imgur, 4chan, YouTube, Derpibooru, e621, Tumblr, Vocaroo and direct image links.
 // @match       *://boards.4chan.org/*
@@ -383,7 +383,7 @@
 			$(eFileThumb).on("click", toggle);
 			
 			if (isSwf) {
-				eExpanded = func.buildObject(url, (dimensions || [854, 480]));
+				eExpanded = func.buildObject(url, (dimensions || {width: 854, height: 480}));
 				eExpanded.className = "imgur-thumb-expanded";
 				
 				$(eExpanded).on("click", function (event) {
@@ -1438,7 +1438,7 @@
 						func.get((currentDomainPath + "/about"), null, "html", function (data) {
 							var filterId;
 							
-							if (data.match(/window\.booru\.userID \= \"null\"/)) {
+							if (!data.match(/window\.booru\.userID \= (\d+);/)) {
 								us.log("[Derpibooru Filter] User is not logged in on domain, skipping");
 								checkNextDomain();
 								return;
@@ -1446,7 +1446,7 @@
 							
 							us.log("[Derpibooru Filter] User is logged in on domain, proceeding");
 							
-							filterId = data.match(/window\.booru\.filterID \= \"(.*?)\"/);
+							filterId = data.match(/window\.booru\.filterID \= (\d+);/);
 							
 							if (!filterId) {
 								us.log("[Derpibooru Filter] No filter found, continuing without filter");
@@ -1456,7 +1456,7 @@
 							
 							filterId = filterId[1];
 							
-							us.log("[Derpibooru Filter] Loading filter data");
+							us.log("[Derpibooru Filter] Filter found, loading filter data");
 							
 							func.get((currentDomainPath + "/filters/" + filterId + ".json"), null, "json", function (data) {
 								var filterTags;
