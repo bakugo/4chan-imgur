@@ -1,3 +1,6 @@
+### 1.17.1 - *2015-11-5*
+- Fix derpibooru filters not working after the recent derpibooru update
+
 ### 1.17.0 - *2015-09-19*
 - Change main derpibooru domain to [derpibooru.org](https://derpibooru.org) (as per the [api documentation](https://derpibooru.org/api))
 - Derpibooru filters can now be loaded from either [derpibooru.org](https://derpibooru.org) or [derpiboo.ru](https://derpiboo.ru)

@@ -1438,7 +1438,7 @@
 						func.get((currentDomainPath + "/about"), null, "html", function (data) {
 							var filterId;
 							
-							if (data.match(/window\.booru\.userID \= \"null\"/)) {
+							if (!data.match(/window\.booru\.userID \= (\d+);/)) {
 								us.log("[Derpibooru Filter] User is not logged in on domain, skipping");
 								checkNextDomain();
 								return;
@@ -1446,7 +1446,7 @@
 							
 							us.log("[Derpibooru Filter] User is logged in on domain, proceeding");
 							
-							filterId = data.match(/window\.booru\.filterID \= \"(.*?)\"/);
+							filterId = data.match(/window\.booru\.filterID \= (\d+);/);
 							
 							if (!filterId) {
 								us.log("[Derpibooru Filter] No filter found, continuing without filter");
@@ -1456,7 +1456,7 @@
 							
 							filterId = filterId[1];
 							
-							us.log("[Derpibooru Filter] Loading filter data");
+							us.log("[Derpibooru Filter] Filter found, loading filter data");
 							
 							func.get((currentDomainPath + "/filters/" + filterId + ".json"), null, "json", function (data) {
 								var filterTags;
