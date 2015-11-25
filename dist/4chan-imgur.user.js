@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        4chan imgur thumbnail (fix)
-// @version     1.17.1
+// @version     1.17.2
 // @namespace   b4k
 // @description Embeds image links in 4chan posts as normal thumbnails. Supports Imgur, 4chan, YouTube, Derpibooru, e621, Tumblr, Vocaroo and direct image links.
 // @match       *://boards.4chan.org/*
@@ -9,7 +9,7 @@
 // @grant       GM_getValue
 // @grant       GM_setValue
 // @require     http://b4k.co/code/lib/jquery/2.1.4/jquery.min.js
-// @require     http://b4k.co/code/lib/b4k-js/1.0.0-beta.9/b4k.min.js
+// @require     http://b4k.co/code/lib/b4k-js/1.0.0-beta.10/b4k.min.js
 // @run-at      document-end
 // @updateURL   https://github.com/bakugo/4chan-imgur/raw/master/dist/4chan-imgur.meta.js
 // @downloadURL https://github.com/bakugo/4chan-imgur/raw/master/dist/4chan-imgur.user.js
@@ -1854,7 +1854,7 @@
 					data.imageTitle = b4k.format("{blog}.tumblr.com/post/{id}", {blog: blogName, id: data.postId});
 					data.imageLink = ("http://" + data.imageTitle);
 					
-					url = b4k.format("{api_url}blog/{blog}.tumblr.com/posts", {
+					dataURL = b4k.format("{api_url}blog/{blog}.tumblr.com/posts", {
 						api_url: _this.tumblrApi.url,
 						blog: blogName
 					});
@@ -1862,7 +1862,7 @@
 					if (dataCache[_this.name][data.postId]) {
 						_this.processData(data);
 					} else {
-						func.get(url, {
+						func.get(dataURL, {
 							id: data.postId,
 							api_key: _this.tumblrApi.key
 						}, "json", function (response) {

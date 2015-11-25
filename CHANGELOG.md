@@ -1,3 +1,6 @@
+### 1.17.2 - *2015-11-25*
+- Fix tumblr processor
+
 ### 1.17.1 - *2015-11-5*
 - Fix default swf embed dimensions not being applied correctly
 - Fix derpibooru filters not working after the recent derpibooru update
