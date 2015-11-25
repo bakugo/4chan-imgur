@@ -1854,7 +1854,7 @@
 					data.imageTitle = b4k.format("{blog}.tumblr.com/post/{id}", {blog: blogName, id: data.postId});
 					data.imageLink = ("http://" + data.imageTitle);
 					
-					url = b4k.format("{api_url}blog/{blog}.tumblr.com/posts", {
+					dataURL = b4k.format("{api_url}blog/{blog}.tumblr.com/posts", {
 						api_url: _this.tumblrApi.url,
 						blog: blogName
 					});
@@ -1862,7 +1862,7 @@
 					if (dataCache[_this.name][data.postId]) {
 						_this.processData(data);
 					} else {
-						func.get(url, {
+						func.get(dataURL, {
 							id: data.postId,
 							api_key: _this.tumblrApi.key
 						}, "json", function (response) {
