@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        4chan imgur thumbnail (fix)
-// @version     1.17.2
+// @version     1.17.3
 // @namespace   b4k
 // @description Embeds image links in 4chan posts as normal thumbnails. Supports Imgur, 4chan, YouTube, Derpibooru, e621, Tumblr, Vocaroo and direct image links.
 // @match       *://boards.4chan.org/*
@@ -1914,7 +1914,7 @@
 					imageTitle = match[0];
 					imageLink = ("http://vocaroo.com/i/" + soundId);
 					
-					SwfURL = (location.protocol + "//files.b4k.co/misc/vocaroo_player.swf");
+					SwfURL = (location.protocol + "//b4k.co/offsite/vocaroo-player.swf");
 					
 					SwfURL += ("?" + $.param({"playMediaID": soundId, "autoplay": ((_this.autoplay && !init) ? "1" : "0")}));
 					

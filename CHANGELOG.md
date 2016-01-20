@@ -1,3 +1,6 @@
+### 1.17.3 - *2016-01-20*
+- Update Vocaroo player URL
+
 ### 1.17.2 - *2015-11-25*
 - Fix tumblr processor
 
