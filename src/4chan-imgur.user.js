@@ -1914,7 +1914,7 @@
 					imageTitle = match[0];
 					imageLink = ("http://vocaroo.com/i/" + soundId);
 					
-					SwfURL = (location.protocol + "//files.b4k.co/misc/vocaroo_player.swf");
+					SwfURL = (location.protocol + "//b4k.co/offsite/vocaroo-player.swf");
 					
 					SwfURL += ("?" + $.param({"playMediaID": soundId, "autoplay": ((_this.autoplay && !init) ? "1" : "0")}));
 					
