@@ -118,7 +118,7 @@
 		},
 		
 		process: function (post, init) {
-			var postNo;
+			var postNumber;
 			var postFile;
 			var postText;
 			var processor;
@@ -128,7 +128,7 @@
 				return;
 			}
 			
-			postNo = b4k.fourchan.getPostNo(post);
+			postNumber = b4k.fourchan.getPostNumber(post);
 			postFile = b4k.fourchan.getPostFile(post, true, true);
 			postText = func.getPostCommentText(post);
 			
@@ -150,7 +150,7 @@
 				processResult = processor.process(post, postText, !!init);
 				
 				if (processResult) {
-					us.log("Post #" + postNo + " processed with \"" + processor.name + "\"");
+					us.log("Post #" + postNumber + " processed with \"" + processor.name + "\"");
 					
 					break;
 				}
@@ -167,16 +167,16 @@
 			}
 		},
 		
-		setPreloaded: function (postNo) {
-			if(main.isPreloaded(postNo)) {
+		setPreloaded: function (postNumber) {
+			if(main.isPreloaded(postNumber)) {
 				return;
 			}
 			
-			main.data.preloaded.push(postNo);
+			main.data.preloaded.push(postNumber);
 		},
 		
-		isPreloaded: function (postNo) {
-			return b4k.arrayContains(main.data.preloaded, postNo);
+		isPreloaded: function (postNumber) {
+			return b4k.arrayContains(main.data.preloaded, postNumber);
 		},
 		
 		registerFile: function (file) {
@@ -414,7 +414,7 @@
 			var placehold;
 			
 			var post;
-			var postNo;
+			var postNumber;
 			var eFile;
 			var eImg;
 			
@@ -479,7 +479,7 @@
 					
 					isPreloaded = true;
 					
-					main.setPreloaded(postNo);
+					main.setPreloaded(postNumber);
 					
 					loadImage();
 				};
@@ -536,13 +536,13 @@
 				return;
 			}
 			
-			postNo = b4k.fourchan.getPostNo(post);
+			postNumber = b4k.fourchan.getPostNumber(post);
 			
-			eFile = func.buildFile(postNo, options, "img");
+			eFile = func.buildFile(postNumber, options, "img");
 			
 			eImg = func.getFileThumb(eFile);
 			
-			if ((!func.getConfigOption(options.processor, "preload") || options.noPreload) && !main.isPreloaded(postNo)) {
+			if ((!func.getConfigOption(options.processor, "preload") || options.noPreload) && !main.isPreloaded(postNumber)) {
 				placehold();
 			} else {
 				loadImage();
@@ -553,19 +553,19 @@
 		
 		placeObject: function (options) {
 			var post;
-			var postNo;
+			var postNumber;
 			var file;
 			
 			post = options.post;
 			
-			postNo = b4k.fourchan.getPostNo(post);
+			postNumber = b4k.fourchan.getPostNumber(post);
 			
-			file = func.buildFile(postNo, options, "obj");
+			file = func.buildFile(postNumber, options, "obj");
 			
 			func.insertFileIntoPost(post, file);
 		},
 		
-		buildFile: function (postNo, options, type) {
+		buildFile: function (postNumber, options, type) {
 			var eFile;
 			var eFiletext;
 			var eFileInfo;
@@ -638,7 +638,7 @@
 			
 			eFile = document.createElement("div");
 			eFile.className = "file imgur-file";
-			//eFile.id = ("f" + postNo);
+			//eFile.id = ("f" + postNumber);
 			
 			/**
 			 * stop propagation of click events
@@ -650,7 +650,7 @@
 			
 			eFiletext = document.createElement("div");
 			eFiletext.className = "fileText";
-			//eFiletext.id = ("fT" + postNo);
+			//eFiletext.id = ("fT" + postNumber);
 			
 			eFileInfo = document.createElement("span");
 			eFileInfo.textContent = "Link: ";
@@ -762,7 +762,7 @@
 			commentLinks = eComment.querySelectorAll("a");
 			
 			for (var i = 0; i < commentLinks.length; i++) {
-				if ($(commentLinks[i]).hasClass("quotelink")) {
+				if (commentLinks[i].classList.contains("quotelink")) {
 					continue;
 				}
 				
@@ -773,7 +773,7 @@
 		},
 		
 		getFileThumb: function (file) {
-			return file.getElementsByClassName("fileThumb")[0].children[0];
+			return file.querySelector(".fileThumb").children[0];
 		},
 		
 		scrollBackAfterExpansion: function (element) {
@@ -2075,5 +2075,4 @@
 	};
 	
 	main.init();
-	
 })();
