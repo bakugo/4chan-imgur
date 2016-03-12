@@ -1,3 +1,7 @@
+### 1.17.4 - *2016-03-12*
+- Update b4k.js
+- Remove unneeded "no Greasemonkey" alert
+
 ### 1.17.3 - *2016-01-20*
 - Update Vocaroo player URL
 
