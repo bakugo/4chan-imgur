@@ -27,7 +27,7 @@
 (function () {
 	"use strict";
 	
-	if(!function(e){if(typeof GM_info!=="undefined"){return true}alert(e+"\n\n"+"This script is not installed correctly."+"\n"+"Please install this script using a script manager like Greasemonkey or Tampermonkey.");return false}("4chan imgur thumbnail")){return};
+	if (typeof GM_info === "undefined") return;
 	
 	var us = new b4k.userscript();
 	
