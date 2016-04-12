@@ -1,3 +1,6 @@
+### 1.17.5 - *2016-04-12*
+- Add @connect userscript header tags (which are now required by Tampermonkey)
+
 ### 1.17.4 - *2016-03-12*
 - Update b4k.js
 - Remove unneeded "no Greasemonkey" alert
