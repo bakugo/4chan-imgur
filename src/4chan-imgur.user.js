@@ -10,6 +10,11 @@
 // @grant       GM_setValue
 // @require     http://b4k.co/code/lib/jquery/2.1.4/jquery.min.js
 // @require     http://b4k.co/code/lib/b4k-js/1.0.0-beta.11/b4k.min.js
+// @connect     b4k.co
+// @connect     derpibooru.org
+// @connect     derpiboo.ru
+// @connect     e621.net
+// @connect     api.tumblr.com
 // @run-at      document-end
 // @updateURL   https://github.com/bakugo/4chan-imgur/raw/master/dist/4chan-imgur.meta.js
 // @downloadURL https://github.com/bakugo/4chan-imgur/raw/master/dist/4chan-imgur.user.js
