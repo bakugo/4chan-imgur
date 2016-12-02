@@ -1,3 +1,6 @@
+### 1.17.6 - *2016-12-01*
+- Fix derpibooru filter loading
+
 ### 1.17.5 - *2016-04-12*
 - Add @connect userscript header tags (which are now required by Tampermonkey)
 

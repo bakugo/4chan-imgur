@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        4chan imgur thumbnail (fix)
-// @version     1.17.5
+// @version     1.17.6
 // @namespace   b4k
 // @description Embeds image links in 4chan posts as normal thumbnails. Supports Imgur, 4chan, YouTube, Derpibooru, e621, Tumblr, Vocaroo and direct image links.
 // @match       *://boards.4chan.org/*
@@ -12,7 +12,6 @@
 // @require     http://b4k.co/code/lib/b4k-js/1.0.0-beta.11/b4k.min.js
 // @connect     b4k.co
 // @connect     derpibooru.org
-// @connect     derpiboo.ru
 // @connect     e621.net
 // @connect     api.tumblr.com
 // @run-at      document-end

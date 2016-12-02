@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        4chan imgur thumbnail (fix)
-// @version     1.17.5
+// @version     1.17.6
 // @namespace   b4k
 // @description Embeds image links in 4chan posts as normal thumbnails. Supports Imgur, 4chan, YouTube, Derpibooru, e621, Tumblr, Vocaroo and direct image links.
 // @match       *://boards.4chan.org/*
@@ -12,7 +12,6 @@
 // @require     http://b4k.co/code/lib/b4k-js/1.0.0-beta.11/b4k.min.js
 // @connect     b4k.co
 // @connect     derpibooru.org
-// @connect     derpiboo.ru
 // @connect     e621.net
 // @connect     api.tumblr.com
 // @run-at      document-end
@@ -156,7 +155,6 @@
 				
 				if (processResult) {
 					us.log("Post #" + postNumber + " processed with \"" + processor.name + "\"");
-					
 					break;
 				}
 			}
@@ -808,7 +806,7 @@
 			$(comment).before(file);
 		},
 		
-		get: function (url, data, dataType, callbackDone, callbackFail) {
+		request: function (url, data, dataType, callbackDone, callbackFail) {
 			var settings;
 			var currentAttempt;
 			var tryToLoad;
@@ -819,7 +817,7 @@
 			};
 			
 			tryToLoad = function () {
-				us.log("[GET] Loading: \"" + url + "\" (attempt " + currentAttempt + " of " + settings.maxAttempts + ")");
+				us.log("[Request] Loading: \"" + url + "\" (attempt " + currentAttempt + " of " + settings.maxAttempts + ")");
 				
 				$.ajax({
 					url: url,
@@ -827,7 +825,7 @@
 					dataType: dataType,
 					
 					success: function (data, textstatus, jqxhr) {
-						us.log("[GET] Loaded successfully: \"" + url + "\"");
+						us.log("[Request] Loaded successfully: \"" + url + "\"");
 						
 						if (callbackDone) {
 							callbackDone(data, textstatus, jqxhr);
@@ -835,16 +833,16 @@
 					},
 					
 					error: function (jqxhr, textstatus, errorthrown) {
-						us.log("[GET] Failed to load: \"" + url + "\" (" + jqxhr.status + " " + jqxhr.statusText + ")");
+						us.log("[Request] Failed to load: \"" + url + "\" (" + jqxhr.status + " " + jqxhr.statusText + ")");
 						
 						if (currentAttempt >= settings.maxAttempts) {
-							us.log("[GET] Failed " + currentAttempt + " times, aborting");
+							us.log("[Request] Failed " + currentAttempt + " times, aborting");
 							
 							if (callbackFail) {
 								callbackFail(jqxhr, textstatus, errorthrown);
 							}
 						} else {
-							us.log("[GET] Retrying in " + settings.retryTime + "ms");
+							us.log("[Request] Retrying in " + settings.retryTime + "ms");
 							
 							currentAttempt++;
 							
@@ -1397,102 +1395,81 @@
 				
 				_this.updateFilteredTags = function () {
 					_this.filteredTags = [];
-					
 					_this.filteredTags = _this.filteredTags.concat(b4k.commaSeparatedStringToArray(func.getConfigOption(_this.name, "filteredTags")));
 					
 					if (func.getConfigOption(_this.name, "loadDerpibooruFilter")) {
-						if (_this.derpibooruFilterTags) {
+						if (_this.derpibooruFilterTags !== null) {
 							_this.filteredTags = _this.filteredTags.concat(_this.derpibooruFilterTags);
 						}
 					}
 				};
 				
 				_this.loadDerpibooruFilter = function () {
-					var domains;
-					var continueWithoutFilter;
+					var getFilter;
 					var onRequestFail;
-					var checkNextDomain;
-					var currentDomainIndex;
+					var continueWithoutFilter;
 					
-					domains = [
-						"derpibooru.org",
-						"derpiboo.ru"
-					];
-					
-					checkNextDomain = function () {
-						var currentDomain;
-						var currentDomainPath;
+					getFilter = function () {
+						var sitePath;
 						
-						if (currentDomainIndex === null) {
-							currentDomainIndex = 0;
-						} else {
-							currentDomainIndex++;
-						}
+						sitePath = "https://derpibooru.org";
 						
-						if (currentDomainIndex > (domains.length - 1)) {
-							us.log("[Derpibooru Filter] No logged in domains, continuing without filter");
-							continueWithoutFilter();
-							return;
-						}
+						us.log("[Derpibooru Filter] Attempting to load filter information");
 						
-						currentDomain = domains[currentDomainIndex];
-						currentDomainPath = ("https://" + currentDomain);
-						
-						us.log("[Derpibooru Filter] Attempting to fetch filter (domain: " + currentDomain + ")");
-						
-						func.get((currentDomainPath + "/about"), null, "html", function (data) {
+						func.request((sitePath + "/about"), null, "html", function (data) {
+							var userId;
+							var userName;
 							var filterId;
 							
-							if (!data.match(/window\.booru\.userID \= (\d+);/)) {
-								us.log("[Derpibooru Filter] User is not logged in on domain, skipping");
-								checkNextDomain();
+							userId = data.match(/data\-user\-id\=\"(\d+?)\"/);
+							userName = data.match(/data\-user\-name\=\"(.+?)\"/);
+							
+							if (!(userId && userName)) {
+								us.log("[Derpibooru Filter] User is not logged in, skipping");
+								continueWithoutFilter();
 								return;
 							}
 							
-							us.log("[Derpibooru Filter] User is logged in on domain, proceeding");
+							userId = userId[1];
+							userName = userName[1];
 							
-							filterId = data.match(/window\.booru\.filterID \= (\d+);/);
+							us.log("[Derpibooru Filter] User is logged in as '" + userName + "' with ID " + userId);
+							
+							filterId = data.match(/data\-filter\-id\=\"(\d+?)\"/);
 							
 							if (!filterId) {
-								us.log("[Derpibooru Filter] No filter found, continuing without filter");
+								us.log("[Derpibooru Filter] No filter found, skipping");
 								continueWithoutFilter();
 								return;
 							}
 							
 							filterId = filterId[1];
 							
-							us.log("[Derpibooru Filter] Filter found, loading filter data");
+							us.log("[Derpibooru Filter] Filter found with ID " + filterId + ", loading data");
 							
-							func.get((currentDomainPath + "/filters/" + filterId + ".json"), null, "json", function (data) {
+							func.request((sitePath + "/filters/" + filterId + ".json"), null, "json", function (data) {
 								var filterTags;
-								
-								us.log("[Derpibooru Filter] Filter loaded successfully, parsing");
 								
 								filterTags = [];
 								
 								filterTags = filterTags.concat(b4k.commaSeparatedStringToArray(data.spoilered_tags));
 								filterTags = filterTags.concat(b4k.commaSeparatedStringToArray(data.hidden_tags));
 								
-								if (!filterTags.length) {
-									us.log("[Derpibooru Filter] Notice: no tags found in filter");
-								}
-								
 								_this.derpibooruFilterTags = filterTags;
-								
-								us.log("[Derpibooru Filter] Successfully fetched and applied filter (id: " + filterId + ")");
-								
 								_this.updateFilteredTags();
+								
+								us.log("[Derpibooru Filter] Successfully loaded and applied filter, " + filterTags.length + " filtered tags found");
 							}, onRequestFail);
 						}, onRequestFail);
 					};
 					
-					continueWithoutFilter = function () {
-						_this.derpibooruFilterTags = [];
-					};
-					
 					onRequestFail = function () {
 						us.log("[Derpibooru Filter] Request failed, skipping");
-						checkNextDomain();
+						continueWithoutFilter();
+					};
+					
+					continueWithoutFilter = function () {
+						_this.derpibooruFilterTags = [];
 					};
 					
 					
@@ -1503,9 +1480,7 @@
 						return;
 					}
 					
-					currentDomainIndex = null;
-					
-					checkNextDomain();
+					getFilter();
 				};
 				
 				_this.processData = function (data, info) {
@@ -1579,7 +1554,7 @@
 					if (dataCache[_this.name][data.imageId]) {
 						_this.processData(data, null);
 					} else {
-						func.get(dataURL, null, "json", function (response) {
+						func.request(dataURL, null, "json", function (response) {
 							_this.processData(data, response);
 						});
 					}
@@ -1700,7 +1675,7 @@
 					if (dataCache[_this.name][data.postId]) {
 						_this.processData(data);
 					} else {
-						func.get(dataURL, requestData, "json", function (response) {
+						func.request(dataURL, requestData, "json", function (response) {
 							_this.processData(data, response);
 						});
 					}
@@ -1867,7 +1842,7 @@
 					if (dataCache[_this.name][data.postId]) {
 						_this.processData(data);
 					} else {
-						func.get(dataURL, {
+						func.request(dataURL, {
 							id: data.postId,
 							api_key: _this.tumblrApi.key
 						}, "json", function (response) {
